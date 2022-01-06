@@ -57,6 +57,7 @@ This is a list of peripherals that I would find useful to have a programmatic wa
     - Potentially use the USB port
 - QT6 cross-platform app interacting with gRPC server
 - Website using WebUSB and Svelte JS for deployment on Chrome OS
+    - Potentially use gRPC server as well
 
 ### Example Boards
 
