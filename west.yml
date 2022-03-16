@@ -1,0 +1,13 @@
+manifest:
+  remotes:
+    - name: dragonlock2
+      url-base: https://github.com/dragonlock2
+
+  projects:
+    - name: zephyrboards
+      remote: dragonlock2
+      revision: 560111a6f3741b3d2e86d97367ce42953db6fcdb
+      import: true
+
+  self:
+    path: JABI
