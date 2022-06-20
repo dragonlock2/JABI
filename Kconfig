@@ -1,5 +1,0 @@
-menu "JABI"
-
-rsource "firmware/Kconfig"
-
-endmenu
