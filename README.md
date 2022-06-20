@@ -2,6 +2,15 @@
 
 JABI (Just Another Bridge Interface) makes creating and deploying bridge devices that provide RPC to common microcontroller peripherals simple. Zephyr RTOS makes porting to any board straigntforward. Various clients enable cross-platform usage.
 
+## Setup
+
+Follow Zephyr's [Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html) to get dependencies installed. Then create a new workspace using this repo. We'll create it under `jabi`, but you can use whatever you want.
+
+```
+west init -m https://github.com/dragonlock2/JABI.git jabi
+cd jabi && west update
+```
+
 ## TODO
 
 Everything here is very much subject to change.
