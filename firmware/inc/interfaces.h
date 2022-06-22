@@ -1,5 +1,5 @@
-#ifndef INTERFACE_COMMON_H
-#define INTERFACE_COMMON_H
+#ifndef INTERFACES_H
+#define INTERFACES_H
 
 #include <stdint.h>
 
@@ -30,4 +30,10 @@ struct iface_api_t {
     const char *name;
 };
 
-#endif // INTERFACE_COMMON_H
+#define IFACE_REQ_HDR_SIZE  (sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE)
+#define IFACE_RESP_HDR_SIZE (sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE)
+
+extern void iface_req_to_le(iface_req_t *req);
+extern void iface_resp_to_le(iface_resp_t *resp);
+
+#endif // INTERFACES_H

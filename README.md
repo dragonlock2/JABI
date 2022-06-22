@@ -51,15 +51,13 @@ Clients connect to the microcontroller over any one of the interfaces. The curre
 
 - None yet!
 
-
-
-
 ## TODO
 
 The following clients.
 
 - C++ library using libusb for USB (like STLINK-V3-BRIDGE)
 - Python library using pybind11 to C++
+    - make it `pip` locally installable
 - gRPC client/server bridging C++ to a network
     - iOS app in React Native or Swift
     - Android app in React Native or Kotlin (USB too?)

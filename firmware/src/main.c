@@ -31,7 +31,6 @@ void process_interface(void* p1, void* p2, void* p3) {
         for (int i = 0; i < resp.payload_len; i++) {
             resp.payload[i] = i;
         }
-        resp.payload_len = -1;
 
         iface->send_resp(&resp);
     }

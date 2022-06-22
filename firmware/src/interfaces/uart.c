@@ -1,11 +1,10 @@
-#include <jabi.h>
 #include <drivers/uart.h>
-#include <sys/byteorder.h>
+#include <jabi.h>
 
 #include <logging/log.h>
 LOG_MODULE_REGISTER(iface_uart, CONFIG_LOG_DEFAULT_LEVEL);
 
-#define RX_TIMEOUT Z_TIMEOUT_MS(1000)
+#if (DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0)
 
 static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time) {
     for (int i = 0; i < len; i++) {
@@ -63,11 +62,8 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
                                                                                       \
     static void uart##idx##_get_req(iface_req_t *req) {                               \
         while (1) {                                                                   \
-            read(&uart##idx##rx, (uint8_t*) req,                                      \
-                 sizeof(req->periph_id) +                                             \
-                 sizeof(req->periph_idx) +                                            \
-                 sizeof(req->payload_len), K_FOREVER);                                \
-            req->payload_len = sys_le16_to_cpu(req->payload_len);                     \
+            read(&uart##idx##rx, (uint8_t*) req, IFACE_REQ_HDR_SIZE, K_FOREVER);      \
+            iface_req_to_le(req);                                                     \
             if (req->payload_len > REQ_PAYLOAD_MAX_SIZE) {                            \
                 LOG_ERR("UART" #idx " bad req payload length %d", req->payload_len);  \
                 k_msgq_purge(&uart##idx##rx);                                         \
@@ -87,12 +83,9 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
             LOG_ERR("UART" #idx " bad resp payload length %d", resp->payload_len);    \
             return;                                                                   \
         }                                                                             \
-        uart##idx##tx_len = sizeof(resp->retcode) +                                   \
-                            sizeof(resp->payload_len) +                               \
-                            resp->payload_len;                                        \
+        uart##idx##tx_len = IFACE_RESP_HDR_SIZE + resp->payload_len;                  \
         uart##idx##tx_buf = (uint8_t*) resp;                                          \
-        resp->retcode = sys_cpu_to_le16(resp->retcode);                               \
-        resp->payload_len = sys_cpu_to_le16(resp->payload_len);                       \
+        iface_resp_to_le(resp);                                                       \
         uart_irq_tx_enable(dev);                                                      \
         k_sem_take(&uart##idx##tx_lock, K_FOREVER);                                   \
     }                                                                                 \
@@ -105,3 +98,5 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
     };
 
 DT_FOREACH_PROP_ELEM(JABI_IFACE_NODE, uart, CREATE_UART_API)
+
+#endif // DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0
