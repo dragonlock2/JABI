@@ -1,8 +1,10 @@
 # JABI
 
-JABI (Just Another Bridge Interface) makes creating and deploying bridge devices that provide RPC to common microcontroller peripherals simple. Zephyr RTOS makes porting to any board straigntforward. Various clients enable cross-platform usage.
+JABI (Just Another Bridge Interface) makes creating and deploying bridge devices that provide RPC to common microcontroller peripherals simple.
 
 ## Setup
+
+### Firmware
 
 Follow Zephyr's [Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html) to get dependencies installed. Then create a new workspace using this repo. We'll create it under `jabi`, but you can use whatever you want.
 
@@ -11,13 +13,50 @@ west init -m https://github.com/dragonlock2/JABI.git jabi
 cd jabi && west update
 ```
 
-## TODO
+To port any board, you'll need the following. See [firmware/boards](firmware/boards/) for examples.
 
-Everything here is very much subject to change.
+- Zephyr board definition. See Zephyr's [Board Porting Guide](https://docs.zephyrproject.org/latest/hardware/porting/board_porting.html) for help.
+- `firmware/boards/<board>.conf` - enable device drivers and any desired settings
+- `firmware/boards/<board>.overlay` - selects available interfaces and peripherals
+
+Now compile and flash the firmware.
+
+```
+west build -b <board>
+west flash
+```
 
 ### Clients
 
-Clients connect to the microcontroller over one of a number of supported interfaces.
+TODO
+
+## Architecture
+
+### Interfaces
+
+Interfaces are the available methods by which a client may connect. Multiple interfaces running concurrently is supported. The following interfaces are currently supported.
+
+- USB
+- UART
+
+### Peripherals
+
+Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
+
+- None yet!
+
+### Clients
+
+Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
+
+- None yet!
+
+
+
+
+## TODO
+
+The following clients.
 
 - C++ library using libusb for USB (like STLINK-V3-BRIDGE)
 - Python library using pybind11 to C++
@@ -27,25 +66,7 @@ Clients connect to the microcontroller over one of a number of supported interfa
     - QT6 cross-platform app
     - Website using Svelte JS (WebUSB too?)
 
-### Firmware
-
-Porting to any board should just involve adding a DTS overlay that selects the appropriate peripherals and interface.
-
-Implementation consists of a custom basic RPC with a single client. Accessing unavailable peripherals should return an error code.
-
-### Interface
-
-A thin compatibility layer parses out RPC packets from the selected interface to dispatch to peripherals.
-
-- USB
-- UART
-- BLE
-- Ethernet
-- WiFi
-
-### Peripherals
-
-Peripherals match the RPC payload to a function prototype which parses out the arguments. Multiple instances of each peripheral type are supported.
+The following peripherals.
 
 - Metadata
     - serial number to make distinguishing devices easier
@@ -59,10 +80,13 @@ Peripherals match the RPC payload to a function prototype which parses out the a
 - ADC
 - DAC
 
-### Extra
-
-Fun things to look into but unlikely to actually reach
+Fun things to look into one day.
 
 - CAN DBC
 - DFU beyond USB for MCUboot
 - Alternative functions for pins
+- gRPC server on the microcontroller
+    - may need to convert USB to a serial port or ethernet gadget
+- Ethernet support
+    - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
+- BLE and WiFi support (need to make a dev board)

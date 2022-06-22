@@ -1,0 +1,13 @@
+description: Interfaces to listen on
+
+include: base.yaml
+
+compatible: "jabi,interfaces"
+
+properties:
+  usb:
+    type: boolean
+
+  uart:
+    type: phandles
+    required: true

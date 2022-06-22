@@ -1,0 +1,7 @@
+menu "JABI"
+
+endmenu
+
+menu "Zephyr"
+source "Kconfig.zephyr"
+endmenu

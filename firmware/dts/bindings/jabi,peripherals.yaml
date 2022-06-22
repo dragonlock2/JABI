@@ -1,0 +1,9 @@
+description: Peripherals to provide access to
+
+include: base.yaml
+
+compatible: "jabi,peripherals"
+
+properties:
+  gpios:
+    type: phandles

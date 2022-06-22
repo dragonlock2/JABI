@@ -1,6 +1,13 @@
 / {
-    chosen {
-        zephyr,console = &cdc_acm_uart0;
+    interfaces {
+        compatible = "jabi,interfaces";
+        // usb;
+        // uart = <>;
+        uart = <&cdc_acm_uart0>;
+    };
+
+    peripherals {
+        compatible = "jabi,peripherals";
     };
 };
 
