@@ -1,6 +1,6 @@
-#include <jabi.h>
 #include <sys/byteorder.h>
 #include <usb/usb_device.h>
+#include <jabi.h>
 
 #include <logging/log.h>
 LOG_MODULE_REGISTER(iface_usb, CONFIG_LOG_DEFAULT_LEVEL);

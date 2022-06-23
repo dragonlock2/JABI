@@ -1,5 +1,9 @@
 menu "JABI"
 
+config JABI_SERIAL
+    string "device serial number string"
+    default "69420"
+
 endmenu
 
 menu "Zephyr"

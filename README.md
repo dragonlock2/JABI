@@ -43,7 +43,7 @@ Interfaces are the available methods by which a client may connect. Multiple int
 
 Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
 
-- None yet!
+- Metadata
 
 ### Clients
 
@@ -66,8 +66,6 @@ The following clients.
 
 The following peripherals.
 
-- Metadata
-    - serial number to make distinguishing devices easier
 - CAN FD
     - allow one filter bc USB FS is slow
 - LIN

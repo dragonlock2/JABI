@@ -7,8 +7,9 @@
 #define RESP_PAYLOAD_MAX_SIZE  512
 
 typedef struct {
-    uint8_t periph_id;
-    uint8_t periph_idx;
+    uint16_t periph_id;
+    uint16_t periph_idx;
+    uint16_t periph_fn;
     uint16_t payload_len;
     uint8_t payload[REQ_PAYLOAD_MAX_SIZE];
 } __attribute__((packed)) iface_req_t;
@@ -35,5 +36,14 @@ struct iface_api_t {
 
 extern void iface_req_to_le(iface_req_t *req);
 extern void iface_resp_to_le(iface_resp_t *resp);
+
+#define CHECK_REQ_PAYLOAD_SIZE(x)  BUILD_ASSERT(sizeof(x) < REQ_PAYLOAD_MAX_SIZE)
+#define CHECK_RESP_PAYLOAD_SIZE(x) BUILD_ASSERT(sizeof(x) < RESP_PAYLOAD_MAX_SIZE)
+
+enum {
+    JABI_NO_ERR = 0,
+    JABI_NOT_SUPPORTED_ERR,
+    JABI_INVALID_ARGS_FORMAT_ERR,
+};
 
 #endif // INTERFACES_H

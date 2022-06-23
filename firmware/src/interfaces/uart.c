@@ -6,6 +6,8 @@ LOG_MODULE_REGISTER(iface_uart, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if (DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0)
 
+#define TIMEOUT Z_TIMEOUT_MS(1000)
+
 static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time) {
     for (int i = 0; i < len; i++) {
         if (k_msgq_get(msgq, &buf[i], time)) {
@@ -69,7 +71,7 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
                 k_msgq_purge(&uart##idx##rx);                                         \
                 continue;                                                             \
             }                                                                         \
-            if (read(&uart##idx##rx, req->payload, req->payload_len, RX_TIMEOUT)) {   \
+            if (read(&uart##idx##rx, req->payload, req->payload_len, TIMEOUT)) {      \
                 LOG_ERR("UART" #idx " timeout waiting for payload");                  \
                 continue;                                                             \
             }                                                                         \

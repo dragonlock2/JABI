@@ -19,6 +19,9 @@ const struct iface_api_t *interfaces[] = {
 };
 
 void iface_req_to_le(iface_req_t *req) {
+    req->periph_id = sys_le16_to_cpu(req->periph_id);
+    req->periph_idx = sys_le16_to_cpu(req->periph_idx);
+    req->periph_fn = sys_le16_to_cpu(req->periph_fn);
     req->payload_len = sys_le16_to_cpu(req->payload_len);
 }
 
