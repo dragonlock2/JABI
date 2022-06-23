@@ -2,8 +2,8 @@
 #define JABI_H
 
 #include <device.h>
-#include <interfaces.h>
-#include <peripherals.h>
+#include <jabi/interfaces.h>
+#include <jabi/peripherals.h>
 
 #define JABI_IFACE_NODE  DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_interfaces)
 #define JABI_PERIPH_NODE DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_peripherals)

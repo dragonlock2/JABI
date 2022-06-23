@@ -1,5 +1,5 @@
-#ifndef PERIPHERALS_H
-#define PERIPHERALS_H
+#ifndef JABI_PERIPHERALS_H
+#define JABI_PERIPHERALS_H
 
 #include <stdint.h>
 
@@ -34,4 +34,4 @@ struct periph_api_t {
 #define PERIPH_FUNC_CHECK_ARGS_EMPTY \
     if (req_len != 0) { return JABI_INVALID_ARGS_FORMAT_ERR; }
 
-#endif
+#endif // JABI_PERIPHERALS_H

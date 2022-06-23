@@ -1,6 +1,6 @@
 #include <sys/byteorder.h>
 #include <jabi.h>
-#include <peripherals/metadata.h>
+#include <jabi/peripherals/metadata.h>
 
 #include <logging/log.h>
 LOG_MODULE_REGISTER(periph_metadata, CONFIG_LOG_DEFAULT_LEVEL);

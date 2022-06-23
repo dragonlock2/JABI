@@ -1,8 +1,8 @@
-#ifndef PERIPHERALS_METADATA_H
-#define PERIPHERALS_METADATA_H
+#ifndef JABI_PERIPHERALS_METADATA_H
+#define JABI_PERIPHERALS_METADATA_H
 
 #include <stdint.h>
-#include <interfaces.h>
+#include <jabi/interfaces.h>
 
 typedef uint8_t* metadata_get_serial_resp_t;
 
@@ -21,4 +21,4 @@ CHECK_RESP_PAYLOAD_SIZE(metadata_get_num_inst_resp_t);
 #define PERIPH_GET_SERIAL_ID   0
 #define PERIPH_GET_NUM_INST_ID 1
 
-#endif // PERIPHERALS_METADATA_H
+#endif // JABI_PERIPHERALS_METADATA_H

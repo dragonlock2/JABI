@@ -49,7 +49,14 @@ Microcontroller peripherals are made available over each interface via a custom 
 
 Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
 
-- None yet!
+- `cpplib` - C++ library
+
+TODO make library custom func w/ header
+TODO add libusb to library and test
+TODO include the firmware headers move if needed
+TODO send raw packets over each interface
+TODO headers with func defs in library
+TODO test Linux and Windows
 
 ## TODO
 
@@ -86,3 +93,4 @@ Fun things to look into one day.
 - Ethernet support
     - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
 - BLE and WiFi support (need to make a dev board)
+- On-device web server

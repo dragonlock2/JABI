@@ -1,5 +1,5 @@
-#ifndef INTERFACES_H
-#define INTERFACES_H
+#ifndef JABI_INTERFACES_H
+#define JABI_INTERFACES_H
 
 #include <stdint.h>
 
@@ -46,4 +46,4 @@ enum {
     JABI_INVALID_ARGS_FORMAT_ERR,
 };
 
-#endif // INTERFACES_H
+#endif // JABI_INTERFACES_H
