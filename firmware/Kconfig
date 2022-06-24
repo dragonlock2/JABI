@@ -3,6 +3,8 @@ menu "JABI"
 config JABI_SERIAL
     string "device serial number string"
     default "69420"
+    help
+        device serial number string, must be non-empty
 
 endmenu
 

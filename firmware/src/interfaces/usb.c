@@ -5,18 +5,9 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(iface_usb, CONFIG_LOG_DEFAULT_LEVEL);
 
-/* Driver will attach to interface descriptor w/ following properties
- *   - bInterfaceClass of 0xFF (Vendor Specific)
- *   - iInterface string descriptor of "JABI_USB"
- *   - only 2 bulk transfer endpoints
- *   - responds to metadata requests on endpoints (within a timeout)
- *
- * Packets are sent raw and split up among multiple bulk transfers
- */
-
 #if DT_PROP(JABI_IFACE_NODE, usb)
 
-#define JABI_IF_STR "JABI_USB"
+#define JABI_IF_STR "JABI USB"
 
 #define AUTO_EP_IN  0x80
 #define AUTO_EP_OUT 0x00

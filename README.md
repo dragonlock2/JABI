@@ -49,20 +49,12 @@ Microcontroller peripherals are made available over each interface via a custom 
 
 Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
 
-- `cpplib` - C++ library
-
-TODO make library custom func w/ header
-TODO add libusb to library and test
-TODO include the firmware headers move if needed
-TODO send raw packets over each interface
-TODO headers with func defs in library
-TODO test Linux and Windows
+- `libjabi` - C++ library
 
 ## TODO
 
 The following clients.
 
-- C++ library using libusb for USB (like STLINK-V3-BRIDGE)
 - Python library using pybind11 to C++
     - make it `pip` locally installable
 - gRPC client/server bridging C++ to a network

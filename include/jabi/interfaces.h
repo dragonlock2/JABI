@@ -37,10 +37,7 @@ struct iface_api_t {
 extern void iface_req_to_le(iface_req_t *req);
 extern void iface_resp_to_le(iface_resp_t *resp);
 
-#define CHECK_REQ_PAYLOAD_SIZE(x)  BUILD_ASSERT(sizeof(x) < REQ_PAYLOAD_MAX_SIZE)
-#define CHECK_RESP_PAYLOAD_SIZE(x) BUILD_ASSERT(sizeof(x) < RESP_PAYLOAD_MAX_SIZE)
-
-enum {
+enum jabi_err_t {
     JABI_NO_ERR = 0,
     JABI_NOT_SUPPORTED_ERR,
     JABI_INVALID_ARGS_FORMAT_ERR,

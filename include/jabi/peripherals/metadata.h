@@ -14,11 +14,8 @@ typedef struct {
     uint16_t num_idx;
 } __attribute__((packed)) metadata_get_num_inst_resp_t;
 
-CHECK_REQ_PAYLOAD_SIZE(metadata_get_num_inst_req_t);
-CHECK_RESP_PAYLOAD_SIZE(metadata_get_num_inst_resp_t);
-
 /* Function indices */
-#define PERIPH_GET_SERIAL_ID   0
-#define PERIPH_GET_NUM_INST_ID 1
+#define METADATA_GET_SERIAL_ID   0
+#define METADATA_GET_NUM_INST_ID 1
 
 #endif // JABI_PERIPHERALS_METADATA_H
