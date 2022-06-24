@@ -7,12 +7,8 @@ namespace jabi {
 USBInterface::USBInterface(libusb_device_handle *dev, int ifnum,
     unsigned char ep_out, unsigned char ep_in)
 :
-    dev(dev), ifnum(ifnum), ep_out(ep_out), ep_in(ep_in) 
-{
-    if (libusb_claim_interface(dev, ifnum) < 0) {
-        throw std::runtime_error("failed to claim interface");
-    }
-}
+    dev(dev), ifnum(ifnum), ep_out(ep_out), ep_in(ep_in)
+{}
 
 USBInterface::~USBInterface() {
     libusb_release_interface(dev, ifnum);
@@ -112,21 +108,34 @@ std::vector<Device> USBInterface::list_devices() {
                 continue;
             }
 
+            if (libusb_claim_interface(dev, if_desc.bInterfaceNumber) < 0) {
+                libusb_close(dev);
+                continue;
+            }
+
             unsigned char ep_out = ep0.bEndpointAddress;
             unsigned char ep_in  = ep1.bEndpointAddress;
             if (ep0.bEndpointAddress & 0x80) { std::swap(ep_out, ep_in); }
 
+            Device jabi = Interface::makeDevice(
+                std::shared_ptr<USBInterface>(
+                    new USBInterface(dev, if_desc.bInterfaceNumber, ep_out, ep_in)
+                )
+            );
             try {
-                Device jabi = Interface::makeDevice(
-                    std::shared_ptr<USBInterface>(
-                        new USBInterface(dev, if_desc.bInterfaceNumber, ep_out, ep_in)
-                    )
-                );
                 jabi.get_serial();
-                jabis.push_back(jabi);
             } catch(std::runtime_error e) {
-                continue;
+                // reset device and try one more time
+                if (libusb_reset_device(dev) < 0) {
+                    break;
+                }
+                try {
+                    jabi.get_serial();
+                } catch(std::runtime_error e) {
+                    break;
+                }
             }
+            jabis.push_back(jabi);
         }
 
         libusb_free_config_descriptor(cfg);
