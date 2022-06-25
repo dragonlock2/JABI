@@ -1,0 +1,14 @@
+/ {
+    interfaces {
+        compatible = "jabi,interfaces";
+        uart = <&usart2>;
+    };
+
+    peripherals {
+        compatible = "jabi,peripherals";
+    };
+};
+
+&usart2 {
+    current-speed = <230400>;
+};

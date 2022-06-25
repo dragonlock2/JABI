@@ -1,13 +1,22 @@
 #include <iostream>
 #include <libjabi/interfaces/usb.h>
+#include <libjabi/interfaces/uart.h>
+
+void testDevice(jabi::Device d) {
+    std::cout << "SN=" << d.get_serial();
+    std::cout << " num_meta=" << d.get_num_inst(0);
+    std::cout << " echo=" << d.echo("❤️");
+    std::cout << std::endl;
+}
 
 int main() {
     for (auto d : jabi::USBInterface::list_devices()) {
-        std::cout << "Found SN=" << d.get_serial();
-        std::cout << " num_meta=" << d.get_num_inst(0);
-        std::cout << " echo=" << d.echo("❤️");
-        std::cout << std::endl;
+        std::cout << "Found USB: ";
+        testDevice(d);
     }
+
+    std::cout << "Found UART: ";
+    testDevice(jabi::UARTInterface::get_device("/dev/tty.usbmodem143202", 230400));
 
     return 0;
 }
