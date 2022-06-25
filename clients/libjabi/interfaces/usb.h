@@ -14,11 +14,12 @@ public:
     static std::vector<Device> list_devices();
 
 private:
-    USBInterface(libusb_device_handle *dev, int ifnum,
+    USBInterface(libusb_device_handle *dev, int ifnum, int wMaxPacketSize,
         unsigned char ep_out, unsigned char ep_in);
     
     libusb_device_handle *dev;
     int ifnum;
+    int wMaxPacketSize; // for OUT transfers
     unsigned char ep_out;
     unsigned char ep_in;
 };

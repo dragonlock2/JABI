@@ -4,10 +4,10 @@
 
 namespace jabi {
 
-USBInterface::USBInterface(libusb_device_handle *dev, int ifnum,
+USBInterface::USBInterface(libusb_device_handle *dev, int ifnum, int wMaxPacketSize,
     unsigned char ep_out, unsigned char ep_in)
 :
-    dev(dev), ifnum(ifnum), ep_out(ep_out), ep_in(ep_in)
+    dev(dev), ifnum(ifnum), wMaxPacketSize(wMaxPacketSize), ep_out(ep_out), ep_in(ep_in)
 {}
 
 USBInterface::~USBInterface() {
@@ -20,6 +20,8 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
         throw std::runtime_error("request payload size too large");
     }
 
+    iface_req_htole(req);
+
     int sent_len;
     int len = IFACE_REQ_HDR_SIZE + req.payload_len;
     if (libusb_bulk_transfer(dev, ep_out, reinterpret_cast<unsigned char*>(&req),
@@ -29,13 +31,21 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
     if (sent_len != len) {
         throw std::runtime_error("wrong USB transfer request length");
     }
+    if (len % wMaxPacketSize == 0) { // manually send ZLP
+        if (libusb_bulk_transfer(dev, ep_out, NULL, 0, NULL, USB_TIMEOUT_MS) < 0) {
+            throw std::runtime_error("USB transfer ZLP request failed");
+        }
+    }
 
     int recv_len;
-    iface_resp_t resp;
+    iface_resp_t resp = { .payload_len = 0 };
     if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(&resp),
             sizeof(iface_resp_t), &recv_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer response failed");
     }
+
+    iface_resp_letoh(resp);
+
     if (recv_len != IFACE_RESP_HDR_SIZE + resp.payload_len) {
         throw std::runtime_error("wrong USB transfer response length");
     }
@@ -113,13 +123,18 @@ std::vector<Device> USBInterface::list_devices() {
                 continue;
             }
 
-            unsigned char ep_out = ep0.bEndpointAddress;
-            unsigned char ep_in  = ep1.bEndpointAddress;
+            auto ep_out = ep0, ep_in = ep1;
             if (ep0.bEndpointAddress & 0x80) { std::swap(ep_out, ep_in); }
 
             Device jabi = Interface::makeDevice(
                 std::shared_ptr<USBInterface>(
-                    new USBInterface(dev, if_desc.bInterfaceNumber, ep_out, ep_in)
+                    new USBInterface(
+                        dev,
+                        if_desc.bInterfaceNumber,
+                        ep_out.wMaxPacketSize,
+                        ep_out.bEndpointAddress,
+                        ep_in.bEndpointAddress
+                    )
                 )
             );
             try {

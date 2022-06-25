@@ -38,9 +38,22 @@ PERIPH_FUNC_DEF(get_num_inst) {
     return 0;
 }
 
+PERIPH_FUNC_DEF(echo) {
+    PERIPH_FUNC_GET_ARGS(metadata, echo);
+    PERIPH_FUNC_GET_RET(metadata, echo);
+
+    LOG_DBG("(len=%d)", req_len);
+
+    memcpy(ret, args, req_len);
+    *resp_len = req_len;
+
+    return 0;
+}
+
 static periph_func_t metadata_periph_fns[] = {
     get_serial,
     get_num_inst,
+    echo,
 };
 
 const struct periph_api_t metadata_periph_api = {
