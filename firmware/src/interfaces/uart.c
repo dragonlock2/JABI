@@ -6,7 +6,7 @@ LOG_MODULE_REGISTER(iface_uart, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if (DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0)
 
-#define TIMEOUT Z_TIMEOUT_MS(1000)
+#define TIMEOUT Z_TIMEOUT_MS(10)
 
 static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time) {
     for (int i = 0; i < len; i++) {
@@ -64,7 +64,12 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
                                                                                       \
     static void uart##idx##_get_req(iface_req_t *req) {                               \
         while (1) {                                                                   \
-            read(&uart##idx##rx, (uint8_t*) req, IFACE_REQ_HDR_SIZE, K_FOREVER);      \
+            read(&uart##idx##rx, (uint8_t*) req, 1, K_FOREVER);                       \
+            if (read(&uart##idx##rx, ((uint8_t*) req) + 1,                            \
+                    IFACE_REQ_HDR_SIZE - 1, TIMEOUT)) {                               \
+                LOG_ERR("UART" #idx " timeout waiting for header");                   \
+                continue;                                                             \
+            }                                                                         \
             iface_req_to_le(req);                                                     \
             if (req->payload_len > REQ_PAYLOAD_MAX_SIZE) {                            \
                 LOG_ERR("UART" #idx " bad req payload length %d", req->payload_len);  \
