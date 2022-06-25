@@ -16,7 +16,7 @@ int main() {
     }
 
     std::cout << "Found UART: ";
-    testDevice(jabi::UARTInterface::get_device("/dev/tty.usbmodem143202", 230400));
+    testDevice(jabi::UARTInterface::get_device("/dev/ttyACM0", 230400));
 
     return 0;
 }

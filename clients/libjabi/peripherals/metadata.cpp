@@ -1,3 +1,4 @@
+#include <cstring>
 #include <libjabi/byteorder.h>
 #include <libjabi/interfaces/interface.h>
 
@@ -12,6 +13,7 @@ std::string Device::get_serial() {
         .periph_idx = 0,
         .periph_fn = METADATA_GET_SERIAL_ID,
         .payload_len = 0,
+        .payload = {0},
     };
 
     iface_resp_t resp = interface->send_request(req);
@@ -26,6 +28,7 @@ int Device::get_num_inst(int periph_id) {
         .periph_idx = 0,
         .periph_fn = METADATA_GET_NUM_INST_ID,
         .payload_len = sizeof(metadata_get_num_inst_req_t),
+        .payload = {0},
     };
 
     auto args = reinterpret_cast<metadata_get_num_inst_req_t*>(req.payload);
@@ -50,8 +53,9 @@ std::string Device::echo(std::string str) {
         .periph_idx = 0,
         .periph_fn = METADATA_ECHO_ID,
         .payload_len = static_cast<uint16_t>(str.length()+1), // include null
+        .payload = {0},
     };
-    std::memcpy(req.payload, str.c_str(), req.payload_len);
+    memcpy(req.payload, str.c_str(), req.payload_len);
 
     iface_resp_t resp = interface->send_request(req);
 

@@ -2,6 +2,7 @@
 #define LIBJABI_DEVICE_H
 
 #include <iostream>
+#include <memory>
 
 namespace jabi {
 

@@ -38,7 +38,8 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
     }
 
     int recv_len;
-    iface_resp_t resp = { .payload_len = 0 };
+    iface_resp_t resp;
+    resp.payload_len = 0;
     if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(&resp),
             sizeof(iface_resp_t), &recv_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer response failed");
@@ -46,7 +47,7 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
 
     iface_resp_letoh(resp);
 
-    if (recv_len != IFACE_RESP_HDR_SIZE + resp.payload_len) {
+    if (recv_len != (int) IFACE_RESP_HDR_SIZE + resp.payload_len) {
         throw std::runtime_error("wrong USB transfer response length");
     }
     if (resp.retcode != 0 || resp.payload_len > RESP_PAYLOAD_MAX_SIZE) {
@@ -139,14 +140,14 @@ std::vector<Device> USBInterface::list_devices() {
             );
             try {
                 jabi.get_serial();
-            } catch(std::runtime_error e) {
+            } catch(const std::runtime_error &e) {
                 // reset device and try one more time
                 if (libusb_reset_device(dev) < 0) {
                     break;
                 }
                 try {
                     jabi.get_serial();
-                } catch(std::runtime_error e) {
+                } catch(const std::runtime_error &e) {
                     break;
                 }
             }

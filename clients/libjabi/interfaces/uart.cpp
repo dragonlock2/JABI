@@ -54,7 +54,18 @@ UARTInterface::UARTInterface(std::string port, int baud) {
         throw std::runtime_error("failed to set baud rate");
     }
 #elif __linux__
-    #error "Linux not supported (yet)!"
+    #include <asm/termios.h>
+    struct termios2 tty2;
+    if (ioctl(fd, TCGETS2, &tty2)) {
+        throw std::runtime_error("failed to get termios2 config");
+    }
+    tty2.c_cflag &= ~CBAUD;
+    tty2.c_cflag |= BOTHER;
+    tty2.c_ispeed = baud;
+    tty2.c_ospeed = baud;
+    if (ioctl(fd, TCSETS2, &tty2)) {
+        throw std::runtime_error("failed to set termios2 config");
+    }
 #else
     #error "OS not supported (yet?)"
 #endif // __APPLE__
@@ -88,7 +99,8 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
             buffer += sent_len;
         }
 
-        iface_resp_t resp = { .payload_len = 0 };
+        iface_resp_t resp;
+        resp.payload_len = 0;
         len = IFACE_RESP_HDR_SIZE;
         buffer = reinterpret_cast<unsigned char*>(&resp);
         while (len) {
