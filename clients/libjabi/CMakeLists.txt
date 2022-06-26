@@ -6,13 +6,16 @@ add_library(jabi
     peripherals/metadata.cpp
 )
 
-find_library(LIBUSB_LIBRARY NAMES usb-1.0)
-find_path(LIBUSB_INCLUDE_DIR NAMES libusb-1.0/libusb.h)
+find_package(libusb CONFIG QUIET)
+if(NOT ${libusb_FOUND})
+    find_library(LIBUSB_LIBRARIES NAMES usb-1.0)
+    find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES libusb-1.0)
+endif()
 
-target_link_libraries(jabi ${LIBUSB_LIBRARY})
+target_link_libraries(jabi ${LIBUSB_LIBRARIES})
 
 target_include_directories(jabi PUBLIC
-    ${LIBUSB_INCLUDE_DIR}
+    ${LIBUSB_INCLUDE_DIRS}
     ..
     ../../include
 )

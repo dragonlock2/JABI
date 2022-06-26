@@ -32,7 +32,7 @@ int Device::get_num_inst(int periph_id) {
     };
 
     auto args = reinterpret_cast<metadata_get_num_inst_req_t*>(req.payload);
-    args->periph_id = htole<uint16_t>(periph_id);
+    args->periph_id = htole<uint16_t>(static_cast<uint16_t>(periph_id));
 
     iface_resp_t resp = interface->send_request(req);
     if (resp.payload_len != sizeof(metadata_get_num_inst_resp_t)) {

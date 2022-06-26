@@ -6,13 +6,13 @@
 
 typedef uint8_t* metadata_get_serial_resp_t;
 
-typedef struct {
+PACKED(metadata_get_num_inst_req_t,
     uint16_t periph_id;
-} __attribute__((packed)) metadata_get_num_inst_req_t;
+);
 
-typedef struct {
+PACKED(metadata_get_num_inst_resp_t,
     uint16_t num_idx;
-} __attribute__((packed)) metadata_get_num_inst_resp_t;
+);
 
 typedef uint8_t* metadata_echo_req_t;
 typedef uint8_t* metadata_echo_resp_t;

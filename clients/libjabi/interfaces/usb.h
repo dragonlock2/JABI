@@ -1,7 +1,7 @@
 #ifndef LIBJABI_INTERFACES_USB_H
 #define LIBJABI_INTERFACES_USB_H
 
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 #include "interface.h"
 
 namespace jabi {

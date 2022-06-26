@@ -3,22 +3,28 @@
 
 #include <stdint.h>
 
+#ifdef _MSC_VER
+#define PACKED(c, m) __pragma(pack(push,1)) typedef struct {m} c __pragma(pack(pop))
+#else
+#define PACKED(c, m) typedef struct {m} __attribute__((packed)) c
+#endif // _MSC_VER
+
 #define REQ_PAYLOAD_MAX_SIZE   512
 #define RESP_PAYLOAD_MAX_SIZE  512
 
-typedef struct {
+PACKED(iface_req_t,
     uint16_t periph_id;
     uint16_t periph_idx;
     uint16_t periph_fn;
     uint16_t payload_len;
     uint8_t payload[REQ_PAYLOAD_MAX_SIZE];
-} __attribute__((packed)) iface_req_t;
+);
 
-typedef struct {
+PACKED(iface_resp_t,
     int16_t retcode;
     uint16_t payload_len;
     uint8_t payload[RESP_PAYLOAD_MAX_SIZE];
-} __attribute__((packed)) iface_resp_t;
+);
 
 typedef void (*iface_init_t)(void);
 typedef void (*iface_get_req_t)(iface_req_t *req);

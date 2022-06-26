@@ -28,7 +28,25 @@ west flash
 
 ### Clients
 
-TODO
+#### libjabi
+
+`libjabi` is provided as a CMake library. A barebones example is provided in `tests/libjabi`. See below to get it running on MacOS or Linux.
+
+```
+brew install cmake libusb # MacOS
+sudo apt install cmake libusb-1.0-0-dev # Linux
+
+cd tests/libjabi
+make
+make run
+```
+
+For Windows, we've verified the following procedure to work.
+
+- Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git).
+- Use [vcpkg](https://github.com/libusb/libusb/wiki/Windows#vcpkg-port) to install `libusb` with the right triplet for your setup (ex. `x64-windows`).
+- Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
+- Use [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) opened to `tests/libjabi` to generate the final `main.exe`.
 
 ## Architecture
 
@@ -78,10 +96,11 @@ The following peripherals.
 Fun things to look into one day.
 
 - CAN DBC
-- DFU beyond USB for MCUboot
+- DFU options beyond USB for MCUboot
 - Alternative functions for pins
 - gRPC server on the microcontroller
     - may need to convert USB to a serial port or ethernet gadget
+- multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
 - Ethernet support
     - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
 - BLE and WiFi support (need to make a dev board)
