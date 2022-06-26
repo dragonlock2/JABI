@@ -16,7 +16,8 @@ int main() {
     }
 
     std::cout << "Found UART: ";
-    testDevice(jabi::UARTInterface::get_device("/dev/ttyACM0", 230400));
+    testDevice(jabi::UARTInterface::get_device("COM5", 230400));
+    std::cout << "done!" << std::endl;
 
     return 0;
 }

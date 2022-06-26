@@ -34,7 +34,7 @@ west flash
 
 ```
 brew install cmake libusb # MacOS
-sudo apt install cmake libusb-1.0-0-dev # Linux
+apt install cmake libusb-1.0-0-dev # Linux
 
 cd tests/libjabi
 make

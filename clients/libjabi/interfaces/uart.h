@@ -3,6 +3,10 @@
 
 #include "interface.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif // _WIN32
+
 namespace jabi {
 
 class UARTInterface : public Interface {
@@ -15,7 +19,11 @@ public:
 private:
     UARTInterface(std::string port, int baud);
 
+#ifdef _WIN32
+    HANDLE hFile;
+#else
     int fd;
+#endif // _WIN32
 };
 
 };
