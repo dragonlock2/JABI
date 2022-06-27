@@ -68,7 +68,7 @@ For Windows, we've verified the following procedure to work.
 - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git).
 - Use [vcpkg](https://github.com/libusb/libusb/wiki/Windows#vcpkg-port) to install `libusb` with the right triplet for your setup (ex. `x64-windows`).
 - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
-- Use [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) opened to `tests/libjabi` to generate the final `main.exe`.
+- Use [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) opened to `tests/libjabi` to generate and run `main.exe`.
 
 #### pyjabi
 
@@ -76,13 +76,10 @@ Before proceeding, make sure to do the following.
 
 - Follow the above instructions to test compiling `libjabi`.
 - Make sure this repo has its submodules initialized (ex. `git clone --recursive`).
-- For Windows, add `cmake` to `PATH` (ex. [by installing it](https://cmake.org/download/)) and set the `CMAKE_TOOLCHAIN_PATH` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake` from the `vcpkg` installation.
+- For Windows, add `cmake` to `PATH` (ex. [by installing it](https://cmake.org/download/)) and set the `CMAKE_TOOLCHAIN_FILE` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake` from the `vcpkg` installation.
 
 ```
-cd clients/pyjabi
-pip install .
-
-pip uninstall pyjabi # to remove
+pip install clients/pyjabi
 ```
 
 Next try running `tests/pyjabi/main.py` to test.
