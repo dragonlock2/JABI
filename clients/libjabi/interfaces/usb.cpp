@@ -51,7 +51,7 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
         throw std::runtime_error("wrong USB transfer response length");
     }
     if (resp.retcode != 0 || resp.payload_len > RESP_PAYLOAD_MAX_SIZE) {
-        throw std::runtime_error("bad response");
+        throw std::runtime_error("bad response " + std::to_string(resp.retcode));
     }
 
     return resp;

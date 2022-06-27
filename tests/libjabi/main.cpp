@@ -4,7 +4,7 @@
 
 void testDevice(jabi::Device d) {
     std::cout << "SN=" << d.get_serial();
-    std::cout << " num_meta=" << d.get_num_inst(0);
+    std::cout << " num_meta=" << d.get_num_inst(jabi::METADATA_ID);
     std::cout << " echo=" << d.echo("❤️");
     std::cout << std::endl;
 }

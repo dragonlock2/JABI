@@ -104,7 +104,7 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
         }
         iface_resp_letoh(resp);
         if (resp.retcode != 0 || resp.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-            throw std::runtime_error("bad response");
+            throw std::runtime_error("bad response " + std::to_string(resp.retcode));
         }
         len = resp.payload_len;
         buffer = reinterpret_cast<char*>(resp.payload);
@@ -214,7 +214,7 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
         }
         iface_resp_letoh(resp);
         if (resp.retcode != 0 || resp.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-            throw std::runtime_error("bad response");
+            throw std::runtime_error("bad response " + std::to_string(resp.retcode));
         }
         len = resp.payload_len;
         buffer = reinterpret_cast<unsigned char*>(resp.payload);

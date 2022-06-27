@@ -23,6 +23,8 @@ private:
     friend class Interface;
 };
 
+const int METADATA_ID = 0;
+
 };
 
 #endif // LIBJABI_DEVICE_H

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-add_library(jabi
+add_library(libjabi
     interfaces/usb.cpp
     interfaces/uart.cpp
     peripherals/metadata.cpp
@@ -12,9 +12,9 @@ if(NOT ${libusb_FOUND})
     find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES libusb-1.0)
 endif()
 
-target_link_libraries(jabi ${LIBUSB_LIBRARIES})
+target_link_libraries(libjabi ${LIBUSB_LIBRARIES})
 
-target_include_directories(jabi PUBLIC
+target_include_directories(libjabi PUBLIC
     ${LIBUSB_INCLUDE_DIRS}
     ..
     ../../include

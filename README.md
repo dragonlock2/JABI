@@ -48,6 +48,23 @@ For Windows, we've verified the following procedure to work.
 - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
 - Use [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) opened to `tests/libjabi` to generate the final `main.exe`.
 
+#### pyjabi
+
+Before proceeding, make sure to do the following.
+
+- Follow the above instructions to test compiling `libjabi`.
+- Make sure this repo has its submodules initialized (ex. `git clone --recursive`).
+- TODO for windows add vcpkg and cmake paths
+
+```
+cd clients/pyjabi
+pip install .
+
+pip uninstall pyjabi # to remove
+```
+
+TODO Once this step has been performed, you may run tests/pyjabi/main.py to test.
+
 ## Architecture
 
 ### Interfaces
@@ -68,13 +85,12 @@ Microcontroller peripherals are made available over each interface via a custom 
 Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
 
 - `libjabi` - C++ library
+- `pyjabi` - Python library
 
 ## TODO
 
 The following clients.
 
-- Python library using pybind11 to C++
-    - make it `pip` locally installable
 - gRPC client/server bridging C++ to a network
     - iOS app in React Native or Swift
     - Android app in React Native or Kotlin (USB too?)
@@ -86,8 +102,8 @@ The following peripherals.
 - CAN FD
     - allow one filter bc USB FS is slow
 - LIN
-- SPI
-- I2C
+- SPI master
+- I2C master
 - UART
 - GPIO
 - ADC
@@ -98,7 +114,8 @@ Fun things to look into one day.
 - CAN DBC
 - DFU options beyond USB for MCUboot
 - Alternative functions for pins
-- gRPC server on the microcontroller
+- Improve security and robustness (encryption? CRC?)
+- gRPC server on the microcontroller (in the roadmap for Zephyr it seems)
     - may need to convert USB to a serial port or ethernet gadget
 - multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
 - Ethernet support

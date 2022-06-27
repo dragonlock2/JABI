@@ -15,4 +15,4 @@ add_subdirectory(../../clients/libjabi ${CMAKE_CURRENT_BINARY_DIR}/libjabi)
 
 add_executable(main main.cpp)
 
-target_link_libraries(main jabi)
+target_link_libraries(main libjabi)
