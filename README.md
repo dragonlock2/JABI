@@ -2,6 +2,28 @@
 
 JABI (Just Another Bridge Interface) makes creating and deploying bridge devices that provide RPC to common microcontroller peripherals simple.
 
+## Architecture
+
+### Interfaces
+
+Interfaces are the available methods by which a client may connect. Multiple interfaces running concurrently is supported. The following interfaces are currently supported.
+
+- USB
+- UART
+
+### Peripherals
+
+Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
+
+- Metadata
+
+### Clients
+
+Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
+
+- `libjabi` - C++ library
+- `pyjabi` - Python library
+
 ## Setup
 
 ### Firmware
@@ -63,29 +85,7 @@ pip install .
 pip uninstall pyjabi # to remove
 ```
 
-TODO Once this step has been performed, you may run tests/pyjabi/main.py to test.
-
-## Architecture
-
-### Interfaces
-
-Interfaces are the available methods by which a client may connect. Multiple interfaces running concurrently is supported. The following interfaces are currently supported.
-
-- USB
-- UART
-
-### Peripherals
-
-Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
-
-- Metadata
-
-### Clients
-
-Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
-
-- `libjabi` - C++ library
-- `pyjabi` - Python library
+Next try running `tests/pyjabi/main.py` to test.
 
 ## TODO
 
@@ -116,7 +116,6 @@ Fun things to look into one day.
 - Alternative functions for pins
 - Improve security and robustness (encryption? CRC?)
 - gRPC server on the microcontroller (in the roadmap for Zephyr it seems)
-    - may need to convert USB to a serial port or ethernet gadget
 - multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
 - Ethernet support
     - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
