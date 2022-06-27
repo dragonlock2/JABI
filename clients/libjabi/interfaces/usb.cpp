@@ -1,3 +1,4 @@
+#include <string>
 #include "usb.h"
 
 #define USB_TIMEOUT_MS 1000

@@ -76,7 +76,7 @@ Before proceeding, make sure to do the following.
 
 - Follow the above instructions to test compiling `libjabi`.
 - Make sure this repo has its submodules initialized (ex. `git clone --recursive`).
-- TODO for windows add vcpkg and cmake paths
+- For Windows, add `cmake` to `PATH` (ex. [by installing it](https://cmake.org/download/)) and set the `CMAKE_TOOLCHAIN_PATH` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake` from the `vcpkg` installation.
 
 ```
 cd clients/pyjabi

@@ -22,6 +22,9 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
         ]
+        if "CMAKE_TOOLCHAIN_FILE" in os.environ:
+            cmake_args.append(f"-DCMAKE_TOOLCHAIN_FILE={os.environ['CMAKE_TOOLCHAIN_FILE']}")
+
         build_args = []
 
         build_temp = os.path.join(self.build_temp, ext.name)
