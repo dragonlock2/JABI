@@ -50,39 +50,42 @@ west flash
 
 ### Clients
 
-#### libjabi
-
-`libjabi` is provided as a CMake library. A barebones example is provided in `tests/libjabi`. See below to get it running on MacOS or Linux.
+First let's install dependencies. For macOS and Linux, it's as simple as the following.
 
 ```
-brew install cmake libusb # MacOS
-apt install cmake libusb-1.0-0-dev # Linux
-
-cd tests/libjabi
-make
-make run
+brew install cmake ninja libusb # MacOS
+apt install g++ cmake ninja-build libusb-1.0-0-dev # Linux
 ```
 
-For Windows, we've verified the following procedure to work.
+For Windows, it's a little more complex. While there's more than one way, we've verified the following procedure to work.
 
 - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git).
 - Use [vcpkg](https://github.com/libusb/libusb/wiki/Windows#vcpkg-port) to install `libusb` with the right triplet for your setup (ex. `x64-windows`).
+    - Set `CMAKE_TOOLCHAIN_FILE` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake`.
 - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
-- Use [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) opened to `tests/libjabi` to generate and run `main.exe`.
+- Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) as a C++ compiler. It's also an IDE.
+- Install [CMake](https://cmake.org/download/) and make sure it's added to `PATH`.
+
+#### libjabi
+
+`libjabi` is provided as a CMake library. A barebones example is provided in `tests/libjabi` and can be run as follows.
+
+```
+cd tests/libjabi
+mkdir build && cd build
+cmake ..
+cmake --build .
+./main
+```
 
 #### pyjabi
 
-Before proceeding, make sure to do the following.
-
-- Follow the above instructions to test compiling `libjabi`.
-- Make sure this repo has its submodules initialized (ex. `git clone --recursive`).
-- For Windows, add `cmake` to `PATH` (ex. [by installing it](https://cmake.org/download/)) and set the `CMAKE_TOOLCHAIN_FILE` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake` from the `vcpkg` installation.
+`pyjabi` can be installed from a local directory using `pip` for easy management. An example application is in `tests/pyjabi/main.py`.
 
 ```
 pip install clients/pyjabi
+python tests/pyjabi/main.py
 ```
-
-Next try running `tests/pyjabi/main.py` to test.
 
 ## TODO
 
