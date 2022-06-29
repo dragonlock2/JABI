@@ -55,7 +55,7 @@ First let's install a few dependencies.
 - Windows
     - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler. It's also an IDE.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
-    - Use [vcpkg](https://github.com/microsoft/vcpkg) to install [libusb](https://vcpkg.info/port/libusb), [gRPC](https://vcpkg.info/port/grpc), and [OpenSSL](https://vcpkg.info/port/openssl).
+    - Use [vcpkg](https://github.com/microsoft/vcpkg) to install [libusb](https://vcpkg.info/port/libusb), [gRPC](https://vcpkg.info/port/grpc), [OpenSSL](https://vcpkg.info/port/openssl), and [getopt](https://vcpkg.info/port/getopt).
     - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
 
 We use CMake for our build system which has the following standard build process. For macOS gRPC projects, you may need to do `cmake .. -DOPENSSL_ROOT_DIR=$(brew --prefix openssl)` instead.

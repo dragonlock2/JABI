@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(MSVC)
-    add_compile_options(/W4 /WX)
+    # add_compile_options(/W4 /WX) # gRPC warnings not suppressed?
 else()
     add_compile_options(-Wall -Wextra -Werror)
 endif()
@@ -17,4 +17,9 @@ add_executable(main
     main.cpp
     server.cpp
 )
-target_link_libraries(main jabiproto libjabi)
+
+if(MSVC)
+    find_library(GETOPT_LIBRARIES NAMES getopt)
+endif()
+
+target_link_libraries(main jabiproto libjabi ${GETOPT_LIBRARIES})
