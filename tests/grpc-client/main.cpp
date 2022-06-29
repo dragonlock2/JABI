@@ -9,8 +9,8 @@ int main(int argc, char* argv[]) {
 
     // parse args
     const struct option options[] = {
-        { .name = "ip",   .val = 'i',  .has_arg = 1, .flag = NULL },
-        { .name = "port", .val = 'p', .has_arg = 1, .flag = NULL },
+        { .name = "ip",   .has_arg = 1, .flag = NULL, .val = 'i' },
+        { .name = "port", .has_arg = 1, .flag = NULL, .val = 'p' },
         {0,0,0,0}
     };
 

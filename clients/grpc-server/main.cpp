@@ -13,12 +13,12 @@ int main(int argc, char* argv[]) {
 
     // parse args
     const struct option options[] = {
-        { .name = "ip",        .val =  0,  .has_arg = 1, .flag = NULL },
-        { .name = "port",      .val = 'p', .has_arg = 1, .flag = NULL },
-        { .name = "interface", .val = 'i', .has_arg = 1, .flag = NULL },
-        { .name = "sn",        .val = 's', .has_arg = 1, .flag = NULL },
-        { .name = "tty",       .val = 't', .has_arg = 1, .flag = NULL },
-        { .name = "baud",      .val = 'b', .has_arg = 1, .flag = NULL },
+        { .name = "ip",        .has_arg = 1, .flag = NULL, .val =  0  },
+        { .name = "port",      .has_arg = 1, .flag = NULL, .val = 'p' },
+        { .name = "interface", .has_arg = 1, .flag = NULL, .val = 'i' },
+        { .name = "sn",        .has_arg = 1, .flag = NULL, .val = 's' },
+        { .name = "tty",       .has_arg = 1, .flag = NULL, .val = 't' },
+        { .name = "baud",      .has_arg = 1, .flag = NULL, .val = 'b' },
         {0,0,0,0}
     };
 

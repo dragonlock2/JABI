@@ -45,19 +45,18 @@ west flash
 
 ### Clients
 
-First let's install a few dependencies. For macOS and Linux, it's as simple as the following.
+First let's install a few dependencies.
 
-```
-brew install git cmake libusb grpc openssl # MacOS
-apt install git cmake libusb-1.0-0-dev grpc libssl-dev # Linux
-```
-
-For Windows, it'll take a few more clicks.
-
-- Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler. It's also an IDE.
-- Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
-- Use [vcpkg](https://github.com/microsoft/vcpkg) to install [libusb](https://vcpkg.info/port/libusb), [gRPC](https://vcpkg.info/port/grpc), and [OpenSSL](https://vcpkg.info/port/openssl).
-- Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
+- macOS
+    - `brew install git cmake libusb grpc openssl`
+- Linux
+    - `apt install git cmake libusb-1.0-0-dev libssl-dev`
+    - Install [grpc](https://github.com/grpc/grpc/blob/master/BUILDING.md) from source.
+- Windows
+    - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler. It's also an IDE.
+    - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
+    - Use [vcpkg](https://github.com/microsoft/vcpkg) to install [libusb](https://vcpkg.info/port/libusb), [gRPC](https://vcpkg.info/port/grpc), and [OpenSSL](https://vcpkg.info/port/openssl).
+    - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
 
 We use CMake for our build system which has the following standard build process. For macOS gRPC projects, you may need to do `cmake .. -DOPENSSL_ROOT_DIR=$(brew --prefix openssl)` instead.
 
