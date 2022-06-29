@@ -1,6 +1,7 @@
 #ifndef LIBJABI_INTERFACES_INTERFACE_H
 #define LIBJABI_INTERFACES_INTERFACE_H
 
+#include <mutex>
 #include <vector>
 #include <libjabi/byteorder.h>
 #include <libjabi/device.h>
@@ -16,6 +17,8 @@ public:
     virtual iface_resp_t send_request(iface_req_t req) = 0;
 
 protected:
+    std::mutex req_lock;
+
     static Device makeDevice(std::shared_ptr<Interface> i) { return Device(i); }
 };
 

@@ -69,6 +69,8 @@ UARTInterface::~UARTInterface() {
 }
 
 iface_resp_t UARTInterface::send_request(iface_req_t req) {
+    std::scoped_lock lk(req_lock);
+
     std::future<iface_resp_t> lock = std::async([this, &req]{
         if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
             throw std::runtime_error("request payload size too large");
@@ -185,6 +187,8 @@ UARTInterface::~UARTInterface() {
 }
 
 iface_resp_t UARTInterface::send_request(iface_req_t req) {
+    std::scoped_lock lk(req_lock);
+
     std::future<iface_resp_t> lock = std::async([this, &req]{
         if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
             throw std::runtime_error("request payload size too large");

@@ -4,25 +4,20 @@ JABI (Just Another Bridge Interface) makes creating and deploying bridge devices
 
 ## Architecture
 
-### Interfaces
-
-Interfaces are the available methods by which a client may connect. Multiple interfaces running concurrently is supported. The following interfaces are currently supported.
+Interfaces are the available methods by which a single client may connect. Multiple interfaces running concurrently is supported. The following interfaces are currently supported.
 
 - USB
 - UART
-
-### Peripherals
 
 Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
 
 - Metadata
 
-### Clients
-
-Clients connect to the microcontroller over any one of the interfaces. The current clients are supported.
+Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
 - `libjabi` - C++ library
 - `pyjabi` - Python library
+- `grpc-server` - gRPC server
 
 ## Setup
 
@@ -50,52 +45,53 @@ west flash
 
 ### Clients
 
-First let's install dependencies. For macOS and Linux, it's as simple as the following.
+First let's install a few dependencies. For macOS and Linux, it's as simple as the following.
 
 ```
-brew install cmake ninja libusb # MacOS
-apt install g++ cmake ninja-build libusb-1.0-0-dev # Linux
+brew install git cmake libusb grpc openssl # MacOS
+apt install git cmake libusb-1.0-0-dev grpc libssl-dev # Linux
 ```
 
-For Windows, it's a little more complex. While there's more than one way, we've verified the following procedure to work.
+For Windows, it'll take a few more clicks.
 
-- Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git).
-- Use [vcpkg](https://github.com/libusb/libusb/wiki/Windows#vcpkg-port) to install `libusb` with the right triplet for your setup (ex. `x64-windows`).
-    - Set `CMAKE_TOOLCHAIN_FILE` environment variable to the location of `vcpkg\scripts\buildsystems\vcpkg.cmake`.
+- Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler. It's also an IDE.
+- Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
+- Use [vcpkg](https://github.com/microsoft/vcpkg) to install [libusb](https://vcpkg.info/port/libusb), [gRPC](https://vcpkg.info/port/grpc), and [OpenSSL](https://vcpkg.info/port/openssl).
 - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
-- Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) as a C++ compiler. It's also an IDE.
-- Install [CMake](https://cmake.org/download/) and make sure it's added to `PATH`.
 
-#### libjabi
-
-`libjabi` is provided as a CMake library. A barebones example is provided in `tests/libjabi` and can be run as follows.
+We use CMake for our build system which has the following standard build process. For macOS gRPC projects, you may need to do `cmake .. -DOPENSSL_ROOT_DIR=$(brew --prefix openssl)` instead.
 
 ```
-cd tests/libjabi
+cd <project path>
 mkdir build && cd build
 cmake ..
 cmake --build .
-./main
 ```
+
+#### libjabi
+
+[`libjabi`](clients/libjabi) is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [tests/libjabi](tests/libjabi).
 
 #### pyjabi
 
-`pyjabi` can be installed from a local directory using `pip` for easy management. An example application is in `tests/pyjabi/main.py`.
+[`pyjabi`](clients/pyjabi) can be installed from a local directory using `pip` for easy management. An example using it is in [tests/pyjabi](tests/pyjabi).
 
 ```
 pip install clients/pyjabi
-python tests/pyjabi/main.py
 ```
+
+#### grpc-server
+
+[`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [tests/grpc-client](tests/grpc-client).
 
 ## TODO
 
-The following clients.
+The following gRPC clients.
 
-- gRPC client/server bridging C++ to a network
-    - iOS app in React Native or Swift
-    - Android app in React Native or Kotlin (USB too?)
-    - QT6 cross-platform app
-    - Website using Svelte JS (WebUSB too?)
+- iOS app in React Native or Swift
+- Android app in React Native or Kotlin (USB too?)
+- QT6 cross-platform app
+- Website using Svelte JS (WebUSB too?)
 
 The following peripherals.
 
@@ -114,10 +110,12 @@ Fun things to look into one day.
 - CAN DBC
 - DFU options beyond USB for MCUboot
 - Alternative functions for pins
-- Improve security and robustness (encryption? CRC?)
+- Improve security and robustness (encryption? CRC? gRPC SSL?)
 - gRPC server on the microcontroller (in the roadmap for Zephyr it seems)
 - multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
 - Ethernet support
     - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
 - BLE and WiFi support (need to make a dev board)
 - On-device web server
+- USB Linux drivers to show up under `/dev`
+- USB HS dev board for comparable performance to STLINK-V3

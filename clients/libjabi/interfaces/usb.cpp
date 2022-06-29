@@ -17,6 +17,8 @@ USBInterface::~USBInterface() {
 }
 
 iface_resp_t USBInterface::send_request(iface_req_t req) {
+    std::scoped_lock lk(req_lock);
+
     if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
         throw std::runtime_error("request payload size too large");
     }
@@ -115,7 +117,7 @@ std::vector<Device> USBInterface::list_devices() {
                 libusb_close(dev);
                 break;
             }
-            if (std::string((char*) str) != "JABI USB") {
+            if (std::string(reinterpret_cast<char*>(str)) != "JABI USB") {
                 libusb_close(dev);
                 continue;
             }

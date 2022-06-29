@@ -19,7 +19,7 @@ std::string Device::get_serial() {
     iface_resp_t resp = interface->send_request(req);
 
     resp.payload[std::min<size_t>(resp.payload_len, RESP_PAYLOAD_MAX_SIZE-1)] = 0x00;
-    return std::string((char*) resp.payload);
+    return std::string(reinterpret_cast<char*>(resp.payload));
 }
 
 int Device::get_num_inst(int periph_id) {
@@ -60,7 +60,7 @@ std::string Device::echo(std::string str) {
     iface_resp_t resp = interface->send_request(req);
 
     resp.payload[RESP_PAYLOAD_MAX_SIZE-1] = 0x00; // just in case
-    return std::string((char*) resp.payload);
+    return std::string(reinterpret_cast<char*>(resp.payload));
 }
 
 };

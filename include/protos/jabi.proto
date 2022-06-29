@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+service JABI {
+    /* Metadata */
+    rpc get_serial (GetSerialRequest) returns (GetSerialResponse);
+    rpc get_num_inst (GetNumInstRequest) returns (GetNumInstResponse);
+    rpc echo (EchoRequest) returns (EchoResponse);
+}
+
+/* Metadata */
+message GetSerialRequest {}
+
+message GetSerialResponse {
+    string sn = 1;
+}
+
+message GetNumInstRequest {
+    uint32 periph_id = 1;
+}
+
+message GetNumInstResponse {
+    uint32 num_idx = 1;
+}
+
+message EchoRequest {
+    string msg = 1;
+}
+
+message EchoResponse {
+    string msg = 1;
+}
