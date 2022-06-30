@@ -10,8 +10,8 @@ using namespace jabi;
 
 PYBIND11_MODULE(jabi, m) { // name matches CMake module
     py::class_<Device>(m, "Device")
-        .def("get_serial", &Device::get_serial)
-        .def("get_num_inst", &Device::get_num_inst)
+        .def("serial", &Device::serial)
+        .def("num_inst", &Device::num_inst)
         .def("echo", &Device::echo);
 
     py::class_<USBInterface>(m, "USBInterface")

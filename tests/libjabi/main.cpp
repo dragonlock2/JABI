@@ -3,8 +3,8 @@
 #include <libjabi/interfaces/uart.h>
 
 void testDevice(jabi::Device d) {
-    std::cout << "SN=" << d.get_serial();
-    std::cout << " num_meta=" << d.get_num_inst(jabi::METADATA_ID);
+    std::cout << "SN=" << d.serial();
+    std::cout << " num_meta=" << d.num_inst(jabi::METADATA_ID);
     std::cout << " echo=" << d.echo("❤️");
     std::cout << std::endl;
 }

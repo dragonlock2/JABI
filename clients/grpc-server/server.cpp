@@ -1,10 +1,10 @@
 #include "server.h"
 
 /* Metadata */
-Status JABIServiceImpl::get_serial(ServerContext*,
-        const GetSerialRequest*, GetSerialResponse* resp) {
+Status JABIServiceImpl::serial(ServerContext*,
+        const SerialRequest*, SerialResponse* resp) {
     try {
-        resp->set_sn(dev->get_serial());
+        resp->set_sn(dev->serial());
         return Status::OK;
     } catch(const std::runtime_error &e) {
         std::cerr << "error: " << e.what() << std::endl;
@@ -12,10 +12,10 @@ Status JABIServiceImpl::get_serial(ServerContext*,
     }
 }
 
-Status JABIServiceImpl::get_num_inst(ServerContext*,
-        const GetNumInstRequest* req, GetNumInstResponse* resp) {
+Status JABIServiceImpl::num_inst(ServerContext*,
+        const NumInstRequest* req, NumInstResponse* resp) {
     try {
-        resp->set_num_idx(dev->get_num_inst(req->periph_id()));
+        resp->set_num_idx(dev->num_inst(req->periph_id()));
         return Status::OK;
     } catch(const std::runtime_error &e) {
         std::cerr << "error: " << e.what() << std::endl;

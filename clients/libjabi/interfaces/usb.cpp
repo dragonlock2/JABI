@@ -142,14 +142,14 @@ std::vector<Device> USBInterface::list_devices() {
                 )
             );
             try {
-                jabi.get_serial();
+                jabi.serial();
             } catch(const std::runtime_error&) {
                 // reset device and try one more time
                 if (libusb_reset_device(dev) < 0) {
                     break;
                 }
                 try {
-                    jabi.get_serial();
+                    jabi.serial();
                 } catch(const std::runtime_error&) {
                     break;
                 }

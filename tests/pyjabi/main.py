@@ -2,8 +2,8 @@ import jabi
 
 def testDevice(d):
     print(
-        "SN=" + d.get_serial(),
-        "num_meta=" + str(d.get_num_inst(jabi.METADATA_ID)),
+        "SN=" + d.serial(),
+        "num_meta=" + str(d.num_inst(jabi.METADATA_ID)),
         "echo=" + d.echo("❤️")
     )
 

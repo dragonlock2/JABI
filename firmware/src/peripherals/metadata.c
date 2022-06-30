@@ -5,8 +5,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(periph_metadata, CONFIG_LOG_DEFAULT_LEVEL);
 
-PERIPH_FUNC_DEF(get_serial) {
-    PERIPH_FUNC_GET_RET(metadata, get_serial);
+PERIPH_FUNC_DEF(serial) {
+    PERIPH_FUNC_GET_RET(metadata, serial);
     PERIPH_FUNC_CHECK_ARGS_EMPTY;
 
     LOG_DBG("()");
@@ -17,10 +17,10 @@ PERIPH_FUNC_DEF(get_serial) {
     return 0;
 }
 
-PERIPH_FUNC_DEF(get_num_inst) {
-    PERIPH_FUNC_GET_ARGS(metadata, get_num_inst);
-    PERIPH_FUNC_GET_RET(metadata, get_num_inst);
-    PERIPH_FUNC_CHECK_ARGS_LEN(metadata, get_num_inst);
+PERIPH_FUNC_DEF(num_inst) {
+    PERIPH_FUNC_GET_ARGS(metadata, num_inst);
+    PERIPH_FUNC_GET_RET(metadata, num_inst);
+    PERIPH_FUNC_CHECK_ARGS_LEN(metadata, num_inst);
 
     args->periph_id = sys_le16_to_cpu(args->periph_id);
 
@@ -33,7 +33,7 @@ PERIPH_FUNC_DEF(get_num_inst) {
 
     extern const struct periph_api_t *peripherals[];
     ret->num_idx = sys_cpu_to_le16(peripherals[args->periph_id]->num_idx);
-    *resp_len = sizeof(metadata_get_num_inst_resp_t);
+    *resp_len = sizeof(metadata_num_inst_resp_t);
 
     return 0;
 }
@@ -50,9 +50,9 @@ PERIPH_FUNC_DEF(echo) {
     return 0;
 }
 
-static periph_func_t metadata_periph_fns[] = {
-    get_serial,
-    get_num_inst,
+static const periph_func_t metadata_periph_fns[] = {
+    serial,
+    num_inst,
     echo,
 };
 

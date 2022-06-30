@@ -1,12 +1,12 @@
 #include "client.h"
 
 /* Metadata */
-std::string JABIClient::get_serial() {
-    GetSerialRequest req;
-    GetSerialResponse resp;
+std::string JABIClient::serial() {
+    SerialRequest req;
+    SerialResponse resp;
     ClientContext ctx;
 
-    Status status = stub->get_serial(&ctx, req, &resp);
+    Status status = stub->serial(&ctx, req, &resp);
 
     if (!status.ok()) {
         throw std::runtime_error("fail");
@@ -14,13 +14,13 @@ std::string JABIClient::get_serial() {
     return resp.sn();
 }
 
-int JABIClient::get_num_inst(int periph_id) {
-    GetNumInstRequest req;
-    GetNumInstResponse resp;
+int JABIClient::num_inst(int periph_id) {
+    NumInstRequest req;
+    NumInstResponse resp;
     ClientContext ctx;
 
     req.set_periph_id(periph_id);
-    Status status = stub->get_num_inst(&ctx, req, &resp);
+    Status status = stub->num_inst(&ctx, req, &resp);
 
     if (!status.ok()) {
         throw std::runtime_error("fail");

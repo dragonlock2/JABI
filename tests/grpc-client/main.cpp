@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
     );
 
     std::cout << "Attached to server: ";
-    std::cout << "SN=" << dev.get_serial();
-    std::cout << " num_meta=" << dev.get_num_inst(jabi::METADATA_ID);
+    std::cout << "SN=" << dev.serial();
+    std::cout << " num_meta=" << dev.num_inst(jabi::METADATA_ID);
     std::cout << " echo=" << dev.echo("❤️");
     std::cout << std::endl;
     return 0;

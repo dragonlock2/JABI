@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     if (interface == "usb") {
         bool found = false;
         for (auto &d : jabi::USBInterface::list_devices()) {
-            if (d.get_serial() == sn) {
+            if (d.serial() == sn) {
                 dev = std::make_shared<jabi::Device>(d);
                 found = true;
                 break;

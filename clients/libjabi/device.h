@@ -6,13 +6,15 @@
 
 namespace jabi {
 
+#include <jabi/peripherals.h>
+
 class Interface;
 
 class Device {
 public:
     /* Metadata */
-    std::string get_serial();
-    int get_num_inst(int periph_id);
+    std::string serial();
+    int num_inst(int periph_id);
     std::string echo(std::string str);
 
 private:
@@ -23,7 +25,7 @@ private:
     friend class Interface;
 };
 
-const int METADATA_ID = 0;
+const int METADATA_ID = PERIPH_METADATA_ID;
 
 };
 

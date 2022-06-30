@@ -7,11 +7,11 @@ namespace jabi {
 #include <jabi/peripherals.h>
 #include <jabi/peripherals/metadata.h>
 
-std::string Device::get_serial() {
+std::string Device::serial() {
     iface_req_t req = {
         .periph_id = PERIPH_METADATA_ID,
         .periph_idx = 0,
-        .periph_fn = METADATA_GET_SERIAL_ID,
+        .periph_fn = METADATA_SERIAL_ID,
         .payload_len = 0,
         .payload = {0},
     };
@@ -22,24 +22,24 @@ std::string Device::get_serial() {
     return std::string(reinterpret_cast<char*>(resp.payload));
 }
 
-int Device::get_num_inst(int periph_id) {
+int Device::num_inst(int periph_id) {
     iface_req_t req = {
         .periph_id = PERIPH_METADATA_ID,
         .periph_idx = 0,
-        .periph_fn = METADATA_GET_NUM_INST_ID,
-        .payload_len = sizeof(metadata_get_num_inst_req_t),
+        .periph_fn = METADATA_NUM_INST_ID,
+        .payload_len = sizeof(metadata_num_inst_req_t),
         .payload = {0},
     };
 
-    auto args = reinterpret_cast<metadata_get_num_inst_req_t*>(req.payload);
+    auto args = reinterpret_cast<metadata_num_inst_req_t*>(req.payload);
     args->periph_id = htole<uint16_t>(static_cast<uint16_t>(periph_id));
 
     iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != sizeof(metadata_get_num_inst_resp_t)) {
+    if (resp.payload_len != sizeof(metadata_num_inst_resp_t)) {
         throw std::runtime_error("unexpected payload length");
     }
 
-    auto ret = reinterpret_cast<metadata_get_num_inst_resp_t*>(resp.payload);
+    auto ret = reinterpret_cast<metadata_num_inst_resp_t*>(resp.payload);
     return letoh<uint16_t>(ret->num_idx);
 }
 

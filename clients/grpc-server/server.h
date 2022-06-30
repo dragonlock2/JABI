@@ -16,8 +16,8 @@ public:
     JABIServiceImpl(std::shared_ptr<jabi::Device> dev) : dev(dev) {}
 
     /* Metadata */
-    Status get_serial(ServerContext*, const GetSerialRequest*, GetSerialResponse* resp) override;
-    Status get_num_inst(ServerContext*, const GetNumInstRequest* req, GetNumInstResponse* resp) override;
+    Status serial(ServerContext*, const SerialRequest*, SerialResponse* resp) override;
+    Status num_inst(ServerContext*, const NumInstRequest* req, NumInstResponse* resp) override;
     Status echo(ServerContext*, const EchoRequest* req, EchoResponse* resp) override;
 
 private:

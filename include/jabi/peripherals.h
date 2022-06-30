@@ -7,9 +7,9 @@ typedef int16_t (*periph_func_t)(uint16_t idx, uint8_t *req, uint16_t req_len,
                                  uint8_t *resp, uint16_t *resp_len);
 
 struct periph_api_t {
-    periph_func_t *fns;
-    uint16_t num_fns;
-    uint16_t num_idx;
+    const periph_func_t *fns;
+    const uint16_t num_fns;
+    const uint16_t num_idx;
     const char *name;
 };
 

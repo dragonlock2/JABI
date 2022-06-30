@@ -31,9 +31,9 @@ typedef void (*iface_get_req_t)(iface_req_t *req);
 typedef void (*iface_send_resp_t)(iface_resp_t *resp);
 
 struct iface_api_t {
-    iface_init_t init;
-    iface_get_req_t get_req;
-    iface_send_resp_t send_resp;
+    const iface_init_t init;
+    const iface_get_req_t get_req;
+    const iface_send_resp_t send_resp;
     const char *name;
 };
 
