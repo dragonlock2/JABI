@@ -5,6 +5,10 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(periph_metadata, CONFIG_LOG_DEFAULT_LEVEL);
 
+static int metadata_init(uint16_t idx) {
+    return 0;
+}
+
 PERIPH_FUNC_DEF(serial) {
     PERIPH_FUNC_GET_RET(metadata, serial);
     PERIPH_FUNC_CHECK_ARGS_EMPTY;
@@ -57,6 +61,7 @@ static const periph_func_t metadata_periph_fns[] = {
 };
 
 const struct periph_api_t metadata_periph_api = {
+    .init = metadata_init,
     .fns = metadata_periph_fns,
     .num_fns = ARRAY_SIZE(metadata_periph_fns),
     .num_idx = 1,

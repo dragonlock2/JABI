@@ -26,7 +26,7 @@ PACKED(iface_resp_t,
     uint8_t payload[RESP_PAYLOAD_MAX_SIZE];
 );
 
-typedef void (*iface_init_t)(void);
+typedef int  (*iface_init_t)(void);
 typedef void (*iface_get_req_t)(iface_req_t *req);
 typedef void (*iface_send_resp_t)(iface_resp_t *resp);
 

@@ -56,10 +56,11 @@ static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time)
         }                                                                             \
     }                                                                                 \
                                                                                       \
-    static void uart##idx##_init() {                                                  \
+    static int uart##idx##_init() {                                                   \
         const struct device *dev = DEVICE_DT_GET(DT_PROP_BY_IDX(node_id, prop, idx)); \
         uart_irq_callback_set(dev, uart##idx##_handler);                              \
         uart_irq_rx_enable(dev);                                                      \
+        return 0;                                                                     \
     }                                                                                 \
                                                                                       \
     static void uart##idx##_get_req(iface_req_t *req) {                               \

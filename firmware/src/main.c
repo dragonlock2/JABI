@@ -19,8 +19,11 @@ struct k_sem *peripheral_locks[NUM_PERIPHERALS];
 void process_interface(void* p1, void* p2, void* p3) {
     const struct iface_api_t *iface = (const struct iface_api_t*) p1;
     
+    if (iface->init()) {
+        LOG_ERR("failed to start interface %s", iface->name);
+        return;
+    }
     LOG_INF("started processing interface %s", iface->name);
-    iface->init();
 
     iface_req_t req;
     iface_resp_t resp;
@@ -86,6 +89,16 @@ int main() {
             k_sem_init(&locks[i], 1, 1);
         }
         peripheral_locks[i] = locks;
+    }
+
+    for (int i = 0; i < NUM_PERIPHERALS; i++) {
+        for (int j = 0; j < peripherals[i]->num_idx; j++) {
+            if (peripherals[i]->init(j)) {
+                LOG_ERR("failed to initialize peripheral %s%d, time to die",
+                    peripherals[i]->name, j);
+                return -1;
+            }
+        }
     }
 
     for (int i = 0; i < NUM_INTERFACES; i++) {

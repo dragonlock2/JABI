@@ -107,7 +107,9 @@ USBD_DEFINE_CFG_DATA(usb_config) = {
     .endpoint = ep_cfg,
 };
 
-static void usb_init() {}
+static int usb_init() {
+    return 0;
+}
 
 static void usb_get_req(iface_req_t *req) {
     while (1) { // loop until packet received
