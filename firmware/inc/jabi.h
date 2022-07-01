@@ -2,6 +2,7 @@
 #define JABI_H
 
 #include <device.h>
+#include <jabi/error.h>
 #include <jabi/interfaces.h>
 #include <jabi/peripherals.h>
 

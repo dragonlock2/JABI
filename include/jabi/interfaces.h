@@ -43,10 +43,4 @@ struct iface_api_t {
 extern void iface_req_to_le(iface_req_t *req);
 extern void iface_resp_to_le(iface_resp_t *resp);
 
-enum jabi_err_t {
-    JABI_NO_ERR = 0,
-    JABI_NOT_SUPPORTED_ERR,
-    JABI_INVALID_ARGS_FORMAT_ERR,
-};
-
 #endif // JABI_INTERFACES_H

@@ -6,6 +6,12 @@ config JABI_SERIAL
     help
         device serial number string, must be non-empty
 
+config JABI_CAN_BUFFER_SIZE
+    int "CAN buffer size"
+    default 32
+    help
+        CAN message queue buffer size, must be >0
+
 endmenu
 
 menu "Zephyr"

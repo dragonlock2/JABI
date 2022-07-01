@@ -12,6 +12,7 @@ Interfaces are the available methods by which a single client may connect. Multi
 Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
 
 - Metadata
+- CAN FD
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -94,8 +95,6 @@ The following gRPC clients.
 
 The following peripherals.
 
-- CAN FD
-    - allow one filter bc USB FS is slow
 - LIN
 - SPI master
 - I2C master

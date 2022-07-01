@@ -1,0 +1,12 @@
+#ifndef JABI_ERROR_H
+#define JABI_ERROR_H
+
+enum jabi_err_t {
+    JABI_NO_ERR = 0,
+    JABI_NOT_SUPPORTED_ERR,
+    JABI_INVALID_ARGS_FORMAT_ERR,
+    JABI_UNINITIALIZED_ERR,
+    JABI_PERIPHERAL_ERR,
+};
+
+#endif // JABI_ERROR_H

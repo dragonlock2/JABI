@@ -17,8 +17,9 @@ struct periph_api_t {
 
 /* Peripheral indices */
 #define PERIPH_METADATA_ID 0
+#define PERIPH_CAN_ID      1
 
-#define NUM_PERIPHERALS 1
+#define NUM_PERIPHERALS 2
 
 /* Helpers */
 #define PERIPH_FUNC_DEF(fn) static int16_t fn(uint16_t idx,                      \

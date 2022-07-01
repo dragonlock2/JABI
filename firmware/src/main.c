@@ -86,7 +86,7 @@ int main() {
             return -1;
         }
         for (int j = 0; j < peripherals[i]->num_idx; j++) {
-            k_sem_init(&locks[i], 1, 1);
+            k_sem_init(&locks[j], 1, 1);
         }
         peripheral_locks[i] = locks;
     }
