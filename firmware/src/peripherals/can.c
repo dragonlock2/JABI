@@ -231,13 +231,10 @@ PERIPH_FUNC_DEF(can_read) {
 
     LOG_DBG("()");
 
-    *resp_len = sizeof(can_read_resp_t);
-
     struct zcan_frame msg;
     can_dev_data_t *can = &can_devs[idx];
     if (k_msgq_get(can->msgq, &msg, K_NO_WAIT)) {
-        memset(ret, 0, sizeof(can_read_resp_t)); // returns 0s
-        ret->num_left = sys_cpu_to_le16(-1);
+        *resp_len = 0;
         return 0;
     }
 
@@ -248,6 +245,7 @@ PERIPH_FUNC_DEF(can_read) {
     ret->brs      = msg.brs;
     ret->rtr      = msg.rtr == CAN_REMOTEREQUEST;
     ret->data_len = can_dlc_to_bytes(msg.dlc);
+    *resp_len = sizeof(can_read_resp_t);
     if (!ret->rtr) {
         memcpy(ret->data, msg.data, ret->data_len);
         *resp_len += ret->data_len;

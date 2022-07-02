@@ -17,12 +17,12 @@ PACKED(can_set_rate_req_t,
     uint32_t bitrate_data;
 );
 
-PACKED(can_set_style_req_t,
+PACKED(can_set_style_req_t, // can_set_mode was taken :P
     uint8_t mode; /* 0=normal, 1=loopback, 2=listen only */
 );
 
 PACKED(can_state_resp_t,
-    uint8_t state; // set to enum can_state
+    uint8_t state; // returns enum can_state
     uint8_t tx_err_cnt;
     uint8_t rx_err_cnt;
 );
@@ -37,8 +37,8 @@ PACKED(can_write_req_t,
     uint8_t  data[];
 );
 
-PACKED(can_read_resp_t,
-    int16_t  num_left; // -1 if none read
+PACKED(can_read_resp_t, // empty response if none to read
+    uint16_t num_left;
     uint32_t id;
     uint8_t  id_type;  /* 0=standard, 1=extended */
     uint8_t  fd;

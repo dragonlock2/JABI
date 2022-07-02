@@ -4,6 +4,7 @@ add_library(libjabi
     interfaces/usb.cpp
     interfaces/uart.cpp
     peripherals/metadata.cpp
+    peripherals/can.cpp
 )
 
 find_package(libusb CONFIG QUIET)

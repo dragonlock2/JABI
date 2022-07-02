@@ -8,6 +8,8 @@
 namespace py = pybind11;
 using namespace jabi;
 
+// TODO in python, abstract out the num_left to can_read_simple, return None if empty
+
 PYBIND11_MODULE(jabi, m) { // name matches CMake module
     py::class_<Device>(m, "Device")
         .def("serial", &Device::serial)

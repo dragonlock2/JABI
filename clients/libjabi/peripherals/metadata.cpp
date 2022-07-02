@@ -9,11 +9,11 @@ namespace jabi {
 
 std::string Device::serial() {
     iface_req_t req = {
-        .periph_id = PERIPH_METADATA_ID,
-        .periph_idx = 0,
-        .periph_fn = METADATA_SERIAL_ID,
+        .periph_id   = PERIPH_METADATA_ID,
+        .periph_idx  = 0,
+        .periph_fn   = METADATA_SERIAL_ID,
         .payload_len = 0,
-        .payload = {0},
+        .payload     = {0},
     };
 
     iface_resp_t resp = interface->send_request(req);
@@ -24,11 +24,11 @@ std::string Device::serial() {
 
 int Device::num_inst(int periph_id) {
     iface_req_t req = {
-        .periph_id = PERIPH_METADATA_ID,
-        .periph_idx = 0,
-        .periph_fn = METADATA_NUM_INST_ID,
+        .periph_id   = PERIPH_METADATA_ID,
+        .periph_idx  = 0,
+        .periph_fn   = METADATA_NUM_INST_ID,
         .payload_len = sizeof(metadata_num_inst_req_t),
-        .payload = {0},
+        .payload     = {0},
     };
 
     auto args = reinterpret_cast<metadata_num_inst_req_t*>(req.payload);
@@ -49,11 +49,11 @@ std::string Device::echo(std::string str) {
     }
 
     iface_req_t req = {
-        .periph_id = PERIPH_METADATA_ID,
-        .periph_idx = 0,
-        .periph_fn = METADATA_ECHO_ID,
+        .periph_id   = PERIPH_METADATA_ID,
+        .periph_idx  = 0,
+        .periph_fn   = METADATA_ECHO_ID,
         .payload_len = static_cast<uint16_t>(str.length()+1), // include null
-        .payload = {0},
+        .payload     = {0},
     };
     memcpy(req.payload, str.c_str(), req.payload_len);
 
