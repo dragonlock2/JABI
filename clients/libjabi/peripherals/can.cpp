@@ -6,41 +6,34 @@ namespace jabi {
 #include <jabi/peripherals.h>
 #include <jabi/peripherals/can.h>
 
+#define CAN_MAX_LEN 64
+
 CANMessage::CANMessage()
 :
-    id(0), ext(false), fd(false), brs(false), rtr(false), len(0), data({})
+    id(0), ext(false), fd(false), brs(false), rtr(false)
 {}
 
 CANMessage::CANMessage(int id, int req_len, bool fd, bool brs)
 :
-    id(id), ext(id & ~0x7FF), fd(fd), brs(brs), rtr(true), len(req_len), data({})
+    id(id), ext(id & ~0x7FF), fd(fd), brs(brs), rtr(true), data(req_len, 0)
 {}
 
-CANMessage::CANMessage(int id, std::vector<char> data, bool fd, bool brs)
+CANMessage::CANMessage(int id, std::vector<uint8_t> data, bool fd, bool brs)
 :
-    id(id), ext(id & ~0x7FF), fd(fd), brs(brs), rtr(false), len(data.size())
-{
-    if (data.size() > this->data.size()) {
-        throw std::runtime_error("input data too long");
-    }
-    std::copy(data.begin(), data.end(), this->data.begin());
-    for (auto i = data.size(); i < this->data.size(); i++) {
-        this->data[i] = 0;
-    }
-}
+    id(id), ext(id & ~0x7FF), fd(fd), brs(brs), rtr(false), data(data)
+{}
 
 std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
     os << "CANMessage(id=" << m.id << ",ext=" << m.ext << ",fd=" << m.fd;
-    os << ",brs=" << m.brs << ",rtr=" << m.rtr << ",len=" << m.len;
-    if (!m.rtr) {
+    os << ",brs=" << m.brs << ",rtr=" << m.rtr;
+    if (m.rtr) {
+        os << ",data.size()=" << m.data.size();
+    } else {
         os << ",data={";
-        for (auto i = 0; i < m.len-1; i++) {
-            os << static_cast<int>(std::byte(m.data[i])) << ",";
-        }
-        os << static_cast<int>(std::byte(m.data[m.len-1])) << "}";
+        for (auto i : m.data) { os << i << ","; }
+        os << "}";
     }
-    os << ")";
-    return os;
+    return os << ")";
 }
 
 void Device::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx) {
@@ -125,6 +118,10 @@ CANState Device::can_state(int idx) {
 }
 
 void Device::can_write(CANMessage msg, int idx) {
+    if (msg.data.size() > CAN_MAX_LEN) {
+        throw std::runtime_error("data too long");
+    }
+
     iface_req_t req = {
         .periph_id   = PERIPH_CAN_ID,
         .periph_idx  = static_cast<uint16_t>(idx),
@@ -139,9 +136,9 @@ void Device::can_write(CANMessage msg, int idx) {
     args->fd       = msg.fd;
     args->brs      = msg.brs;
     args->rtr      = msg.rtr;
-    args->data_len = std::min<size_t>(msg.data.size(), msg.len);
+    args->data_len = msg.data.size();
     if (!msg.rtr) {
-        memcpy(args->data, msg.data.data(), args->data_len);
+        memcpy(args->data, msg.data.data(), msg.data.size());
         req.payload_len += args->data_len;
     }
 
@@ -174,16 +171,16 @@ int Device::can_read(CANMessage &msg, int idx) {
 
     if  ((ret->rtr && resp.payload_len != sizeof(can_read_resp_t)) ||
         (!ret->rtr && resp.payload_len != sizeof(can_read_resp_t) + ret->data_len) ||
-          ret->data_len > msg.data.size()) {
+          ret->data_len > CAN_MAX_LEN) {
         throw std::runtime_error("unexpected payload length");
     }
 
-    msg.id  = ret->id;
-    msg.ext = ret->id_type;
-    msg.fd  = ret->fd;
-    msg.brs = ret->brs;
-    msg.rtr = ret->rtr;
-    msg.len = ret->data_len;
+    msg.id   = ret->id;
+    msg.ext  = ret->id_type;
+    msg.fd   = ret->fd;
+    msg.brs  = ret->brs;
+    msg.rtr  = ret->rtr;
+    msg.data = std::vector<uint8_t>(ret->data_len, 0);
     if (!ret->rtr) {
         memcpy(msg.data.data(), ret->data, ret->data_len);
     }

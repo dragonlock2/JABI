@@ -27,7 +27,7 @@ void testDevice(jabi::Device d) {
         std::cout << " rx_err" << state.rx_err << std::endl;
 
         std::cout << "Sending a message" << std::endl;
-        jabi::CANMessage msg(0x69, std::vector<char>{1, 2, 3}, false, false);
+        jabi::CANMessage msg(0x69, std::vector<uint8_t>{1, 2, 3}, false, false);
         d.can_write(msg, i);
 
         std::this_thread::sleep_for(100ms); // wait for some messages
@@ -43,9 +43,9 @@ int main() {
         testDevice(d);
     }
 
-    // std::cout << "Found UART: ";
-    // testDevice(jabi::UARTInterface::get_device("COM5", 230400));
-    // std::cout << "done!" << std::endl;
+    std::cout << "Found UART: ";
+    testDevice(jabi::UARTInterface::get_device("COM5", 230400));
+    std::cout << "done!" << std::endl;
 
     return 0;
 }

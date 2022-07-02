@@ -36,12 +36,11 @@ struct CANMessage {
     bool fd;
     bool brs;
     bool rtr;
-    int  len;
-    std::array<char, 64> data;
+    std::vector<uint8_t> data;
 
     CANMessage();
     CANMessage(int id, int req_len, bool fd=false, bool brs=false);
-    CANMessage(int id, std::vector<char> data, bool fd=false, bool brs=false);
+    CANMessage(int id, std::vector<uint8_t> data, bool fd=false, bool brs=false);
 };
 
 std::ostream &operator<<(std::ostream &os, CANMessage const &m);
