@@ -30,7 +30,7 @@ std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
         os << ",data.size()=" << m.data.size();
     } else {
         os << ",data={";
-        for (auto i : m.data) { os << i << ","; }
+        for (auto i : m.data) { os << static_cast<int>(i) << ","; }
         os << "}";
     }
     return os << ")";

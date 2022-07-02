@@ -11,6 +11,14 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 using namespace jabi;
 
+py::object can_read_simple(Device &d, int idx) {
+    CANMessage msg;
+    if (d.can_read(msg, idx) == -1) {
+        return py::none();
+    }
+    return py::cast(msg);
+}
+
 PYBIND11_MODULE(jabi, m) {
     py::class_<Device>(m, "Device")
         /* Metadata */
@@ -24,9 +32,9 @@ PYBIND11_MODULE(jabi, m) {
         .def("can_set_rate", &Device::can_set_rate,
             "bitrate"_a, "bitrate_data"_a, "idx"_a=0)
         .def("can_set_mode", &Device::can_set_mode, "mode"_a, "idx"_a=0)
-        .def("can_state", &Device::can_state, "idx"_a=0);
-        // TODO write
-        // TODO read abstract out the num_left to can_read_simple, return None if empty
+        .def("can_state", &Device::can_state, "idx"_a=0)
+        .def("can_write", &Device::can_write, "msg"_a, "idx"_a=0)
+        .def("can_read", &can_read_simple, "idx"_a=0);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")
@@ -52,6 +60,10 @@ PYBIND11_MODULE(jabi, m) {
 
     py::class_<CANMessage>(m, "CANMessage")
         .def(py::init<>())
+        .def(py::init<int, int, bool, bool>(),
+            "id"_a, "req_len"_a, "fd"_a=false, "brs"_a=false)
+        .def(py::init<int, std::vector<uint8_t>, bool, bool>(),
+            "id"_a, "data"_a, "fd"_a=false, "brs"_a=false)
         .def_readwrite("id", &CANMessage::id)
         .def_readwrite("ext", &CANMessage::ext)
         .def_readwrite("fd", &CANMessage::fd)
@@ -60,6 +72,4 @@ PYBIND11_MODULE(jabi, m) {
         .def_readwrite("data", &CANMessage::data) // Note can't set individual elements
         .def("__repr__", [](const CANMessage &m){
             std::stringstream s; s << m; return s.str(); });
-
-    // TODO diff constructors
 }
