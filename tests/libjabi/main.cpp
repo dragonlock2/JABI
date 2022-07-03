@@ -17,22 +17,25 @@ void testDevice(jabi::Device d) {
     /* CAN */
     auto lim = d.num_inst(jabi::CAN_ID);
     for (auto i = 0; i < lim; i++) {
-        std::cout << "Capturing all messages on CAN" << i << std::endl;
-        d.can_set_filter(0, 0, 0, 0, i);
+        std::cout << "\tListening only to 0x69420 messages on CAN " << i << std::endl;
         d.can_set_rate(125000, 1000000, i);
+        d.can_set_filter(0x69420, 0xFFFFF, 0, 0, i);
         d.can_set_mode(jabi::CANMode::NORMAL, i);
+        auto s = d.can_state(i);
+        std::cout << "\tstate: " << s.state << " tx_err: " << s.tx_err;
+        std::cout << " rx_err: " << s.rx_err << std::endl;
 
-        jabi::CANState state = d.can_state(i);
-        std::cout << "state=" << state.state << " tx_err=" << state.tx_err;
-        std::cout << " rx_err" << state.rx_err << std::endl;
+        d.can_write(jabi::CANMessage(0x69420, std::vector<uint8_t>{69, 42}), i);
+        d.can_write(jabi::CANMessage(0x69420, 2), i);
+        std::cout << "\tSent some messages" << std::endl;
 
-        std::cout << "Sending a message" << std::endl;
-        jabi::CANMessage msg(0x69, std::vector<uint8_t>{1, 2, 3}, false, false);
-        d.can_write(msg, i);
+        std::this_thread::sleep_for(500ms);
+        std::cout << "\tPrinting received messsages" << std::endl;
+        jabi::CANMessage msg;
 
-        std::this_thread::sleep_for(100ms); // wait for some messages
+        // less LOC, but one extra check
         while (d.can_read(msg, i) != -1) {
-            std::cout << "Got msg: " << msg << std::endl;
+            std::cout << "\t " << msg << std::endl;
         }
     }
 }

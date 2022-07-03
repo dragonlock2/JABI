@@ -89,7 +89,9 @@ PERIPH_FUNC_DEF(can_set_filter) {
     can->filter_ext.rtr      = args->rtr ? CAN_REMOTEREQUEST : CAN_DATAFRAME;
     can->filter_ext.rtr_mask = args->rtr_mask ? 1 : 0;
 
-    can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
+    if (args->id_mask <= CAN_STD_ID_MASK) {
+        can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
+    }
     can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
     if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
         LOG_ERR("failed to change filters for can%d", idx);

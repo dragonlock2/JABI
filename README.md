@@ -84,6 +84,10 @@ pip install clients/pyjabi
 
 [`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [tests/grpc-client](tests/grpc-client).
 
+## Known Issues
+
+- UART interface timeout doesn't work when binded in Python.
+
 ## TODO
 
 The following gRPC clients.
@@ -102,6 +106,7 @@ The following peripherals.
 - GPIO
 - ADC
 - DAC
+- PWM
 
 Fun things to look into one day.
 

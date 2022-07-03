@@ -1,3 +1,4 @@
+#include <sstream>
 #include <libjabi/byteorder.h>
 #include <libjabi/interfaces/interface.h>
 
@@ -24,16 +25,19 @@ CANMessage::CANMessage(int id, std::vector<uint8_t> data, bool fd, bool brs)
 {}
 
 std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
-    os << "CANMessage(id=" << m.id << ",ext=" << m.ext << ",fd=" << m.fd;
-    os << ",brs=" << m.brs << ",rtr=" << m.rtr;
+    std::stringstream s;
+    s << std::hex << std::showbase << "CANMessage(";
+    s <<  "id="  << m.id  << ",ext=" << m.ext << ",fd=" << m.fd;
+    s << ",brs=" << m.brs << ",rtr=" << m.rtr;
     if (m.rtr) {
-        os << ",data.size()=" << m.data.size();
+        s << ",data.size()=" << m.data.size();
     } else {
-        os << ",data={";
-        for (auto i : m.data) { os << static_cast<int>(i) << ","; }
-        os << "}";
+        s << ",data={";
+        for (auto i : m.data) { s << static_cast<int>(i) << ","; }
+        s << "}";
     }
-    return os << ")";
+    s << ")";
+    return os << s.str();
 }
 
 void Device::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx) {

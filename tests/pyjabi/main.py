@@ -1,11 +1,31 @@
 import jabi
+import time
 
 def testDevice(d):
+    # Metadata
     print(
         "SN=" + d.serial(),
         "num_meta=" + str(d.num_inst(jabi.METADATA_ID)),
         "echo=" + d.echo("❤️")
     )
+
+    # CAN
+    for i in range(d.num_inst(jabi.CAN_ID)):
+        print("\tListening only to 0x69420 messages on CAN", i)
+        d.can_set_rate(125000, 1000000, i)
+        d.can_set_filter(0x69420, 0xFFFFF, 0, 0, i)
+        d.can_set_mode(jabi.CANMode.NORMAL, i)
+        s = d.can_state(i)
+        print("\tstate:", s.state, "tx_err:", s.tx_err, "rx_err:", s.rx_err)
+
+        d.can_write(jabi.CANMessage(0x69420, [69, 42]), i)
+        d.can_write(jabi.CANMessage(0x69420, 2), i)
+        print("\tSent some messages")
+
+        time.sleep(0.5)
+        print("\tPrinting received messsages")
+        while (msg := d.can_read(i)):
+            print("\t", msg)
 
 if __name__ == "__main__":
     for d in jabi.USBInterface.list_devices():
