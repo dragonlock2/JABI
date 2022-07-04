@@ -8,6 +8,7 @@ using grpc::Status;
 using google::protobuf::Empty;
 using google::protobuf::StringValue;
 using google::protobuf::UInt32Value;
+using google::protobuf::BytesValue;
 
 namespace jabi {
 
@@ -173,5 +174,46 @@ int gRPCDevice::can_read(CANMessage &msg, int idx) {
     msg.data = std::vector<uint8_t>(s.begin(), s.end());
     return resp.num_left();
 }
+
+/* I2C */
+void gRPCDevice::i2c_set_freq(I2CFreq preset, int idx) {
+    JABI::I2CSetFreqRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_preset(static_cast<JABI::I2CFreq>(preset));
+    req.set_idx(idx);
+    Status status = stub->i2c_set_freq(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::i2c_write(int addr, std::vector<uint8_t> data, int idx) {
+    JABI::I2CWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_addr(addr);
+    req.set_data(std::string(data.begin(), data.end()));
+    req.set_idx(idx);
+    Status status = stub->i2c_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+std::vector<uint8_t> gRPCDevice::i2c_read(int addr, size_t len, int idx) {
+    JABI::I2CReadRequest req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_addr(addr);
+    req.set_len(len);
+    req.set_idx(idx);
+    Status status = stub->i2c_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
 
 };

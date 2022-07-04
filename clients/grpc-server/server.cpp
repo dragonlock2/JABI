@@ -85,3 +85,24 @@ Status JABIServiceImpl::can_read(ServerContext*, const Index* req, CANReadRespon
     )
 }
 
+/* I2C */
+Status JABIServiceImpl::i2c_set_freq(ServerContext*, const I2CSetFreqRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->i2c_set_freq(static_cast<jabi::I2CFreq>(req->preset()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::i2c_write(ServerContext*, const I2CWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        auto s = req->data();
+        dev->i2c_write(req->addr(), std::vector<uint8_t>(s.begin(), s.end()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::i2c_read(ServerContext*, const I2CReadRequest* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto v = dev->i2c_read(req->addr(), req->len(), req->idx());
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}
+

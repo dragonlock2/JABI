@@ -14,6 +14,7 @@ namespace jabi {
 enum class InstID {
     METADATA = JABI::InstID::METADATA,
     CAN      = JABI::InstID::CAN,
+    I2C      = JABI::InstID::I2C,
 };
 
 /* CAN */
@@ -44,6 +45,15 @@ struct CANMessage {
 
 std::ostream &operator<<(std::ostream &os, CANMessage const &m);
 
+/* I2C */
+enum class I2CFreq {
+    STANDARD  = JABI::I2CFreq::STANDARD,  // 100kHz
+    FAST      = JABI::I2CFreq::FAST,      // 400kHz
+    FAST_PLUS = JABI::I2CFreq::FAST_PLUS, // 1MHz
+    HIGH      = JABI::I2CFreq::HIGH,      // 3.4MHz
+    ULTRA     = JABI::I2CFreq::ULTRA,     // 5MHz
+};
+
 class gRPCDevice {
 public:
     gRPCDevice(std::shared_ptr<grpc::Channel> channel)
@@ -61,6 +71,11 @@ public:
     CANState can_state(int idx=0);
     void can_write(CANMessage msg, int idx=0);
     int can_read(CANMessage &msg, int idx=0);
+
+    /* I2C */
+    void i2c_set_freq(I2CFreq preset, int idx=0);
+    void i2c_write(int addr, std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> i2c_read(int addr, size_t len, int idx=0);
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;

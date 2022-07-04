@@ -16,6 +16,11 @@ service Device {
     rpc can_state(Index) returns (CANStateResponse);
     rpc can_write(CANWriteRequest) returns (google.protobuf.Empty);
     rpc can_read(Index) returns (CANReadResponse);
+
+    /* I2C */
+    rpc i2c_set_freq(I2CSetFreqRequest) returns (google.protobuf.Empty);
+    rpc i2c_write(I2CWriteRequest) returns (google.protobuf.Empty);
+    rpc i2c_read(I2CReadRequest) returns (google.protobuf.BytesValue);
 }
 
 /* Common */
@@ -27,6 +32,7 @@ message Index {
 enum InstID {
     METADATA = 0;
     CAN = 1;
+    I2C = 2;
 }
 
 message NumInstRequest {
@@ -82,4 +88,30 @@ message CANWriteRequest {
 message CANReadResponse {
     int32 num_left = 1;
     CANMessage msg = 2;
+}
+
+/* I2C */
+enum I2CFreq {
+    STANDARD  = 0; // 100kHz
+    FAST = 1;      // 400kHz
+    FAST_PLUS = 2; // 1MHz
+    HIGH = 3;      // 3.4MHz
+    ULTRA = 4;     // 5MHz
+}
+
+message I2CSetFreqRequest {
+    I2CFreq preset = 1;
+    uint32 idx = 2;
+}
+
+message I2CWriteRequest {
+    uint32 addr = 1;
+    bytes data = 2;
+    uint32 idx = 3;
+}
+
+message I2CReadRequest {
+    uint32 addr = 1;
+    uint32 len = 2;
+    uint32 idx = 3;
 }
