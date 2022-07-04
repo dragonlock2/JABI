@@ -140,7 +140,7 @@ void Device::can_write(CANMessage msg, int idx) {
     args->fd       = msg.fd;
     args->brs      = msg.brs;
     args->rtr      = msg.rtr;
-    args->data_len = msg.data.size();
+    args->data_len = static_cast<uint8_t>(msg.data.size());
     if (!msg.rtr) {
         memcpy(args->data, msg.data.data(), msg.data.size());
         req.payload_len += args->data_len;
