@@ -80,6 +80,9 @@ int main() {
 #endif
 
     for (int i = 0; i < NUM_PERIPHERALS; i++) {
+        if (peripherals[i]->num_idx == 0) {
+            continue;
+        }
         struct k_sem *locks = malloc(sizeof(struct k_sem) * peripherals[i]->num_idx);
         if (locks == NULL) {
             LOG_ERR("failed to allocate locks, time to die");
