@@ -5,12 +5,12 @@ def testDevice(d):
     # Metadata
     print(
         "SN=" + d.serial(),
-        "num_meta=" + str(d.num_inst(jabi.METADATA_ID)),
+        "num_meta=" + str(d.num_inst(jabi.InstID.METADATA)),
         "echo=" + d.echo("❤️")
     )
 
     # CAN
-    for i in range(d.num_inst(jabi.CAN_ID)):
+    for i in range(d.num_inst(jabi.InstID.CAN)):
         print("\tListening only to 0x69420 messages on CAN", i)
         d.can_set_rate(125000, 1000000, i)
         d.can_set_filter(0x69420, 0xFFFFF, 0, 0, i)

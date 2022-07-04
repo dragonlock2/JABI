@@ -22,7 +22,7 @@ std::string Device::serial() {
     return std::string(reinterpret_cast<char*>(resp.payload));
 }
 
-int Device::num_inst(int periph_id) {
+int Device::num_inst(InstID id) {
     iface_req_t req = {
         .periph_id   = PERIPH_METADATA_ID,
         .periph_idx  = 0,
@@ -32,7 +32,7 @@ int Device::num_inst(int periph_id) {
     };
 
     auto args = reinterpret_cast<metadata_num_inst_req_t*>(req.payload);
-    args->periph_id = htole<uint16_t>(static_cast<uint16_t>(periph_id));
+    args->periph_id = htole<uint16_t>(static_cast<uint16_t>(id));
 
     iface_resp_t resp = interface->send_request(req);
     if (resp.payload_len != sizeof(metadata_num_inst_resp_t)) {

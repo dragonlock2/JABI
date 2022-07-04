@@ -12,11 +12,12 @@ namespace jabi {
 class Interface;
 
 /* Metadata */
-const int METADATA_ID = PERIPH_METADATA_ID;
+enum class InstID {
+    METADATA = PERIPH_METADATA_ID,
+    CAN      = PERIPH_CAN_ID,
+};
 
 /* CAN */
-const int CAN_ID = PERIPH_CAN_ID;
-
 enum class CANMode {
     NORMAL     = 0,
     LOOPBACK   = 1,
@@ -48,7 +49,7 @@ class Device {
 public:
     /* Metadata */
     std::string serial();
-    int num_inst(int periph_id);
+    int num_inst(InstID id);
     std::string echo(std::string str);
 
     /* CAN */

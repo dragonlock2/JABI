@@ -1,31 +1,85 @@
 syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+package JABI;
 
-service JABI {
+service Device {
     /* Metadata */
-    rpc serial (SerialRequest) returns (SerialResponse);
-    rpc num_inst (NumInstRequest) returns (NumInstResponse);
-    rpc echo (EchoRequest) returns (EchoResponse);
+    rpc serial (google.protobuf.Empty) returns (google.protobuf.StringValue);
+    rpc num_inst (NumInstRequest) returns (google.protobuf.UInt32Value);
+    rpc echo (google.protobuf.StringValue) returns (google.protobuf.StringValue);
+
+    /* CAN */
+    rpc can_set_filter(CANSetFilterRequest) returns (google.protobuf.Empty);
+    rpc can_set_rate(CANSetRateRequest) returns (google.protobuf.Empty);
+    rpc can_set_mode(CANSetModeRequest) returns (google.protobuf.Empty);
+    rpc can_state(Index) returns (CANStateResponse);
+    rpc can_write(CANWriteRequest) returns (google.protobuf.Empty);
+    rpc can_read(Index) returns (CANReadResponse);
+}
+
+/* Common */
+message Index {
+    uint32 idx = 1;
 }
 
 /* Metadata */
-message SerialRequest {}
-
-message SerialResponse {
-    string sn = 1;
+enum InstID {
+    METADATA = 0;
+    CAN = 1;
 }
 
 message NumInstRequest {
-    uint32 periph_id = 1;
+    InstID id = 1;
 }
 
-message NumInstResponse {
-    uint32 num_idx = 1;
+/* CAN */
+message CANSetFilterRequest {
+    uint32 id = 1;
+    uint32 id_mask = 2;
+    bool rtr = 3;
+    bool rtr_mask = 4;
+    uint32 idx = 5;
 }
 
-message EchoRequest {
-    string msg = 1;
+message CANSetRateRequest {
+    uint32 bitrate = 1;
+    uint32 bitrate_data = 2;
+    uint32 idx = 3;
 }
 
-message EchoResponse {
-    string msg = 1;
+enum CANMode {
+    NORMAL = 0;
+    LOOPBACK = 1;
+    LISTENONLY = 2;
+}
+
+message CANSetModeRequest {
+    CANMode mode = 1;
+    uint32 idx = 2;
+}
+
+message CANStateResponse {
+    uint32 state = 1;
+    uint32 tx_err = 2;
+    uint32 rx_err = 3;
+}
+
+message CANMessage {
+    uint32 id = 1;
+    bool ext = 2;
+    bool fd = 3;
+    bool brs = 4;
+    bool rtr = 5;
+    bytes data = 6;
+}
+
+message CANWriteRequest {
+    CANMessage msg = 1;
+    uint32 idx = 2;
+}
+
+message CANReadResponse {
+    int32 num_left = 1;
+    CANMessage msg = 2;
 }

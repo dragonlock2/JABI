@@ -12,7 +12,6 @@ else()
 endif()
 
 add_subdirectory(../../include/protos ${CMAKE_CURRENT_BINARY_DIR}/protos)
-add_subdirectory(../../clients/libjabi ${CMAKE_CURRENT_BINARY_DIR}/libjabi)
 add_executable(main
     main.cpp
     client.cpp
@@ -22,4 +21,4 @@ if(MSVC)
     find_library(GETOPT_LIBRARIES NAMES getopt)
 endif()
 
-target_link_libraries(main jabiproto libjabi ${GETOPT_LIBRARIES})
+target_link_libraries(main jabiproto ${GETOPT_LIBRARIES})

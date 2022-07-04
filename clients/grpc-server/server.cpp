@@ -1,35 +1,87 @@
 #include "server.h"
 
+#define CHECK_EXCEPT(c)                                  \
+    try {                                                \
+        c                                                \
+        return Status::OK;                               \
+    } catch(const std::runtime_error &e) {               \
+        std::cerr << "error: " << e.what() << std::endl; \
+        return Status::CANCELLED;                        \
+    }
+
 /* Metadata */
-Status JABIServiceImpl::serial(ServerContext*,
-        const SerialRequest*, SerialResponse* resp) {
-    try {
-        resp->set_sn(dev->serial());
-        return Status::OK;
-    } catch(const std::runtime_error &e) {
-        std::cerr << "error: " << e.what() << std::endl;
-        return Status::CANCELLED;
-    }
+Status JABIServiceImpl::serial(ServerContext*, const Empty*, StringValue* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->serial());
+    )
 }
 
-Status JABIServiceImpl::num_inst(ServerContext*,
-        const NumInstRequest* req, NumInstResponse* resp) {
-    try {
-        resp->set_num_idx(dev->num_inst(req->periph_id()));
-        return Status::OK;
-    } catch(const std::runtime_error &e) {
-        std::cerr << "error: " << e.what() << std::endl;
-        return Status::CANCELLED;
-    }
+Status JABIServiceImpl::num_inst(ServerContext*, const NumInstRequest* req, UInt32Value* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->num_inst(static_cast<jabi::InstID>(req->id())));
+    )
 }
 
-Status JABIServiceImpl::echo(ServerContext*,
-        const EchoRequest* req, EchoResponse* resp) {
-    try {
-        resp->set_msg(dev->echo(req->msg()));
-        return Status::OK;
-    } catch(const std::runtime_error &e) {
-        std::cerr << "error: " << e.what() << std::endl;
-        return Status::CANCELLED;
-    }
+Status JABIServiceImpl::echo(ServerContext*, const StringValue* req, StringValue* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->echo(req->value()));
+    )
 }
+
+/* CAN */
+Status JABIServiceImpl::can_set_filter(ServerContext*, const CANSetFilterRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->can_set_filter(req->id(), req->id_mask(), req->rtr(), req->rtr_mask(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::can_set_rate(ServerContext*, const CANSetRateRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->can_set_rate(req->bitrate(), req->bitrate_data(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::can_set_mode(ServerContext*, const CANSetModeRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->can_set_mode(static_cast<jabi::CANMode>(req->mode()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::can_state(ServerContext*, const Index* req, CANStateResponse* resp) {
+    CHECK_EXCEPT(
+        jabi::CANState s = dev->can_state(req->idx());
+        resp->set_state(s.state);
+        resp->set_tx_err(s.tx_err);
+        resp->set_rx_err(s.rx_err);
+    )
+}
+
+Status JABIServiceImpl::can_write(ServerContext*, const CANWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        jabi::CANMessage m;
+        m.id   = req->msg().id();
+        m.ext  = req->msg().ext();
+        m.fd   = req->msg().fd();
+        m.brs  = req->msg().brs();
+        m.rtr  = req->msg().rtr();
+        auto s = req->msg().data();
+        m.data = std::vector<uint8_t>(s.begin(), s.end());
+        dev->can_write(m, req->idx());
+    )
+}
+
+Status JABIServiceImpl::can_read(ServerContext*, const Index* req, CANReadResponse* resp) {
+    CHECK_EXCEPT(
+        jabi::CANMessage msg;
+        resp->set_num_left(dev->can_read(msg, req->idx()));
+        CANMessage* m = new CANMessage();
+        m->set_id(msg.id);
+        m->set_ext(msg.ext);
+        m->set_fd(msg.fd);
+        m->set_brs(msg.brs);
+        m->set_rtr(msg.rtr);
+        m->set_data(std::string(msg.data.begin(), msg.data.end()));
+        resp->set_allocated_msg(m);
+    )
+}
+

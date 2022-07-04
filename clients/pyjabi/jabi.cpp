@@ -44,8 +44,9 @@ PYBIND11_MODULE(jabi, m) {
         .def("get_device", &UARTInterface::get_device);
 
     /* Metadata */
-    m.attr("METADATA_ID") = METADATA_ID;
-    m.attr("CAN_ID") = CAN_ID;
+    py::enum_<InstID>(m, "InstID")
+        .value("METADATA", InstID::METADATA)
+        .value("CAN", InstID::CAN);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")

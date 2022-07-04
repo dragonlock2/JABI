@@ -10,12 +10,12 @@ using namespace std::chrono_literals;
 void testDevice(jabi::Device d) {
     /* Metadata */
     std::cout << "SN=" << d.serial();
-    std::cout << " num_meta=" << d.num_inst(jabi::METADATA_ID);
+    std::cout << " num_meta=" << d.num_inst(jabi::InstID::METADATA);
     std::cout << " echo=" << d.echo("❤️");
     std::cout << std::endl;
 
     /* CAN */
-    auto lim = d.num_inst(jabi::CAN_ID);
+    auto lim = d.num_inst(jabi::InstID::CAN);
     for (auto i = 0; i < lim; i++) {
         std::cout << "\tListening only to 0x69420 messages on CAN " << i << std::endl;
         d.can_set_rate(125000, 1000000, i);
