@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sstream>
 #include <libjabi/byteorder.h>
 #include <libjabi/interfaces/interface.h>
