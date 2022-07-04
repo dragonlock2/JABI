@@ -39,8 +39,8 @@ void Device::i2c_write(int addr, std::vector<uint8_t> data, int idx) {
     };
 
     auto args = reinterpret_cast<i2c_write_j_req_t*>(req.payload);
-    args->addr = htole<uint16_t>(addr);
-    args->data_len = htole<uint16_t>(data.size());
+    args->addr = htole<uint16_t>(static_cast<uint16_t>(addr));
+    args->data_len = htole<uint16_t>(static_cast<uint16_t>(data.size()));
     memcpy(args->data, data.data(), data.size());
 
     iface_resp_t resp = interface->send_request(req);
@@ -59,8 +59,8 @@ std::vector<uint8_t> Device::i2c_read(int addr, size_t len, int idx) {
     };
 
     auto args = reinterpret_cast<i2c_read_j_req_t*>(req.payload);
-    args->addr = htole<uint16_t>(addr);
-    args->data_len = htole<uint16_t>(len);
+    args->addr = htole<uint16_t>(static_cast<uint16_t>(addr));
+    args->data_len = htole<uint16_t>(static_cast<uint16_t>(len));
 
     iface_resp_t resp = interface->send_request(req);
     if (resp.payload_len != len) {
