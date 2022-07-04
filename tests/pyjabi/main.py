@@ -26,6 +26,20 @@ def testDevice(d):
         print("\tPrinting received messsages")
         while (msg := d.can_read(i)):
             print("\t", msg)
+    print()
+
+    # I2C
+    for i in range(d.num_inst(jabi.InstID.I2C)):
+        print("\tScanning for devices on I2C", i)
+        d.i2c_set_freq(jabi.I2CFreq.STANDARD, i)
+        for j in range(128):
+            try:
+                d.i2c_write(j, [], i)
+                d.i2c_read(j, 0, i)
+                print("\t Found", j)
+            except:
+                continue
+    print()
 
 if __name__ == "__main__":
     for d in jabi.USBInterface.list_devices():

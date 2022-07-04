@@ -34,7 +34,12 @@ PYBIND11_MODULE(jabi, m) {
         .def("can_set_mode", &Device::can_set_mode, "mode"_a, "idx"_a=0)
         .def("can_state", &Device::can_state, "idx"_a=0)
         .def("can_write", &Device::can_write, "msg"_a, "idx"_a=0)
-        .def("can_read", &can_read_simple, "idx"_a=0);
+        .def("can_read", &can_read_simple, "idx"_a=0)
+
+        /* I2C */
+        .def("i2c_set_freq", &Device::i2c_set_freq, "preset"_a, "idx"_a=0)
+        .def("i2c_write", &Device::i2c_write, "addr"_a, "data"_a, "idx"_a=0)
+        .def("i2c_read", &Device::i2c_read, "addr"_a, "len"_a, "idx"_a=0);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")
@@ -46,7 +51,8 @@ PYBIND11_MODULE(jabi, m) {
     /* Metadata */
     py::enum_<InstID>(m, "InstID")
         .value("METADATA", InstID::METADATA)
-        .value("CAN", InstID::CAN);
+        .value("CAN", InstID::CAN)
+        .value("I2C", InstID::I2C);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -73,4 +79,12 @@ PYBIND11_MODULE(jabi, m) {
         .def_readwrite("data", &CANMessage::data) // Note can't set individual elements
         .def("__repr__", [](const CANMessage &m){
             std::stringstream s; s << m; return s.str(); });
+
+    /* I2C */
+    py::enum_<I2CFreq>(m, "I2CFreq")
+        .value("STANDARD", I2CFreq::STANDARD)
+        .value("FAST", I2CFreq::FAST)
+        .value("FAST_PLUS", I2CFreq::FAST_PLUS)
+        .value("HIGH", I2CFreq::HIGH)
+        .value("ULTRA", I2CFreq::ULTRA);
 }

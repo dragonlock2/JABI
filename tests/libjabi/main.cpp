@@ -38,6 +38,22 @@ void testDevice(jabi::Device d) {
             std::cout << "\t " << msg << std::endl;
         }
     }
+    std::cout << std::endl;
+
+    /* I2C */
+    lim = d.num_inst(jabi::InstID::I2C);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tScanning for devices on I2C " << i << std::endl;
+        d.i2c_set_freq(jabi::I2CFreq::STANDARD, i);
+        for (int j = 0; j < 128; j++) {
+            try {
+                d.i2c_write(j, std::vector<uint8_t>(), i);
+                d.i2c_read(j, 0, i); // only one needed, testing both
+                std::cout << "\t Found " << j << std::endl;
+            } catch(const std::runtime_error&) {}
+        }
+    }
+    std::cout << std::endl;
 }
 
 int main() {

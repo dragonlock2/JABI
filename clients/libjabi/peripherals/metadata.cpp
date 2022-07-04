@@ -44,7 +44,7 @@ int Device::num_inst(InstID id) {
 }
 
 std::string Device::echo(std::string str) {
-    if (str.length() > RESP_PAYLOAD_MAX_SIZE-1) {
+    if (str.length() > RESP_PAYLOAD_MAX_SIZE) {
         throw std::runtime_error("string too long");
     }
 
@@ -52,15 +52,13 @@ std::string Device::echo(std::string str) {
         .periph_id   = PERIPH_METADATA_ID,
         .periph_idx  = 0,
         .periph_fn   = METADATA_ECHO_ID,
-        .payload_len = static_cast<uint16_t>(str.length()+1), // include null
+        .payload_len = static_cast<uint16_t>(str.length()),
         .payload     = {0},
     };
-    memcpy(req.payload, str.c_str(), req.payload_len);
+    memcpy(req.payload, str.c_str(), str.length());
 
     iface_resp_t resp = interface->send_request(req);
-
-    resp.payload[RESP_PAYLOAD_MAX_SIZE-1] = 0x00; // just in case
-    return std::string(reinterpret_cast<char*>(resp.payload));
+    return std::string(reinterpret_cast<char*>(resp.payload), resp.payload_len);
 }
 
 };

@@ -15,6 +15,7 @@ class Interface;
 enum class InstID {
     METADATA = PERIPH_METADATA_ID,
     CAN      = PERIPH_CAN_ID,
+    I2C      = PERIPH_I2C_ID,
 };
 
 /* CAN */
@@ -45,6 +46,15 @@ struct CANMessage {
 
 std::ostream &operator<<(std::ostream &os, CANMessage const &m);
 
+/* I2C */
+enum class I2CFreq {
+    STANDARD  = 0, // 100kHz
+    FAST      = 1, // 400kHz
+    FAST_PLUS = 2, // 1MHz
+    HIGH      = 3, // 3.4MHz
+    ULTRA     = 4, // 5MHz
+};
+
 class Device {
 public:
     /* Metadata */
@@ -59,6 +69,11 @@ public:
     CANState can_state(int idx=0);
     void can_write(CANMessage msg, int idx=0);
     int can_read(CANMessage &msg, int idx=0);
+
+    /* I2C */
+    void i2c_set_freq(I2CFreq preset, int idx=0);
+    void i2c_write(int addr, std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> i2c_read(int addr, size_t len, int idx=0);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

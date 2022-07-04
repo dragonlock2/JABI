@@ -5,6 +5,7 @@ add_library(libjabi
     interfaces/uart.cpp
     peripherals/metadata.cpp
     peripherals/can.cpp
+    peripherals/i2c.cpp
 )
 
 find_package(libusb CONFIG QUIET)
