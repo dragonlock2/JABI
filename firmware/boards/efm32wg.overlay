@@ -6,6 +6,7 @@
 
     peripherals {
         compatible = "jabi,peripherals";
+        i2c = <&i2c0 &i2c1>;
     };
 };
 

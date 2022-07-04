@@ -8,5 +8,8 @@ properties:
   can:
     type: phandles
 
+  i2c:
+    type: phandles
+
   gpios:
     type: phandles

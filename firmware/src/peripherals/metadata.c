@@ -6,7 +6,7 @@
 LOG_MODULE_REGISTER(periph_metadata, CONFIG_LOG_DEFAULT_LEVEL);
 
 static int metadata_init(uint16_t idx) {
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(serial) {
@@ -18,7 +18,7 @@ PERIPH_FUNC_DEF(serial) {
     strncpy((char*) ret, CONFIG_JABI_SERIAL, RESP_PAYLOAD_MAX_SIZE);
     *resp_len = strlen(CONFIG_JABI_SERIAL);
 
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(num_inst) {
@@ -39,7 +39,7 @@ PERIPH_FUNC_DEF(num_inst) {
     ret->num_idx = sys_cpu_to_le16(peripherals[args->periph_id]->num_idx);
     *resp_len = sizeof(metadata_num_inst_resp_t);
 
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(echo) {
@@ -48,10 +48,15 @@ PERIPH_FUNC_DEF(echo) {
 
     LOG_DBG("(len=%d)", req_len);
 
+    if (req_len > RESP_PAYLOAD_MAX_SIZE) {
+        LOG_ERR("input string too long");
+        return JABI_INVALID_ARGS_ERR;
+    }
+
     memcpy(ret, args, req_len);
     *resp_len = req_len;
 
-    return 0;
+    return JABI_NO_ERR;
 }
 
 static const periph_func_t metadata_periph_fns[] = {

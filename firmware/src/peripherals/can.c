@@ -54,15 +54,15 @@ static int can_init(uint16_t idx) {
     can_dev_data_t *can = &can_devs[idx];
     if (can_set_mode(can->dev, CAN_MODE_NORMAL | MODE_FLAG)) {
         LOG_ERR("failed to set mode for can%d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
     can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
     can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
     if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
         LOG_ERR("failed to add filters for can%d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(can_set_filter) {
@@ -95,11 +95,11 @@ PERIPH_FUNC_DEF(can_set_filter) {
     can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
     if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
         LOG_ERR("failed to change filters for can%d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
 
     *resp_len = 0;
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(can_set_rate) {
@@ -114,17 +114,17 @@ PERIPH_FUNC_DEF(can_set_rate) {
     can_dev_data_t *can = &can_devs[idx];
     if (can_set_bitrate(can->dev, args->bitrate)) {
         LOG_ERR("failed to set bitrate for can %d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
 #ifdef CONFIG_CAN_FD_MODE
     if (can_set_bitrate_data(can->dev, args->bitrate_data)) {
         LOG_ERR("failed to set data bitrate for can %d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
 #endif // CONFIG_CAN_FD_MODE
 
     *resp_len = 0;
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(can_set_style) {
@@ -140,16 +140,16 @@ PERIPH_FUNC_DEF(can_set_style) {
         case 2: mode = CAN_MODE_LISTENONLY; break;
         default:
             LOG_ERR("invalid mode");
-            return -1;
+            return JABI_INVALID_ARGS_ERR;
     }
     can_dev_data_t *can = &can_devs[idx];
     if (can_set_mode(can->dev, mode | MODE_FLAG)) {
         LOG_ERR("failed to set mode for can%d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
 
     *resp_len = 0;
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(can_state) {
@@ -163,14 +163,14 @@ PERIPH_FUNC_DEF(can_state) {
     can_dev_data_t *can = &can_devs[idx];
     if (can_get_state(can->dev, &state, &err_cnt)) {
         LOG_ERR("failed to get state for can%d", idx);
-        return -1;
+        return JABI_PERIPHERAL_ERR;
     }
 
     ret->state = state;
     ret->tx_err_cnt = err_cnt.tx_err_cnt;
     ret->rx_err_cnt = err_cnt.rx_err_cnt;
     *resp_len = sizeof(can_state_resp_t);
-    return 0;
+    return JABI_NO_ERR;
 }
 
 static void can_write_cb(const struct device *, int, void*) {}
@@ -224,7 +224,7 @@ PERIPH_FUNC_DEF(can_write) {
     }
 
     *resp_len = 0;
-    return 0;
+    return JABI_NO_ERR;
 }
 
 PERIPH_FUNC_DEF(can_read) {
@@ -237,7 +237,7 @@ PERIPH_FUNC_DEF(can_read) {
     can_dev_data_t *can = &can_devs[idx];
     if (k_msgq_get(can->msgq, &msg, K_NO_WAIT)) {
         *resp_len = 0;
-        return 0;
+        return JABI_NO_ERR;
     }
 
     ret->num_left = sys_cpu_to_le16(k_msgq_num_used_get(can->msgq));
@@ -252,7 +252,7 @@ PERIPH_FUNC_DEF(can_read) {
         memcpy(ret->data, msg.data, ret->data_len);
         *resp_len += ret->data_len;
     }
-    return 0;
+    return JABI_NO_ERR;
 }
 
 static const periph_func_t can_periph_fns[] = {

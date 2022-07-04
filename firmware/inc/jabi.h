@@ -15,4 +15,7 @@
 extern void iface_req_to_le(iface_req_t *req);
 extern void iface_resp_to_le(iface_resp_t *resp);
 
+#define ELEM_TO_DEVICE(node_id, prop, idx) \
+    DEVICE_DT_GET(DT_PROP_BY_IDX(node_id, prop, idx)),
+
 #endif // JABI_H
