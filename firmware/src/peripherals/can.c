@@ -65,6 +65,10 @@ static int can_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *can_get_dev(uint16_t idx) {
+    return (void*) can_devs[idx].dev;
+}
+
 PERIPH_FUNC_DEF(can_set_filter) {
     PERIPH_FUNC_GET_ARGS(can, set_filter);
     PERIPH_FUNC_CHECK_ARGS_LEN(can, set_filter);
@@ -266,6 +270,7 @@ static const periph_func_t can_periph_fns[] = {
 
 const struct periph_api_t can_periph_api = {
     .init = can_init,
+    .get_dev = can_get_dev,
     .fns = can_periph_fns,
     .num_fns = ARRAY_SIZE(can_periph_fns),
     .num_idx = DT_PROP_LEN(JABI_PERIPH_NODE, can),
@@ -276,6 +281,7 @@ const struct periph_api_t can_periph_api = {
 
 const struct periph_api_t can_periph_api = {
     .init = NULL,
+    .get_dev = NULL,
     .fns = NULL,
     .num_fns = 0,
     .num_idx = 0,

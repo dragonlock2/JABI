@@ -9,6 +9,10 @@ static int metadata_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *metadata_get_dev(uint16_t idx) {
+    return NULL;
+}
+
 PERIPH_FUNC_DEF(serial) {
     PERIPH_FUNC_GET_RET(metadata, serial);
     PERIPH_FUNC_CHECK_ARGS_EMPTY;
@@ -67,6 +71,7 @@ static const periph_func_t metadata_periph_fns[] = {
 
 const struct periph_api_t metadata_periph_api = {
     .init = metadata_init,
+    .get_dev = metadata_get_dev,
     .fns = metadata_periph_fns,
     .num_fns = ARRAY_SIZE(metadata_periph_fns),
     .num_idx = 1,

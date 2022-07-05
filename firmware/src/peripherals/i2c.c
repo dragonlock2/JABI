@@ -16,6 +16,10 @@ static int i2c_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *i2c_get_dev(uint16_t idx) {
+    return (void*) i2c_devs[idx];
+}
+
 PERIPH_FUNC_DEF(i2c_set_freq) {
     PERIPH_FUNC_GET_ARGS(i2c, set_freq);
     PERIPH_FUNC_CHECK_ARGS_LEN(i2c, set_freq);
@@ -96,6 +100,7 @@ static const periph_func_t i2c_periph_fns[] = {
 
 const struct periph_api_t i2c_periph_api = {
     .init = i2c_init,
+    .get_dev = i2c_get_dev,
     .fns = i2c_periph_fns,
     .num_fns = ARRAY_SIZE(i2c_periph_fns),
     .num_idx = DT_PROP_LEN(JABI_PERIPH_NODE, i2c),
@@ -106,6 +111,7 @@ const struct periph_api_t i2c_periph_api = {
 
 const struct periph_api_t i2c_periph_api = {
     .init = NULL,
+    .get_dev = NULL,
     .fns = NULL,
     .num_fns = 0,
     .num_idx = 0,

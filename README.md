@@ -92,7 +92,6 @@ pip install clients/pyjabi
 ## Known Issues
 
 - UART interface timeout doesn't work when binded in Python.
-- Peripheral "instances" each have a lock rather than the underlying `struct device*` which may cause concurrency issues when running multiple interfaces that would access that same `struct device*`. Fix is coming.
 
 ## TODO
 

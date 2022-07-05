@@ -31,6 +31,10 @@ static int adc_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *adc_get_dev(uint16_t idx) {
+    return (void*) adc_devs[idx].dev;
+}
+
 PERIPH_FUNC_DEF(adc_read_j) {
     PERIPH_FUNC_GET_RET(adc, read_j);
     PERIPH_FUNC_CHECK_ARGS_EMPTY;
@@ -79,6 +83,7 @@ static const periph_func_t adc_periph_fns[] = {
 
 const struct periph_api_t adc_periph_api = {
     .init = adc_init,
+    .get_dev = adc_get_dev,
     .fns = adc_periph_fns,
     .num_fns = ARRAY_SIZE(adc_periph_fns),
     .num_idx = ARRAY_SIZE(adc_devs),
@@ -89,6 +94,7 @@ const struct periph_api_t adc_periph_api = {
 
 const struct periph_api_t adc_periph_api = {
     .init = NULL,
+    .get_dev = NULL,
     .fns = NULL,
     .num_fns = 0,
     .num_idx = 0,

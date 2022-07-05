@@ -31,6 +31,10 @@ static int dac_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *dac_get_dev(uint16_t idx) {
+    return (void*) dac_devs[idx].dev;
+}
+
 PERIPH_FUNC_DEF(dac_write) {
     PERIPH_FUNC_GET_ARGS(dac, write);
     PERIPH_FUNC_CHECK_ARGS_LEN(dac, write);
@@ -61,6 +65,7 @@ static const periph_func_t dac_periph_fns[] = {
 
 const struct periph_api_t dac_periph_api = {
     .init = dac_init,
+    .get_dev = dac_get_dev,
     .fns = dac_periph_fns,
     .num_fns = ARRAY_SIZE(dac_periph_fns),
     .num_idx = ARRAY_SIZE(dac_devs),
@@ -71,6 +76,7 @@ const struct periph_api_t dac_periph_api = {
 
 const struct periph_api_t dac_periph_api = {
     .init = NULL,
+    .get_dev = NULL,
     .fns = NULL,
     .num_fns = 0,
     .num_idx = 0,

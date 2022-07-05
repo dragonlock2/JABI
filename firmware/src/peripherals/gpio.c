@@ -15,6 +15,10 @@ static int gpio_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *gpio_get_dev(uint16_t idx) {
+    return (void*) gpios[idx].port;
+}
+
 PERIPH_FUNC_DEF(gpio_set_mode) {
     PERIPH_FUNC_GET_ARGS(gpio, set_mode);
     PERIPH_FUNC_CHECK_ARGS_LEN(gpio, set_mode);
@@ -91,6 +95,7 @@ static const periph_func_t gpio_periph_fns[] = {
 
 const struct periph_api_t gpio_periph_api = {
     .init = gpio_init,
+    .get_dev = gpio_get_dev,
     .fns = gpio_periph_fns,
     .num_fns = ARRAY_SIZE(gpio_periph_fns),
     .num_idx = DT_PROP_LEN(JABI_PERIPH_NODE, gpio),
@@ -101,6 +106,7 @@ const struct periph_api_t gpio_periph_api = {
 
 const struct periph_api_t gpio_periph_api = {
     .init = NULL,
+    .get_dev = NULL,
     .fns = NULL,
     .num_fns = 0,
     .num_idx = 0,

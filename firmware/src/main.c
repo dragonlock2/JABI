@@ -1,4 +1,5 @@
 #include <zephyr.h>
+#include <sys/slist.h>
 #include <usb/usb_device.h>
 #include <stdlib.h>
 #include <jabi.h>
@@ -11,10 +12,17 @@ LOG_MODULE_REGISTER(jabi, CONFIG_LOG_DEFAULT_LEVEL);
 extern const struct iface_api_t *interfaces[];
 extern const struct periph_api_t *peripherals[];
 
+typedef struct {
+    sys_snode_t node;
+    void* dev;
+    struct k_sem lock;
+} dev_lock_t;
+
+sys_slist_t dev_locks;
+struct k_sem **peripheral_locks[NUM_PERIPHERALS];
+
 K_THREAD_STACK_ARRAY_DEFINE(thread_stack, NUM_INTERFACES, STACK_SIZE);
 struct k_thread thread_data[NUM_INTERFACES];
-
-struct k_sem *peripheral_locks[NUM_PERIPHERALS];
 
 void process_interface(void* p1, void* p2, void* p3) {
     const struct iface_api_t *iface = (const struct iface_api_t*) p1;
@@ -55,13 +63,12 @@ void process_interface(void* p1, void* p2, void* p3) {
             goto send_resp;
         }
 
-        k_sem_take(&peripheral_locks[req.periph_id][req.periph_idx], K_FOREVER);
-        
+        struct k_sem *lock = peripheral_locks[req.periph_id][req.periph_idx];
+        k_sem_take(lock, K_FOREVER);
         resp.retcode = api->fns[req.periph_fn](req.periph_idx, 
                                                req.payload, req.payload_len,
                                                resp.payload, &payload_len);
-
-        k_sem_give(&peripheral_locks[req.periph_id][req.periph_idx]);
+        k_sem_give(lock);
 
         if (resp.retcode) {
             LOG_ERR("%s peripheral function error %d", iface->name, resp.retcode);
@@ -79,23 +86,37 @@ int main() {
     usb_enable(NULL);
 #endif
 
+    sys_slist_init(&dev_locks);
     for (int i = 0; i < NUM_PERIPHERALS; i++) {
         if (peripherals[i]->num_idx == 0) {
             continue;
         }
-        struct k_sem *locks = malloc(sizeof(struct k_sem) * peripherals[i]->num_idx);
-        if (locks == NULL) {
-            LOG_ERR("failed to allocate locks, time to die");
+        if ((peripheral_locks[i] =
+                malloc(sizeof(struct k_sem*) * peripherals[i]->num_idx)) == NULL) {
+            LOG_ERR("failed to allocate array of lock pointers, time to die");
             return -1;
         }
         for (int j = 0; j < peripherals[i]->num_idx; j++) {
-            k_sem_init(&locks[j], 1, 1);
-        }
-        peripheral_locks[i] = locks;
-    }
-
-    for (int i = 0; i < NUM_PERIPHERALS; i++) {
-        for (int j = 0; j < peripherals[i]->num_idx; j++) {
+            peripheral_locks[i][j] = NULL;
+            sys_snode_t *n;
+            SYS_SLIST_FOR_EACH_NODE(&dev_locks, n) {
+                dev_lock_t *d = CONTAINER_OF(n, dev_lock_t, node);
+                if (d->dev == peripherals[i]->get_dev(j)) {
+                    peripheral_locks[i][j] = &d->lock;
+                    break;
+                }
+            }
+            if (peripheral_locks[i][j] == NULL) {
+                dev_lock_t *d;
+                if ((d = malloc(sizeof(dev_lock_t))) == NULL) {
+                    LOG_ERR("failed to allocate lock");
+                    return -1;
+                }
+                d->dev = peripherals[i]->get_dev(j);
+                k_sem_init(&d->lock, 1, 1);
+                peripheral_locks[i][j] = &d->lock;
+                sys_slist_prepend(&dev_locks, &d->node);
+            }
             if (peripherals[i]->init(j)) {
                 LOG_ERR("failed to initialize peripheral %s%d, time to die",
                     peripherals[i]->name, j);

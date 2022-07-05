@@ -4,11 +4,13 @@
 #include <stdint.h>
 
 typedef int     (*periph_init_t)(uint16_t idx);
+typedef void*   (*periph_get_dev_t)(uint16_t idx);
 typedef int16_t (*periph_func_t)(uint16_t idx, uint8_t *req, uint16_t req_len,
                                  uint8_t *resp, uint16_t *resp_len);
 
 struct periph_api_t {
     const periph_init_t init;
+    const periph_get_dev_t get_dev;
     const periph_func_t *fns;
     const uint16_t num_fns;
     const uint16_t num_idx;
