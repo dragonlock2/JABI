@@ -41,7 +41,7 @@ def testDevice(d):
                 continue
     print()
 
-    # PWM (GPIO overrides it)
+    # PWM (GPIO overrides it until reset)
     for i in range(d.num_inst(jabi.InstID.PWM)):
         print("\tFlashing PWM", i, "at 1Hz")
         d.pwm_write(i, 0.5, 1.0)
@@ -63,6 +63,10 @@ def testDevice(d):
         d.gpio_set_mode(i, jabi.GPIODir.INPUT, jabi.GPIOPull.UP)
         print("\tRead GPIO", i, "w/ pullups:", int(d.gpio_read(i)))
     print()
+
+    # ADC
+    for i in range(d.num_inst(jabi.InstID.ADC)):
+        print("\tRead ADC", i, "as", d.adc_read(i), "\bmV")
 
 if __name__ == "__main__":
     for d in jabi.USBInterface.list_devices():

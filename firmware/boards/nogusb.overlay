@@ -10,6 +10,13 @@
         can = <&can1>;
         i2c = <&i2c2>;
         gpio = <&led_red &led_green &led_blue &dbg_1 &dbg_2>;
+        adc {
+            compatible = "jabi,adc";
+            devices     = <&adc1>;
+            channels    = <1>;
+            resolutions = <12>;
+            vrefs-mv    = <36300>; // voltage divider!
+        };
     };
 };
 

@@ -18,6 +18,7 @@ enum class InstID {
     I2C      = PERIPH_I2C_ID,
     GPIO     = PERIPH_GPIO_ID,
     PWM      = PERIPH_PWM_ID,
+    ADC      = PERIPH_ADC_ID,
 };
 
 /* CAN */
@@ -100,6 +101,9 @@ public:
 
     /* PWM */
     void pwm_write(int idx, double pulsewidth, double period); // seconds
+
+    /* ADC */
+    int adc_read(int idx); // mV
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

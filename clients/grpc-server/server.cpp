@@ -132,3 +132,10 @@ Status JABIServiceImpl::pwm_write(ServerContext*, const PWMWriteRequest* req, Em
         dev->pwm_write(req->idx(), req->pulsewidth(), req->period());
     )
 }
+
+/* ADC */
+Status JABIServiceImpl::adc_read(ServerContext*, const Index* req, Int32Value* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->adc_read(req->idx()));
+    )
+}

@@ -1,0 +1,22 @@
+description: list of ADC channels and settings
+
+include: base.yaml
+
+compatible: "jabi,adc"
+
+properties:
+  devices:
+    type: phandles
+    required: true
+
+  channels:
+    type: array
+    required: true
+
+  resolutions:
+    type: array
+    required: true
+
+  vrefs-mv:
+    type: array
+    required: true

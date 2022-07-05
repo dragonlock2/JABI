@@ -10,6 +10,7 @@ using google::protobuf::StringValue;
 using google::protobuf::UInt32Value;
 using google::protobuf::BytesValue;
 using google::protobuf::BoolValue;
+using google::protobuf::Int32Value;
 
 namespace jabi {
 
@@ -267,6 +268,19 @@ void gRPCDevice::pwm_write(int idx, double pulsewidth, double period) {
     if (!status.ok()) {
         throw std::runtime_error("fail");
     }
+}
+
+/* ADC */
+int gRPCDevice::adc_read(int idx) {
+    JABI::Index req;
+    Int32Value resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    Status status = stub->adc_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return resp.value();
 }
 
 };

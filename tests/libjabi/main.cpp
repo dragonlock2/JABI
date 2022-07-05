@@ -84,6 +84,13 @@ void testDevice(jabi::Device d) {
         std::cout << "\tRead GPIO " << i << " w/ pullups: " << d.gpio_read(i) << std::endl;
     }
     std::cout << std::endl;
+
+    /* ADC */
+    lim = d.num_inst(jabi::InstID::ADC);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tRead ADC " << i << " as " << d.adc_read(i) << "mV" << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 int main() {

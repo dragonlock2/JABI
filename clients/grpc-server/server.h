@@ -16,6 +16,7 @@ using google::protobuf::StringValue;
 using google::protobuf::UInt32Value;
 using google::protobuf::BytesValue;
 using google::protobuf::BoolValue;
+using google::protobuf::Int32Value;
 
 using namespace JABI;
 
@@ -48,6 +49,9 @@ public:
 
     /* PWM */
     Status pwm_write(ServerContext*, const PWMWriteRequest* req, Empty*) override;
+
+    /* ADC */
+    Status adc_read(ServerContext*, const Index* req, Int32Value* resp) override;
 
 private:
     std::shared_ptr<jabi::Device> dev;

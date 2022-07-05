@@ -16,6 +16,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 - I2C master
 - GPIO
 - PWM output
+- ADC
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -90,6 +91,7 @@ pip install clients/pyjabi
 ## Known Issues
 
 - UART interface timeout doesn't work when binded in Python.
+- Peripheral "instances" each have a lock rather than the underlying `struct device*` which may cause concurrency issues when running multiple interfaces that would access that same `struct device*`. Fix is coming.
 
 ## TODO
 
@@ -105,7 +107,6 @@ The following peripherals.
 - LIN
 - SPI master
 - UART
-- ADC
 - DAC
 
 Fun things to look into one day.

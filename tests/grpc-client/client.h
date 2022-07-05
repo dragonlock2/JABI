@@ -17,6 +17,7 @@ enum class InstID {
     I2C      = JABI::InstID::I2C,
     GPIO     = JABI::InstID::GPIO,
     PWM      = JABI::InstID::PWM,
+    ADC      = JABI::InstID::ADC,
 };
 
 /* CAN */
@@ -102,6 +103,9 @@ public:
 
     /* PWM */
     void pwm_write(int idx, double pulsewidth, double period); // seconds
+
+    /* ADC */
+    int adc_read(int idx); // mV
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;

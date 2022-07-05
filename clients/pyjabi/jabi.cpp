@@ -26,7 +26,8 @@ PYBIND11_MODULE(jabi, m) {
         .value("CAN", InstID::CAN)
         .value("I2C", InstID::I2C)
         .value("GPIO", InstID::GPIO)
-        .value("PWM", InstID::PWM);
+        .value("PWM", InstID::PWM)
+        .value("ADC", InstID::ADC);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -104,7 +105,10 @@ PYBIND11_MODULE(jabi, m) {
         .def("gpio_read", &Device::gpio_read, "idx"_a)
 
         /* PWM */
-        .def("pwm_write", &Device::pwm_write);
+        .def("pwm_write", &Device::pwm_write)
+
+        /* ADC */
+        .def("adc_read", &Device::adc_read);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")
