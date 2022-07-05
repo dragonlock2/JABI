@@ -1,0 +1,20 @@
+/ {
+    interfaces {
+        compatible = "jabi,interfaces";
+        uart = <&cdc_acm_uart0>;
+    };
+
+    peripherals {
+        compatible = "jabi,peripherals";
+        i2c = <&i2c1>;
+        gpio = <&led_red &led_green &led_blue &user_button>;
+        pwm = <&led_red_pwm &led_green_pwm &led_blue_pwm>;
+    };
+};
+
+&zephyr_udc0 {
+    cdc_acm_uart0: cdc_acm_uart0 {
+        compatible = "zephyr,cdc-acm-uart";
+        label = "CDC_ACM_0";
+    };
+};

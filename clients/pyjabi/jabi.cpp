@@ -25,7 +25,8 @@ PYBIND11_MODULE(jabi, m) {
         .value("METADATA", InstID::METADATA)
         .value("CAN", InstID::CAN)
         .value("I2C", InstID::I2C)
-        .value("GPIO", InstID::GPIO);
+        .value("GPIO", InstID::GPIO)
+        .value("PWM", InstID::PWM);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -100,7 +101,10 @@ PYBIND11_MODULE(jabi, m) {
         .def("gpio_set_mode", &Device::gpio_set_mode, 
             "idx"_a, "dir"_a=GPIODir::INPUT, "pull"_a=GPIOPull::NONE, "init_val"_a=false)
         .def("gpio_write", &Device::gpio_write, "idx"_a, "val"_a)
-        .def("gpio_read", &Device::gpio_read, "idx"_a);
+        .def("gpio_read", &Device::gpio_read, "idx"_a)
+
+        /* PWM */
+        .def("pwm_write", &Device::pwm_write);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")

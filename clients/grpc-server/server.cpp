@@ -125,3 +125,10 @@ Status JABIServiceImpl::gpio_read(ServerContext*, const Index* req, BoolValue* r
         resp->set_value(dev->gpio_read(req->idx()));
     )
 }
+
+/* PWM */
+Status JABIServiceImpl::pwm_write(ServerContext*, const PWMWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->pwm_write(req->idx(), req->pulsewidth(), req->period());
+    )
+}

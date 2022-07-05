@@ -255,4 +255,18 @@ bool gRPCDevice::gpio_read(int idx) {
     return resp.value();
 }
 
+/* PWM */
+void gRPCDevice::pwm_write(int idx, double pulsewidth, double period) {
+    JABI::PWMWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    req.set_pulsewidth(pulsewidth);
+    req.set_period(period);
+    Status status = stub->pwm_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
 };

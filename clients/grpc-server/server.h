@@ -46,6 +46,9 @@ public:
     Status gpio_write(ServerContext*, const GPIOWriteRequest* req, Empty*) override;
     Status gpio_read(ServerContext*, const Index* req, BoolValue* resp) override;
 
+    /* PWM */
+    Status pwm_write(ServerContext*, const PWMWriteRequest* req, Empty*) override;
+
 private:
     std::shared_ptr<jabi::Device> dev;
 };

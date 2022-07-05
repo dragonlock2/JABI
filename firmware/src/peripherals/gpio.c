@@ -12,10 +12,6 @@ static const struct gpio_dt_spec gpios[] = {
 };
 
 static int gpio_init(uint16_t idx) {
-    if (gpio_pin_configure(gpios[idx].port, gpios[idx].pin, GPIO_INPUT)) {
-        LOG_ERR("failed to configure gpio");
-        return JABI_PERIPHERAL_ERR;
-    }
     return JABI_NO_ERR;
 }
 

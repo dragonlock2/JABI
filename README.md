@@ -15,6 +15,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 - CAN FD
 - I2C master
 - GPIO
+- PWM output
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -106,7 +107,6 @@ The following peripherals.
 - UART
 - ADC
 - DAC
-- PWM
 
 Fun things to look into one day.
 

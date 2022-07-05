@@ -26,6 +26,9 @@ service Device {
     rpc gpio_set_mode(GPIOSetModeRequest) returns (google.protobuf.Empty);
     rpc gpio_write(GPIOWriteRequest) returns (google.protobuf.Empty);
     rpc gpio_read(Index) returns (google.protobuf.BoolValue);
+
+    /* PWM */
+    rpc pwm_write(PWMWriteRequest) returns (google.protobuf.Empty);
 }
 
 /* Common */
@@ -39,6 +42,7 @@ enum InstID {
     CAN = 1;
     I2C = 2;
     GPIO = 3;
+    PWM = 4;
 }
 
 message NumInstRequest {
@@ -147,4 +151,11 @@ message GPIOSetModeRequest {
 message GPIOWriteRequest {
     uint32 idx = 1;
     bool val = 2;
+}
+
+/* PWM */
+message PWMWriteRequest {
+    uint32 idx = 1;
+    double pulsewidth = 2;
+    double period = 3;
 }

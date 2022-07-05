@@ -13,3 +13,6 @@ properties:
 
   gpio:
     type: phandles
+
+  pwm:
+    type: phandles

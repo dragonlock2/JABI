@@ -21,4 +21,7 @@ extern void iface_resp_to_le(iface_resp_t *resp);
 #define ELEM_TO_GPIO(node_id, prop, idx) \
     GPIO_DT_SPEC_GET(DT_PROP_BY_IDX(node_id, prop, idx), gpios),
 
+#define ELEM_TO_PWM(node_id, prop, idx) \
+    PWM_DT_SPEC_GET(DT_PROP_BY_IDX(node_id, prop, idx)),
+
 #endif // JABI_H

@@ -41,6 +41,15 @@ def testDevice(d):
                 continue
     print()
 
+    # PWM (GPIO overrides it)
+    for i in range(d.num_inst(jabi.InstID.PWM)):
+        print("\tFlashing PWM", i, "at 1Hz")
+        d.pwm_write(i, 0.5, 1.0)
+        time.sleep(0.1)
+    if d.num_inst(jabi.InstID.PWM) > 0:
+        time.sleep(3)
+    print()
+
     # GPIO
     for i in range(d.num_inst(jabi.InstID.GPIO)):
         print("\tFlashing GPIO", i)

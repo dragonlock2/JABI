@@ -7,6 +7,7 @@ add_library(libjabi
     peripherals/can.cpp
     peripherals/i2c.cpp
     peripherals/gpio.cpp
+    peripherals/pwm.cpp
 )
 
 find_package(libusb CONFIG QUIET)

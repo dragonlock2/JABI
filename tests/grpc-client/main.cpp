@@ -56,6 +56,18 @@ void testDevice(jabi::gRPCDevice &d) {
     }
     std::cout << std::endl;
 
+    /* PWM (GPIO overrides it until reset) */
+    lim = d.num_inst(jabi::InstID::PWM);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tFlashing PWM " << i << " at 1Hz" << std::endl;
+        d.pwm_write(i, 0.5, 1.0);
+        std::this_thread::sleep_for(100ms); // add offset
+    }
+    if (lim > 0) {
+        std::this_thread::sleep_for(3s);
+    }
+    std::cout << std::endl;
+
     /* GPIO */
     lim = d.num_inst(jabi::InstID::GPIO);
     for (auto i = 0; i < lim; i++) {

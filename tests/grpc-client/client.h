@@ -16,6 +16,7 @@ enum class InstID {
     CAN      = JABI::InstID::CAN,
     I2C      = JABI::InstID::I2C,
     GPIO     = JABI::InstID::GPIO,
+    PWM      = JABI::InstID::PWM,
 };
 
 /* CAN */
@@ -98,6 +99,9 @@ public:
         GPIOPull pull=GPIOPull::NONE, bool init_val=false);
     void gpio_write(int idx, bool val);
     bool gpio_read(int idx);
+
+    /* PWM */
+    void pwm_write(int idx, double pulsewidth, double period); // seconds
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;
