@@ -50,17 +50,17 @@ PERIPH_FUNC_DEF(i2c_set_freq) {
 PERIPH_FUNC_DEF(i2c_write_j) {
     PERIPH_FUNC_GET_ARGS(i2c, write_j);
     args->addr = sys_le16_to_cpu(args->addr);
-    args->data_len = sys_le16_to_cpu(args->data_len);
 
-    if (req_len != (sizeof(i2c_write_j_req_t) + args->data_len)) {
+    if (req_len < sizeof(i2c_write_j_req_t)) {
         LOG_ERR("invalid amount of data provided");
         return JABI_INVALID_ARGS_FORMAT_ERR;
     }
+    uint32_t data_len = req_len - sizeof(i2c_write_j_req_t);
 
-    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
-    LOG_HEXDUMP_DBG(args->data, args->data_len, "data=");
+    LOG_DBG("(addr=0x%x)", args->addr);
+    LOG_HEXDUMP_DBG(args->data, data_len, "data=");
 
-    if (i2c_write(i2c_devs[idx], args->data, args->data_len, args->addr)) {
+    if (i2c_write(i2c_devs[idx], args->data, data_len, args->addr)) {
         LOG_ERR("failed to write data");
         return JABI_PERIPHERAL_ERR;
     }

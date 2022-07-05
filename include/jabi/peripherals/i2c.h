@@ -17,7 +17,6 @@ PACKED(i2c_set_freq_req_t,
 
 PACKED(i2c_write_j_req_t,
     uint16_t addr;
-    uint16_t data_len;
     uint8_t  data[];
 );
 
