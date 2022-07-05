@@ -15,6 +15,7 @@ enum class InstID {
     METADATA = JABI::InstID::METADATA,
     CAN      = JABI::InstID::CAN,
     I2C      = JABI::InstID::I2C,
+    GPIO     = JABI::InstID::GPIO,
 };
 
 /* CAN */
@@ -54,6 +55,21 @@ enum class I2CFreq {
     ULTRA     = JABI::I2CFreq::ULTRA,     // 5MHz
 };
 
+/* GPIO */
+enum class GPIODir {
+    INPUT       = JABI::GPIODir::INPUT,
+    OUTPUT      = JABI::GPIODir::OUTPUT,
+    OPEN_DRAIN  = JABI::GPIODir::OPEN_DRAIN,
+    OPEN_SOURCE = JABI::GPIODir::OPEN_SOURCE,
+};
+
+enum class GPIOPull {
+    NONE = JABI::GPIOPull::NONE,
+    UP   = JABI::GPIOPull::UP,
+    DOWN = JABI::GPIOPull::DOWN,
+    BOTH = JABI::GPIOPull::BOTH,
+};
+
 class gRPCDevice {
 public:
     gRPCDevice(std::shared_ptr<grpc::Channel> channel)
@@ -76,6 +92,12 @@ public:
     void i2c_set_freq(I2CFreq preset, int idx=0);
     void i2c_write(int addr, std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> i2c_read(int addr, size_t len, int idx=0);
+
+    /* GPIO */
+    void gpio_set_mode(int idx, GPIODir dir=GPIODir::INPUT,
+        GPIOPull pull=GPIOPull::NONE, bool init_val=false);
+    void gpio_write(int idx, bool val);
+    bool gpio_read(int idx);
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;

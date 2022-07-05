@@ -16,6 +16,7 @@ enum class InstID {
     METADATA = PERIPH_METADATA_ID,
     CAN      = PERIPH_CAN_ID,
     I2C      = PERIPH_I2C_ID,
+    GPIO     = PERIPH_GPIO_ID,
 };
 
 /* CAN */
@@ -55,6 +56,21 @@ enum class I2CFreq {
     ULTRA     = 4, // 5MHz
 };
 
+/* GPIO */
+enum class GPIODir {
+    INPUT       = 0,
+    OUTPUT      = 1,
+    OPEN_DRAIN  = 2,
+    OPEN_SOURCE = 3,
+};
+
+enum class GPIOPull {
+    NONE = 0,
+    UP   = 1,
+    DOWN = 2,
+    BOTH = 3,
+};
+
 class Device {
 public:
     /* Metadata */
@@ -74,6 +90,12 @@ public:
     void i2c_set_freq(I2CFreq preset, int idx=0);
     void i2c_write(int addr, std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> i2c_read(int addr, size_t len, int idx=0);
+
+    /* GPIO */
+    void gpio_set_mode(int idx, GPIODir dir=GPIODir::INPUT,
+        GPIOPull pull=GPIOPull::NONE, bool init_val=false);
+    void gpio_write(int idx, bool val);
+    bool gpio_read(int idx);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

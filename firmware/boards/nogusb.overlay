@@ -9,6 +9,7 @@
         compatible = "jabi,peripherals";
         can = <&can1>;
         i2c = <&i2c2>;
+        gpio = <&led_red &led_green &led_blue &dbg_1 &dbg_2>;
     };
 };
 

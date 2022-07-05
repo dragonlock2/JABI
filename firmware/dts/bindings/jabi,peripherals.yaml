@@ -11,5 +11,5 @@ properties:
   i2c:
     type: phandles
 
-  gpios:
+  gpio:
     type: phandles

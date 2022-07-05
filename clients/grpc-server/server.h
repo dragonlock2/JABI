@@ -15,6 +15,7 @@ using google::protobuf::Empty;
 using google::protobuf::StringValue;
 using google::protobuf::UInt32Value;
 using google::protobuf::BytesValue;
+using google::protobuf::BoolValue;
 
 using namespace JABI;
 
@@ -39,6 +40,11 @@ public:
     Status i2c_set_freq(ServerContext*, const I2CSetFreqRequest* req, Empty*) override;
     Status i2c_write(ServerContext*, const I2CWriteRequest* req, Empty*) override;
     Status i2c_read(ServerContext*, const I2CReadRequest* req, BytesValue* resp) override;
+
+    /* GPIO */
+    Status gpio_set_mode(ServerContext*, const GPIOSetModeRequest* req, Empty*) override;
+    Status gpio_write(ServerContext*, const GPIOWriteRequest* req, Empty*) override;
+    Status gpio_read(ServerContext*, const Index* req, BoolValue* resp) override;
 
 private:
     std::shared_ptr<jabi::Device> dev;

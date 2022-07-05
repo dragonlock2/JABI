@@ -21,6 +21,11 @@ service Device {
     rpc i2c_set_freq(I2CSetFreqRequest) returns (google.protobuf.Empty);
     rpc i2c_write(I2CWriteRequest) returns (google.protobuf.Empty);
     rpc i2c_read(I2CReadRequest) returns (google.protobuf.BytesValue);
+
+    /* GPIO */
+    rpc gpio_set_mode(GPIOSetModeRequest) returns (google.protobuf.Empty);
+    rpc gpio_write(GPIOWriteRequest) returns (google.protobuf.Empty);
+    rpc gpio_read(Index) returns (google.protobuf.BoolValue);
 }
 
 /* Common */
@@ -33,6 +38,7 @@ enum InstID {
     METADATA = 0;
     CAN = 1;
     I2C = 2;
+    GPIO = 3;
 }
 
 message NumInstRequest {
@@ -114,4 +120,31 @@ message I2CReadRequest {
     uint32 addr = 1;
     uint32 len = 2;
     uint32 idx = 3;
+}
+
+/* GPIO */
+enum GPIODir {
+    INPUT = 0;
+    OUTPUT = 1;
+    OPEN_DRAIN = 2;
+    OPEN_SOURCE = 3;
+}
+
+enum GPIOPull {
+    NONE = 0;
+    UP = 1;
+    DOWN = 2;
+    BOTH = 3;
+}
+
+message GPIOSetModeRequest {
+    uint32 idx = 1;
+    GPIODir dir = 2;
+    GPIOPull pull = 3;
+    bool init_val = 4;
+}
+
+message GPIOWriteRequest {
+    uint32 idx = 1;
+    bool val = 2;
 }

@@ -35,10 +35,24 @@ def testDevice(d):
         for j in range(128):
             try:
                 d.i2c_write(j, [], i)
-                d.i2c_read(j, 0, i)
+                # d.i2c_read(j, 0, i)
                 print("\t Found", j)
             except:
                 continue
+    print()
+
+    # GPIO
+    for i in range(d.num_inst(jabi.InstID.GPIO)):
+        print("\tFlashing GPIO", i)
+        d.gpio_set_mode(i, jabi.GPIODir.OUTPUT)
+        for _ in range(6):
+            d.gpio_write(i, 0)
+            time.sleep(0.025)
+            d.gpio_write(i, 1)
+            time.sleep(0.025)
+    for i in range(d.num_inst(jabi.InstID.GPIO)):
+        d.gpio_set_mode(i, jabi.GPIODir.INPUT, jabi.GPIOPull.UP)
+        print("\tRead GPIO", i, "w/ pullups:", int(d.gpio_read(i)))
     print()
 
 if __name__ == "__main__":

@@ -20,39 +20,12 @@ py::object can_read_simple(Device &d, int idx) {
 }
 
 PYBIND11_MODULE(jabi, m) {
-    py::class_<Device>(m, "Device")
-        /* Metadata */
-        .def("serial", &Device::serial)
-        .def("num_inst", &Device::num_inst)
-        .def("echo", &Device::echo)
-
-        /* CAN */
-        .def("can_set_filter", &Device::can_set_filter,
-            "id"_a, "id_mask"_a, "rtr"_a, "rtr_mask"_a, "idx"_a=0)
-        .def("can_set_rate", &Device::can_set_rate,
-            "bitrate"_a, "bitrate_data"_a, "idx"_a=0)
-        .def("can_set_mode", &Device::can_set_mode, "mode"_a, "idx"_a=0)
-        .def("can_state", &Device::can_state, "idx"_a=0)
-        .def("can_write", &Device::can_write, "msg"_a, "idx"_a=0)
-        .def("can_read", &can_read_simple, "idx"_a=0)
-
-        /* I2C */
-        .def("i2c_set_freq", &Device::i2c_set_freq, "preset"_a, "idx"_a=0)
-        .def("i2c_write", &Device::i2c_write, "addr"_a, "data"_a, "idx"_a=0)
-        .def("i2c_read", &Device::i2c_read, "addr"_a, "len"_a, "idx"_a=0);
-
-    /* Interfaces */
-    py::class_<USBInterface>(m, "USBInterface")
-        .def("list_devices", &USBInterface::list_devices);
-
-    py::class_<UARTInterface>(m, "UARTInterface")
-        .def("get_device", &UARTInterface::get_device);
-
     /* Metadata */
     py::enum_<InstID>(m, "InstID")
         .value("METADATA", InstID::METADATA)
         .value("CAN", InstID::CAN)
-        .value("I2C", InstID::I2C);
+        .value("I2C", InstID::I2C)
+        .value("GPIO", InstID::GPIO);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -87,4 +60,52 @@ PYBIND11_MODULE(jabi, m) {
         .value("FAST_PLUS", I2CFreq::FAST_PLUS)
         .value("HIGH", I2CFreq::HIGH)
         .value("ULTRA", I2CFreq::ULTRA);
+
+    /* GPIO */
+    py::enum_<GPIODir>(m, "GPIODir")
+        .value("INPUT", GPIODir::INPUT)
+        .value("OUTPUT", GPIODir::OUTPUT)
+        .value("OPEN_DRAIN", GPIODir::OPEN_DRAIN)
+        .value("OPEN_SOURCE", GPIODir::OPEN_SOURCE);
+
+    py::enum_<GPIOPull>(m, "GPIOPull")
+        .value("NONE", GPIOPull::NONE)
+        .value("UP", GPIOPull::UP)
+        .value("DOWN", GPIOPull::DOWN)
+        .value("BOTH", GPIOPull::BOTH);
+
+    /* Device */
+    py::class_<Device>(m, "Device")
+        /* Metadata */
+        .def("serial", &Device::serial)
+        .def("num_inst", &Device::num_inst)
+        .def("echo", &Device::echo)
+
+        /* CAN */
+        .def("can_set_filter", &Device::can_set_filter,
+            "id"_a, "id_mask"_a, "rtr"_a, "rtr_mask"_a, "idx"_a=0)
+        .def("can_set_rate", &Device::can_set_rate,
+            "bitrate"_a, "bitrate_data"_a, "idx"_a=0)
+        .def("can_set_mode", &Device::can_set_mode, "mode"_a, "idx"_a=0)
+        .def("can_state", &Device::can_state, "idx"_a=0)
+        .def("can_write", &Device::can_write, "msg"_a, "idx"_a=0)
+        .def("can_read", &can_read_simple, "idx"_a=0)
+
+        /* I2C */
+        .def("i2c_set_freq", &Device::i2c_set_freq, "preset"_a, "idx"_a=0)
+        .def("i2c_write", &Device::i2c_write, "addr"_a, "data"_a, "idx"_a=0)
+        .def("i2c_read", &Device::i2c_read, "addr"_a, "len"_a, "idx"_a=0)
+
+        /* GPIO */
+        .def("gpio_set_mode", &Device::gpio_set_mode, 
+            "idx"_a, "dir"_a=GPIODir::INPUT, "pull"_a=GPIOPull::NONE, "init_val"_a=false)
+        .def("gpio_write", &Device::gpio_write, "idx"_a, "val"_a)
+        .def("gpio_read", &Device::gpio_read, "idx"_a);
+
+    /* Interfaces */
+    py::class_<USBInterface>(m, "USBInterface")
+        .def("list_devices", &USBInterface::list_devices);
+
+    py::class_<UARTInterface>(m, "UARTInterface")
+        .def("get_device", &UARTInterface::get_device);
 }

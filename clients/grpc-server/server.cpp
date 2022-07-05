@@ -106,3 +106,22 @@ Status JABIServiceImpl::i2c_read(ServerContext*, const I2CReadRequest* req, Byte
     )
 }
 
+/* GPIO */
+Status JABIServiceImpl::gpio_set_mode(ServerContext*, const GPIOSetModeRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->gpio_set_mode(req->idx(), static_cast<jabi::GPIODir>(req->dir()),
+            static_cast<jabi::GPIOPull>(req->pull()), req->init_val());
+    )
+}
+
+Status JABIServiceImpl::gpio_write(ServerContext*, const GPIOWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->gpio_write(req->idx(), req->val());
+    )
+}
+
+Status JABIServiceImpl::gpio_read(ServerContext*, const Index* req, BoolValue* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->gpio_read(req->idx()));
+    )
+}

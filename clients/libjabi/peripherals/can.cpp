@@ -112,7 +112,7 @@ CANState Device::can_state(int idx) {
     if (resp.payload_len != sizeof(can_state_resp_t)) {
         throw std::runtime_error("unexpected payload length");
     }
-    auto ret = reinterpret_cast<can_state_resp_t*>(req.payload);
+    auto ret = reinterpret_cast<can_state_resp_t*>(resp.payload);
 
     CANState state = {
         .state  = ret->state,

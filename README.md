@@ -14,6 +14,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 - Metadata
 - CAN FD
 - I2C master
+- GPIO
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -103,7 +104,6 @@ The following peripherals.
 - LIN
 - SPI master
 - UART
-- GPIO
 - ADC
 - DAC
 - PWM
@@ -115,7 +115,7 @@ Fun things to look into one day.
 - Alternative functions for pins
 - Improve security and robustness (encryption? CRC? gRPC SSL?)
 - gRPC server on the microcontroller (in the roadmap for Zephyr it seems)
-- multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
+- Multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
 - Ethernet support
     - Listen for TCP on port 42069 and dispatch to a thread pool, refuse if all used
 - BLE and WiFi support (need to make a dev board)

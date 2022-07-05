@@ -48,10 +48,28 @@ void testDevice(jabi::Device d) {
         for (int j = 0; j < 128; j++) {
             try {
                 d.i2c_write(j, std::vector<uint8_t>(), i);
-                d.i2c_read(j, 0, i); // only one needed, testing both
+                // d.i2c_read(j, 0, i);
                 std::cout << "\t Found " << j << std::endl;
             } catch(const std::runtime_error&) {}
         }
+    }
+    std::cout << std::endl;
+
+    /* GPIO */
+    lim = d.num_inst(jabi::InstID::GPIO);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tFlashing GPIO " << i << std::endl;
+        d.gpio_set_mode(i, jabi::GPIODir::OUTPUT);
+        for (auto j = 0; j < 6; j++) {
+            d.gpio_write(i, 0);
+            std::this_thread::sleep_for(25ms);
+            d.gpio_write(i, 1);
+            std::this_thread::sleep_for(25ms);
+        }
+    }
+    for (auto i = 0; i < lim; i++) {
+        d.gpio_set_mode(i, jabi::GPIODir::INPUT, jabi::GPIOPull::UP);
+        std::cout << "\tRead GPIO " << i << " w/ pullups: " << d.gpio_read(i) << std::endl;
     }
     std::cout << std::endl;
 }

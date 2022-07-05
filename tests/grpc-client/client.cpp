@@ -9,6 +9,7 @@ using google::protobuf::Empty;
 using google::protobuf::StringValue;
 using google::protobuf::UInt32Value;
 using google::protobuf::BytesValue;
+using google::protobuf::BoolValue;
 
 namespace jabi {
 
@@ -215,5 +216,43 @@ std::vector<uint8_t> gRPCDevice::i2c_read(int addr, size_t len, int idx) {
     return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
 }
 
+/* GPIO */
+void gRPCDevice::gpio_set_mode(int idx, GPIODir dir, GPIOPull pull, bool init_val) {
+    JABI::GPIOSetModeRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    req.set_dir(static_cast<JABI::GPIODir>(dir));
+    req.set_pull(static_cast<JABI::GPIOPull>(pull));
+    req.set_init_val(init_val);
+    Status status = stub->gpio_set_mode(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::gpio_write(int idx, bool val) {
+    JABI::GPIOWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    req.set_val(val);
+    Status status = stub->gpio_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+bool gRPCDevice::gpio_read(int idx) {
+    JABI::Index req;
+    BoolValue resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    Status status = stub->gpio_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return resp.value();
+}
 
 };

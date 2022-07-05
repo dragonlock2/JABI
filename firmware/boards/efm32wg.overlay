@@ -7,6 +7,7 @@
     peripherals {
         compatible = "jabi,peripherals";
         i2c = <&i2c0 &i2c1>;
+        gpio = <&led_red &led_green &led_blue &user_button>;
     };
 };
 
