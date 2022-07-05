@@ -7,8 +7,6 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(jabi, CONFIG_LOG_DEFAULT_LEVEL);
 
-#define STACK_SIZE 2048
-
 extern const struct iface_api_t *interfaces[];
 extern const struct periph_api_t *peripherals[];
 
@@ -21,7 +19,7 @@ typedef struct {
 sys_slist_t dev_locks;
 struct k_sem **peripheral_locks[NUM_PERIPHERALS];
 
-K_THREAD_STACK_ARRAY_DEFINE(thread_stack, NUM_INTERFACES, STACK_SIZE);
+K_THREAD_STACK_ARRAY_DEFINE(thread_stack, NUM_INTERFACES, CONFIG_JABI_THREAD_STACK_SIZE);
 struct k_thread thread_data[NUM_INTERFACES];
 
 void process_interface(void* p1, void* p2, void* p3) {
@@ -126,7 +124,7 @@ int main() {
     }
 
     for (int i = 0; i < NUM_INTERFACES; i++) {
-        k_thread_create(&thread_data[i], thread_stack[i], STACK_SIZE,
+        k_thread_create(&thread_data[i], thread_stack[i], CONFIG_JABI_THREAD_STACK_SIZE,
                         process_interface, (void*) interfaces[i], NULL, NULL,
                         K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
     }

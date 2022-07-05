@@ -12,6 +12,8 @@ void testDevice(jabi::Device d) {
     std::cout << "SN=" << d.serial();
     std::cout << " num_meta=" << d.num_inst(jabi::InstID::METADATA);
     std::cout << " echo=" << d.echo("❤️");
+    std::cout << " req_max_size=" << d.req_max_size();
+    std::cout << " resp_max_size=" << d.resp_max_size();
     std::cout << std::endl;
 
     /* CAN */

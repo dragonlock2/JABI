@@ -16,9 +16,19 @@ PACKED(metadata_num_inst_resp_t,
 typedef uint8_t metadata_echo_req_t;
 typedef uint8_t metadata_echo_resp_t;
 
+PACKED(metadata_req_max_size_resp_t,
+    uint32_t size;
+);
+
+PACKED(metadata_resp_max_size_resp_t,
+    uint32_t size;
+);
+
 /* Function indices */
-#define METADATA_SERIAL_ID   0
-#define METADATA_NUM_INST_ID 1
-#define METADATA_ECHO_ID     2
+#define METADATA_SERIAL_ID        0
+#define METADATA_NUM_INST_ID      1
+#define METADATA_ECHO_ID          2
+#define METADATA_REQ_MAX_SIZE_ID  3
+#define METADATA_RESP_MAX_SIZE_ID 4
 
 #endif // JABI_PERIPHERALS_METADATA_H

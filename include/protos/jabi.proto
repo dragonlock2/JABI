@@ -8,6 +8,8 @@ service Device {
     rpc serial (google.protobuf.Empty) returns (google.protobuf.StringValue);
     rpc num_inst (NumInstRequest) returns (google.protobuf.UInt32Value);
     rpc echo (google.protobuf.StringValue) returns (google.protobuf.StringValue);
+    rpc req_max_size (google.protobuf.Empty) returns (google.protobuf.UInt32Value);
+    rpc resp_max_size (google.protobuf.Empty) returns (google.protobuf.UInt32Value);
 
     /* CAN */
     rpc can_set_filter(CANSetFilterRequest) returns (google.protobuf.Empty);

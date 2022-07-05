@@ -61,4 +61,34 @@ std::string Device::echo(std::string str) {
     return std::string(reinterpret_cast<char*>(resp.payload), resp.payload_len);
 }
 
+size_t Device::req_max_size() {
+    iface_req_t req = {
+        .periph_id   = PERIPH_METADATA_ID,
+        .periph_idx  = 0,
+        .periph_fn   = METADATA_REQ_MAX_SIZE_ID,
+        .payload_len = 0,
+        .payload     = {0},
+    };
+
+    iface_resp_t resp = interface->send_request(req);
+
+    auto ret = reinterpret_cast<metadata_req_max_size_resp_t*>(resp.payload);
+    return letoh<uint32_t>(ret->size);
+}
+
+size_t Device::resp_max_size() {
+    iface_req_t req = {
+        .periph_id   = PERIPH_METADATA_ID,
+        .periph_idx  = 0,
+        .periph_fn   = METADATA_RESP_MAX_SIZE_ID,
+        .payload_len = 0,
+        .payload     = {0},
+    };
+
+    iface_resp_t resp = interface->send_request(req);
+
+    auto ret = reinterpret_cast<metadata_resp_max_size_resp_t*>(resp.payload);
+    return letoh<uint32_t>(ret->size);
+}
+
 };

@@ -84,6 +84,8 @@ PYBIND11_MODULE(jabi, m) {
         .def("serial", &Device::serial)
         .def("num_inst", &Device::num_inst)
         .def("echo", &Device::echo)
+        .def("req_max_size", &Device::req_max_size)
+        .def("resp_max_size", &Device::resp_max_size)
 
         /* CAN */
         .def("can_set_filter", &Device::can_set_filter,

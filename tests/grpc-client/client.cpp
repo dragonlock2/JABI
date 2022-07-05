@@ -50,6 +50,28 @@ std::string gRPCDevice::echo(std::string str) {
     return resp.value();
 }
 
+size_t gRPCDevice::req_max_size() {
+    Empty req;
+    UInt32Value resp;
+    ClientContext ctx;
+    Status status = stub->req_max_size(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return resp.value();
+}
+
+size_t gRPCDevice::resp_max_size() {
+    Empty req;
+    UInt32Value resp;
+    ClientContext ctx;
+    Status status = stub->req_max_size(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return resp.value();
+}
+
 /* CAN */
 CANMessage::CANMessage()
 :

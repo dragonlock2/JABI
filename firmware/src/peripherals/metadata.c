@@ -63,10 +63,34 @@ PERIPH_FUNC_DEF(echo) {
     return JABI_NO_ERR;
 }
 
+PERIPH_FUNC_DEF(req_max_size) {
+    PERIPH_FUNC_GET_RET(metadata, req_max_size);
+    PERIPH_FUNC_CHECK_ARGS_EMPTY;
+
+    LOG_DBG("()");
+
+    ret->size = sys_cpu_to_le32(REQ_PAYLOAD_MAX_SIZE);
+    *resp_len = sizeof(metadata_req_max_size_resp_t);
+    return JABI_NO_ERR;
+}
+
+PERIPH_FUNC_DEF(resp_max_size) {
+    PERIPH_FUNC_GET_RET(metadata, resp_max_size);
+    PERIPH_FUNC_CHECK_ARGS_EMPTY;
+
+    LOG_DBG("()");
+
+    ret->size = sys_cpu_to_le32(RESP_PAYLOAD_MAX_SIZE);
+    *resp_len = sizeof(metadata_resp_max_size_resp_t);
+    return JABI_NO_ERR;
+}
+
 static const periph_func_t metadata_periph_fns[] = {
     serial,
     num_inst,
     echo,
+    req_max_size,
+    resp_max_size,
 };
 
 const struct periph_api_t metadata_periph_api = {

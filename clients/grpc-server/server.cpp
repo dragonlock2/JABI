@@ -28,6 +28,18 @@ Status JABIServiceImpl::echo(ServerContext*, const StringValue* req, StringValue
     )
 }
 
+Status JABIServiceImpl::req_max_size(ServerContext*, const Empty*, UInt32Value* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->req_max_size());
+    )
+}
+
+Status JABIServiceImpl::resp_max_size(ServerContext*, const Empty*, UInt32Value* resp) {
+    CHECK_EXCEPT(
+        resp->set_value(dev->resp_max_size());
+    )
+}
+
 /* CAN */
 Status JABIServiceImpl::can_set_filter(ServerContext*, const CANSetFilterRequest* req, Empty*) {
     CHECK_EXCEPT(

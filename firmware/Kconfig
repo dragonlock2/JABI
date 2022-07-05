@@ -4,13 +4,32 @@ config JABI_SERIAL
     string "device serial number string"
     default "69420"
     help
-        device serial number string, must be non-empty
+        must be non-empty
 
 config JABI_CAN_BUFFER_SIZE
     int "CAN buffer size"
     default 32
     help
-        CAN message queue buffer size, must be >0
+        must be >0
+
+config JABI_REQ_PAYLOAD_MAX_SIZE
+    int "interface request payload maximum size"
+    default 128
+    help
+        keep larger than largest packet (currently CAN)
+
+config JABI_RESP_PAYLOAD_MAX_SIZE
+    int "interface request payload maximum size"
+    default 128
+    help
+        keep larger than largest packet (currently CAN)
+
+config JABI_THREAD_STACK_SIZE
+    int "stack size for interface threads"
+    default 2048
+    help
+        make sure enough to hold request/response and the peripherals
+        (tip: start this large and then reduce until it crashes)
 
 endmenu
 

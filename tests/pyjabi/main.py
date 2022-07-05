@@ -6,7 +6,9 @@ def testDevice(d):
     print(
         "SN=" + d.serial(),
         "num_meta=" + str(d.num_inst(jabi.InstID.METADATA)),
-        "echo=" + d.echo("❤️")
+        "echo=" + d.echo("❤️"),
+        "req_max_size=" + str(d.req_max_size()),
+        "resp_max_size=" + str(d.resp_max_size()),
     )
 
     # CAN

@@ -9,8 +9,17 @@
 #define PACKED(c, m) typedef struct {m} __attribute__((packed)) c
 #endif // _MSC_VER
 
-#define REQ_PAYLOAD_MAX_SIZE   512
-#define RESP_PAYLOAD_MAX_SIZE  512
+#ifdef CONFIG_JABI_REQ_PAYLOAD_MAX_SIZE
+#define REQ_PAYLOAD_MAX_SIZE CONFIG_JABI_REQ_PAYLOAD_MAX_SIZE
+#else
+#define REQ_PAYLOAD_MAX_SIZE 128 // safe minimum
+#endif
+
+#ifdef CONFIG_JABI_RESP_PAYLOAD_MAX_SIZE
+#define RESP_PAYLOAD_MAX_SIZE CONFIG_JABI_RESP_PAYLOAD_MAX_SIZE
+#else
+#define RESP_PAYLOAD_MAX_SIZE 128 // safe minimum
+#endif
 
 PACKED(iface_req_t,
     uint16_t periph_id;

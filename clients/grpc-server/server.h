@@ -28,6 +28,8 @@ public:
     Status serial(ServerContext*, const Empty*, StringValue* resp) override;
     Status num_inst(ServerContext*, const NumInstRequest* req, UInt32Value* resp) override;
     Status echo(ServerContext*, const StringValue* req, StringValue* resp) override;
+    Status req_max_size(ServerContext*, const Empty*, UInt32Value* resp) override;
+    Status resp_max_size(ServerContext*, const Empty*, UInt32Value* resp) override;
 
     /* CAN */
     Status can_set_filter(ServerContext*, const CANSetFilterRequest* req, Empty*) override;
