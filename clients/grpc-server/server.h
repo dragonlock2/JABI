@@ -53,6 +53,9 @@ public:
     /* ADC */
     Status adc_read(ServerContext*, const Index* req, Int32Value* resp) override;
 
+    /* DAC */
+    Status dac_write(ServerContext*, const DACWriteRequest* req, Empty*) override;
+
 private:
     std::shared_ptr<jabi::Device> dev;
 };

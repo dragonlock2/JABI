@@ -1,0 +1,22 @@
+description: list of DAC channels and settings
+
+include: base.yaml
+
+compatible: "jabi,dac"
+
+properties:
+  devices:
+    type: phandles
+    required: true
+
+  channels:
+    type: array
+    required: true
+
+  resolutions:
+    type: array
+    required: true
+
+  vrefs-mv:
+    type: array
+    required: true

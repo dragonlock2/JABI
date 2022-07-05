@@ -67,6 +67,13 @@ def testDevice(d):
     # ADC
     for i in range(d.num_inst(jabi.InstID.ADC)):
         print("\tRead ADC", i, "as", d.adc_read(i), "\bmV")
+    print()
+
+    # DAC
+    for i in range(d.num_inst(jabi.InstID.DAC)):
+        print("\tSetting DAC", i, "to 690mV")
+        d.dac_write(i, 690)
+    print()
 
 if __name__ == "__main__":
     for d in jabi.USBInterface.list_devices():

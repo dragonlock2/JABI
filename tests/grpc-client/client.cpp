@@ -283,4 +283,17 @@ int gRPCDevice::adc_read(int idx) {
     return resp.value();
 }
 
+/* DAC */
+void gRPCDevice::dac_write(int idx, int mV) {
+    JABI::DACWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    req.set_mv(mV);
+    Status status = stub->dac_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
 };

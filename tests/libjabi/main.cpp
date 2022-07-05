@@ -91,6 +91,14 @@ void testDevice(jabi::Device d) {
         std::cout << "\tRead ADC " << i << " as " << d.adc_read(i) << "mV" << std::endl;
     }
     std::cout << std::endl;
+
+    /* DAC */
+    lim = d.num_inst(jabi::InstID::DAC);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tSetting DAC " << i << " to 690mV" << std::endl;
+        d.dac_write(i, 690);
+    }
+    std::cout << std::endl;
 }
 
 int main() {

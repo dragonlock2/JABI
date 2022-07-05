@@ -19,6 +19,7 @@ enum class InstID {
     GPIO     = PERIPH_GPIO_ID,
     PWM      = PERIPH_PWM_ID,
     ADC      = PERIPH_ADC_ID,
+    DAC      = PERIPH_DAC_ID,
 };
 
 /* CAN */
@@ -104,6 +105,9 @@ public:
 
     /* ADC */
     int adc_read(int idx); // mV
+
+    /* DAC */
+    void dac_write(int idx, int mV);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

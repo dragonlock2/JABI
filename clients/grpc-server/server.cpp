@@ -139,3 +139,10 @@ Status JABIServiceImpl::adc_read(ServerContext*, const Index* req, Int32Value* r
         resp->set_value(dev->adc_read(req->idx()));
     )
 }
+
+/* DAC */
+Status JABIServiceImpl::dac_write(ServerContext*, const DACWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->dac_write(req->idx(), req->mv());
+    )
+}

@@ -17,6 +17,13 @@
             resolutions = <12>;
             vrefs-mv    = <36300>; // voltage divider!
         };
+        dac {
+            compatible = "jabi,dac";
+            devices     = <&dac1>;
+            channels    = <2>;
+            resolutions = <12>;
+            vrefs-mv    = <3300>;
+        };
     };
 };
 

@@ -9,6 +9,7 @@
 #define JABI_IFACE_NODE  DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_interfaces)
 #define JABI_PERIPH_NODE DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_peripherals)
 #define JABI_ADC_NODE    DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_adc)
+#define JABI_DAC_NODE    DT_COMPAT_GET_ANY_STATUS_OKAY(jabi_dac)
 
 #define NUM_INTERFACES (DT_PROP(JABI_IFACE_NODE, usb) + \
                         DT_PROP_LEN(JABI_IFACE_NODE, uart))

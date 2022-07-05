@@ -32,6 +32,9 @@ service Device {
 
     /* ADC */
     rpc adc_read(Index) returns (google.protobuf.Int32Value);
+
+    /* DAC */
+    rpc dac_write(DACWriteRequest) returns (google.protobuf.Empty);
 }
 
 /* Common */
@@ -47,6 +50,7 @@ enum InstID {
     GPIO = 3;
     PWM = 4;
     ADC = 5;
+    DAC = 6;
 }
 
 message NumInstRequest {
@@ -162,4 +166,10 @@ message PWMWriteRequest {
     uint32 idx = 1;
     double pulsewidth = 2;
     double period = 3;
+}
+
+/* DAC */
+message DACWriteRequest {
+    uint32 idx = 1;
+    int32 mv = 2;
 }

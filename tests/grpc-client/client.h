@@ -18,6 +18,7 @@ enum class InstID {
     GPIO     = JABI::InstID::GPIO,
     PWM      = JABI::InstID::PWM,
     ADC      = JABI::InstID::ADC,
+    DAC      = JABI::InstID::DAC,
 };
 
 /* CAN */
@@ -106,6 +107,9 @@ public:
 
     /* ADC */
     int adc_read(int idx); // mV
+
+    /* DAC */
+    void dac_write(int idx, int mV);
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;
