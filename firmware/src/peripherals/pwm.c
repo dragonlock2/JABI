@@ -16,6 +16,10 @@ static int pwm_init(uint16_t idx) {
     return JABI_NO_ERR;
 }
 
+static void *pwm_get_dev(uint16_t idx) {
+    return (void*) pwms[idx].dev;
+}
+
 PERIPH_FUNC_DEF(pwm_write) {
     PERIPH_FUNC_GET_ARGS(pwm, write);
     PERIPH_FUNC_CHECK_ARGS_LEN(pwm, write);
@@ -39,6 +43,7 @@ static const periph_func_t pwm_periph_fns[] = {
 
 const struct periph_api_t pwm_periph_api = {
     .init = pwm_init,
+    .get_dev = pwm_get_dev,
     .fns = pwm_periph_fns,
     .num_fns = ARRAY_SIZE(pwm_periph_fns),
     .num_idx = DT_PROP_LEN(JABI_PERIPH_NODE, pwm),
