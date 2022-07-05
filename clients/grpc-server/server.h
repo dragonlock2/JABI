@@ -56,6 +56,14 @@ public:
     /* DAC */
     Status dac_write(ServerContext*, const DACWriteRequest* req, Empty*) override;
 
+    /* SPI */
+    Status spi_set_freq(ServerContext*, const SPISetFreqRequest* req, Empty*) override;
+    Status spi_set_mode(ServerContext*, const SPISetModeRequest* req, Empty*) override;
+    Status spi_set_bitorder(ServerContext*, const SPISetBitorderRequest* req, Empty*) override;
+    Status spi_write(ServerContext*, const SPIWriteRequest* req, Empty*) override;
+    Status spi_read(ServerContext*, const SPIReadRequest* req, BytesValue* resp) override;
+    Status spi_transceive(ServerContext*, const SPITransceiveRequest* req, BytesValue* resp) override;
+
 private:
     std::shared_ptr<jabi::Device> dev;
 };

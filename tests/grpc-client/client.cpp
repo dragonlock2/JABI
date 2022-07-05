@@ -296,4 +296,79 @@ void gRPCDevice::dac_write(int idx, int mV) {
     }
 }
 
+/* SPI */
+void gRPCDevice::spi_set_freq(int freq, int idx) {
+    JABI::SPISetFreqRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_freq(freq);
+    req.set_idx(idx);
+    Status status = stub->spi_set_freq(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::spi_set_mode(int mode, int idx) {
+    JABI::SPISetModeRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_mode(mode);
+    req.set_idx(idx);
+    Status status = stub->spi_set_mode(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::spi_set_bitorder(bool msb, int idx) {
+    JABI::SPISetBitorderRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_msb(msb);
+    req.set_idx(idx);
+    Status status = stub->spi_set_bitorder(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::spi_write(std::vector<uint8_t> data, int idx) {
+    JABI::SPIWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_data(std::string(data.begin(), data.end()));
+    req.set_idx(idx);
+    Status status = stub->spi_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+std::vector<uint8_t> gRPCDevice::spi_read(size_t len, int idx) {
+    JABI::SPIReadRequest req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_len(len);
+    req.set_idx(idx);
+    Status status = stub->spi_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
+std::vector<uint8_t> gRPCDevice::spi_transceive(std::vector<uint8_t> data, int idx) {
+    JABI::SPITransceiveRequest req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_data(std::string(data.begin(), data.end()));
+    req.set_idx(idx);
+    Status status = stub->spi_transceive(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
 };

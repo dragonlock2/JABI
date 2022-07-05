@@ -146,3 +146,44 @@ Status JABIServiceImpl::dac_write(ServerContext*, const DACWriteRequest* req, Em
         dev->dac_write(req->idx(), req->mv());
     )
 }
+
+/* SPI */
+Status JABIServiceImpl::spi_set_freq(ServerContext*, const SPISetFreqRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->spi_set_freq(req->freq(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::spi_set_mode(ServerContext*, const SPISetModeRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->spi_set_mode(req->mode(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::spi_set_bitorder(ServerContext*, const SPISetBitorderRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->spi_set_bitorder(req->msb(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::spi_write(ServerContext*, const SPIWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        auto s = req->data();
+        dev->spi_write(std::vector<uint8_t>(s.begin(), s.end()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::spi_read(ServerContext*, const SPIReadRequest* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto v = dev->spi_read(req->len(), req->idx());
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}
+
+Status JABIServiceImpl::spi_transceive(ServerContext*, const SPITransceiveRequest* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto s = req->data();
+        auto v = dev->spi_transceive(std::vector<uint8_t>(s.begin(), s.end()), req->idx());
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}

@@ -19,6 +19,7 @@ enum class InstID {
     PWM      = JABI::InstID::PWM,
     ADC      = JABI::InstID::ADC,
     DAC      = JABI::InstID::DAC,
+    SPI      = JABI::InstID::SPI,
 };
 
 /* CAN */
@@ -110,6 +111,14 @@ public:
 
     /* DAC */
     void dac_write(int idx, int mV);
+
+    /* SPI */
+    void spi_set_freq(int freq, int idx=0);
+    void spi_set_mode(int mode, int idx=0);
+    void spi_set_bitorder(bool msb, int idx=0);
+    void spi_write(std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> spi_read(size_t len, int idx=0);
+    std::vector<uint8_t> spi_transceive(std::vector<uint8_t> data, int idx=0);
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;

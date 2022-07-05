@@ -35,6 +35,14 @@ service Device {
 
     /* DAC */
     rpc dac_write(DACWriteRequest) returns (google.protobuf.Empty);
+
+    /* SPI */
+    rpc spi_set_freq(SPISetFreqRequest) returns (google.protobuf.Empty);
+    rpc spi_set_mode(SPISetModeRequest) returns (google.protobuf.Empty);
+    rpc spi_set_bitorder(SPISetBitorderRequest) returns (google.protobuf.Empty);
+    rpc spi_write(SPIWriteRequest) returns (google.protobuf.Empty);
+    rpc spi_read(SPIReadRequest) returns (google.protobuf.BytesValue);
+    rpc spi_transceive(SPITransceiveRequest) returns (google.protobuf.BytesValue);
 }
 
 /* Common */
@@ -51,6 +59,7 @@ enum InstID {
     PWM = 4;
     ADC = 5;
     DAC = 6;
+    SPI = 7;
 }
 
 message NumInstRequest {
@@ -172,4 +181,35 @@ message PWMWriteRequest {
 message DACWriteRequest {
     uint32 idx = 1;
     int32 mv = 2;
+}
+
+/* SPI */
+message SPISetFreqRequest {
+    uint32 freq = 1;
+    uint32 idx = 2;
+}
+
+message SPISetModeRequest {
+    uint32 mode = 1;
+    uint32 idx = 2;
+}
+
+message SPISetBitorderRequest {
+    bool msb = 1;
+    uint32 idx = 2;
+}
+
+message SPIWriteRequest {
+    bytes data = 1;
+    uint32 idx = 2;
+}
+
+message SPIReadRequest {
+    uint32 len = 1;
+    uint32 idx = 2;
+}
+
+message SPITransceiveRequest {
+    bytes data = 1;
+    uint32 idx = 2;
 }

@@ -28,7 +28,8 @@ PYBIND11_MODULE(jabi, m) {
         .value("GPIO", InstID::GPIO)
         .value("PWM", InstID::PWM)
         .value("ADC", InstID::ADC)
-        .value("DAC", InstID::DAC);
+        .value("DAC", InstID::DAC)
+        .value("SPI", InstID::SPI);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -112,7 +113,15 @@ PYBIND11_MODULE(jabi, m) {
         .def("adc_read", &Device::adc_read)
 
         /* DAC */
-        .def("dac_write", &Device::dac_write);
+        .def("dac_write", &Device::dac_write)
+
+        /* SPI */
+        .def("spi_set_freq", &Device::spi_set_freq, "freq"_a, "idx"_a=0)
+        .def("spi_set_mode", &Device::spi_set_mode, "mode"_a, "idx"_a=0)
+        .def("spi_set_bitorder", &Device::spi_set_bitorder, "msb"_a, "idx"_a=0)
+        .def("spi_write", &Device::spi_write, "data"_a, "idx"_a=0)
+        .def("spi_read", &Device::spi_read, "len"_a, "idx"_a=0)
+        .def("spi_transceive", &Device::spi_transceive, "data"_a, "idx"_a=0);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")

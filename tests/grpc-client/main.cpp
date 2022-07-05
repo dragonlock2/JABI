@@ -41,6 +41,26 @@ void testDevice(jabi::gRPCDevice &d) {
     }
     std::cout << std::endl;
 
+    /* SPI */
+    lim = d.num_inst(jabi::InstID::SPI);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tSetting SPI to 250kHz, MODE0, LSB first" << std::endl;
+        d.spi_set_freq(250000, i);
+        d.spi_set_mode(0, i);
+        d.spi_set_bitorder(false);
+
+        d.spi_write(std::vector<uint8_t>{69}, i);
+        std::cout << "\t Wrote 69" << std::endl;
+        std::cout << "\t Read " << (int) d.spi_read(1, i)[0] << std::endl;
+        
+        std::cout << "\t Transceived out [1, 2, 3, 4], in [";
+        for (auto c : d.spi_transceive(std::vector<uint8_t>{1,2,3,4}, i)) {
+            std::cout << (int) c << ", ";
+        }
+        std::cout << "]" << std::endl;
+    }
+    std::cout << std::endl;
+
     /* I2C */
     lim = d.num_inst(jabi::InstID::I2C);
     for (auto i = 0; i < lim; i++) {

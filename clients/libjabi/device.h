@@ -20,6 +20,7 @@ enum class InstID {
     PWM      = PERIPH_PWM_ID,
     ADC      = PERIPH_ADC_ID,
     DAC      = PERIPH_DAC_ID,
+    SPI      = PERIPH_SPI_ID,
 };
 
 /* CAN */
@@ -108,6 +109,14 @@ public:
 
     /* DAC */
     void dac_write(int idx, int mV);
+
+    /* SPI */
+    void spi_set_freq(int freq, int idx=0);
+    void spi_set_mode(int mode, int idx=0);
+    void spi_set_bitorder(bool msb, int idx=0);
+    void spi_write(std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> spi_read(size_t len, int idx=0);
+    std::vector<uint8_t> spi_transceive(std::vector<uint8_t> data, int idx=0);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

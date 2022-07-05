@@ -28,6 +28,19 @@ def testDevice(d):
             print("\t", msg)
     print()
 
+    # SPI
+    for i in range(d.num_inst(jabi.InstID.SPI)):
+        print("\tSetting SPI to 250kHz, MODE0, LSB first")
+        d.spi_set_freq(250000, i)
+        d.spi_set_mode(0, i)
+        d.spi_set_bitorder(False, i)
+
+        d.spi_write([69], i)
+        print("\t Wrote 69")
+        print("\t Read", d.spi_read(1, i)[0])
+        print("\t Transceived out [1, 2, 3, 4], in ", d.spi_transceive([1,2,3,4], i))
+    print()
+
     # I2C
     for i in range(d.num_inst(jabi.InstID.I2C)):
         print("\tScanning for devices on I2C", i)

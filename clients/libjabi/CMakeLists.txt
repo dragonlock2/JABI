@@ -10,6 +10,7 @@ add_library(libjabi
     peripherals/pwm.cpp
     peripherals/adc.cpp
     peripherals/dac.cpp
+    peripherals/spi.cpp
 )
 
 find_package(libusb CONFIG QUIET)

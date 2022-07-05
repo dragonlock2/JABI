@@ -52,13 +52,13 @@ PERIPH_FUNC_DEF(i2c_write_j) {
     args->addr = sys_le16_to_cpu(args->addr);
     args->data_len = sys_le16_to_cpu(args->data_len);
 
-    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
-    LOG_HEXDUMP_DBG(args->data, args->data_len, "data=");
-
     if (req_len != (sizeof(i2c_write_j_req_t) + args->data_len)) {
         LOG_ERR("invalid amount of data provided");
         return JABI_INVALID_ARGS_FORMAT_ERR;
     }
+
+    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
+    LOG_HEXDUMP_DBG(args->data, args->data_len, "data=");
 
     if (i2c_write(i2c_devs[idx], args->data, args->data_len, args->addr)) {
         LOG_ERR("failed to write data");
@@ -76,12 +76,12 @@ PERIPH_FUNC_DEF(i2c_read_j) {
     args->addr = sys_le16_to_cpu(args->addr);
     args->data_len = sys_le16_to_cpu(args->data_len);
 
-    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
-
     if (args->data_len > RESP_PAYLOAD_MAX_SIZE) {
         LOG_ERR("requested read too long");
         return JABI_INVALID_ARGS_ERR;
     }
+
+    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
 
     if (i2c_read(i2c_devs[idx], ret, args->data_len, args->addr)) {
         LOG_ERR("failed to read data");

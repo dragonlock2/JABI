@@ -16,3 +16,6 @@ properties:
 
   pwm:
     type: phandles
+
+  spi:
+    type: phandles

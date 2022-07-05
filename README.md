@@ -9,7 +9,7 @@ Interfaces are the available methods by which a single client may connect. Multi
 - USB
 - UART
 
-Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. The following peripherals are currently supported.
+Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. Multiple instances of each peripheral type is supported. The following peripherals are currently supported.
 
 - Metadata
 - CAN FD
@@ -18,6 +18,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 - PWM output
 - ADC
 - DAC
+- SPI master
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -105,7 +106,6 @@ The following gRPC clients.
 The following peripherals.
 
 - LIN
-- SPI master
 - UART
 
 Fun things to look into one day.
