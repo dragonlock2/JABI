@@ -28,7 +28,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
     iface_req_htole(req.msg);
 
     // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
-    auto req_buffer = std::make_shared<uint8_t[]>(
+    auto req_buffer = std::make_unique<uint8_t[]>(
         sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE + req_max_size);
     iface_req_t* req_msg = reinterpret_cast<iface_req_t*>(req_buffer.get());
     memcpy(req_msg, &req.msg, IFACE_REQ_HDR_SIZE);
@@ -50,7 +50,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
     }
 
     // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
-    auto resp_buffer = std::make_shared<uint8_t[]>(
+    auto resp_buffer = std::make_unique<uint8_t[]>(
         sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE + resp_max_size);
     iface_resp_t* resp_msg = reinterpret_cast<iface_resp_t*>(resp_buffer.get());
 
