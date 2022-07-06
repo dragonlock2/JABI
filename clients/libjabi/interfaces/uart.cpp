@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #endif // _WIN32
 
-#define UART_TIMEOUT std::chrono::milliseconds(1000)
+#define UART_TIMEOUT std::chrono::milliseconds(3000)
 
 namespace jabi {
 
@@ -68,16 +68,27 @@ UARTInterface::~UARTInterface() {
     CloseHandle(hFile);
 }
 
-iface_resp_t UARTInterface::send_request(iface_req_t req) {
+iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
     std::scoped_lock lk(req_lock);
 
-    std::future<iface_resp_t> lock = std::async([this, &req]{
-        if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
+    std::future<iface_dynamic_resp_t> lock = std::async([this, &req]{
+        if (req.msg.payload_len > req_max_size ||
+            req.msg.payload_len != req.payload.size()) {
             throw std::runtime_error("request payload size too large");
         }
-        iface_req_htole(req);
-        DWORD len = IFACE_REQ_HDR_SIZE + req.payload_len;
-        auto buffer = reinterpret_cast<char*>(&req);
+        iface_req_htole(req.msg);
+        DWORD len = IFACE_REQ_HDR_SIZE;
+        auto buffer = reinterpret_cast<char*>(&req.msg);
+        while (len) {
+            DWORD sent_len;
+            if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
+                throw std::runtime_error("write failed");
+            }
+            len -= sent_len;
+            buffer += sent_len;
+        }
+        DWORD len = req.payload.size();
+        auto buffer = reinterpret_cast<char*>(req.payload.data());
         while (len) {
             DWORD sent_len;
             if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
@@ -93,10 +104,10 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
             throw std::runtime_error("failed to clear error?");
         }
 
-        iface_resp_t resp;
-        resp.payload_len = 0;
+        iface_dynamic_resp_t resp;
+        resp.msg.payload_len = 0;
         len = IFACE_RESP_HDR_SIZE;
-        buffer = reinterpret_cast<char*>(&resp);
+        buffer = reinterpret_cast<char*>(&resp.msg);
         while (len) {
             DWORD recv_len;
             if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
@@ -105,12 +116,13 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
             len -= recv_len;
             buffer += recv_len;
         }
-        iface_resp_letoh(resp);
-        if (resp.retcode != 0 || resp.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-            throw std::runtime_error("bad response " + std::to_string(resp.retcode));
+        iface_resp_letoh(resp.msg);
+        if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
+            throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
         }
-        len = resp.payload_len;
-        buffer = reinterpret_cast<char*>(resp.payload);
+        resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
+        len = resp.payload.size();
+        buffer = reinterpret_cast<char*>(resp.payload.data());
         while (len) {
             DWORD recv_len;
             if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
@@ -186,16 +198,27 @@ UARTInterface::~UARTInterface() {
     close(fd);
 }
 
-iface_resp_t UARTInterface::send_request(iface_req_t req) {
+iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
     std::scoped_lock lk(req_lock);
 
-    std::future<iface_resp_t> lock = std::async([this, &req]{
-        if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-            throw std::runtime_error("request payload size too large");
+    std::future<iface_dynamic_resp_t> lock = std::async([this, &req]{
+        if (req.msg.payload_len > req_max_size ||
+            req.msg.payload_len != req.payload.size()) {
+            throw std::runtime_error("request payload size bad");
         }
-        iface_req_htole(req);
-        int len = IFACE_REQ_HDR_SIZE + req.payload_len;
-        auto buffer = reinterpret_cast<unsigned char*>(&req);
+        iface_req_htole(req.msg);
+        int len = IFACE_REQ_HDR_SIZE;
+        auto buffer = reinterpret_cast<unsigned char*>(&req.msg);
+        while (len) {
+            int sent_len;
+            if ((sent_len = write(fd, buffer, len)) < 0) {
+                throw std::runtime_error("write failed");
+            }
+            len -= sent_len;
+            buffer += sent_len;
+        }
+        len = req.payload.size();
+        buffer = reinterpret_cast<unsigned char*>(req.payload.data());
         while (len) {
             int sent_len;
             if ((sent_len = write(fd, buffer, len)) < 0) {
@@ -205,10 +228,10 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
             buffer += sent_len;
         }
 
-        iface_resp_t resp;
-        resp.payload_len = 0;
+        iface_dynamic_resp_t resp;
+        resp.msg.payload_len = 0;
         len = IFACE_RESP_HDR_SIZE;
-        buffer = reinterpret_cast<unsigned char*>(&resp);
+        buffer = reinterpret_cast<unsigned char*>(&resp.msg);
         while (len) {
             int recv_len;
             if ((recv_len = read(fd, buffer, len)) < 0) {
@@ -217,12 +240,13 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
             len -= recv_len;
             buffer += recv_len;
         }
-        iface_resp_letoh(resp);
-        if (resp.retcode != 0 || resp.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-            throw std::runtime_error("bad response " + std::to_string(resp.retcode));
+        iface_resp_letoh(resp.msg);
+        if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
+            throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
         }
-        len = resp.payload_len;
-        buffer = reinterpret_cast<unsigned char*>(resp.payload);
+        resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
+        len = resp.payload.size();
+        buffer = reinterpret_cast<unsigned char*>(resp.payload.data());
         while (len) {
             int recv_len;
             if ((recv_len = read(fd, buffer, len)) < 0) {
@@ -244,8 +268,13 @@ iface_resp_t UARTInterface::send_request(iface_req_t req) {
 #endif // _WIN32
 
 Device UARTInterface::get_device(std::string port, int baud) {
-    return Interface::makeDevice(std::shared_ptr<UARTInterface>(
-        new UARTInterface(port, baud)));
+    std::shared_ptr<UARTInterface> iface(new UARTInterface(port, baud));
+    auto dev = Interface::makeDevice(iface);
+    if ((iface->req_max_size = dev.req_max_size()) < REQ_PAYLOAD_MAX_SIZE ||
+        (iface->resp_max_size = dev.resp_max_size()) < RESP_PAYLOAD_MAX_SIZE) {
+        throw std::runtime_error("maximum packet size too small");
+    }
+    return dev;
 }
 
 };

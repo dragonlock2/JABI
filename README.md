@@ -76,11 +76,11 @@ cmake --build .
 
 #### libjabi
 
-[`libjabi`](clients/libjabi) is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [tests/libjabi](tests/libjabi).
+[`libjabi`](clients/libjabi) is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [examples/libjabi](examples/libjabi).
 
 #### pyjabi
 
-[`pyjabi`](clients/pyjabi) can be installed from a local directory using `pip` for easy management. An example using it is in [tests/pyjabi](tests/pyjabi).
+[`pyjabi`](clients/pyjabi) can be installed from a local directory using `pip` for easy management. An example using it is in [examples/pyjabi](examples/pyjabi).
 
 ```
 pip install clients/pyjabi
@@ -88,7 +88,7 @@ pip install clients/pyjabi
 
 #### grpc-server
 
-[`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [tests/grpc-client](tests/grpc-client).
+[`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [examples/grpc-client](examples/grpc-client).
 
 ## Known Issues
 
@@ -105,7 +105,6 @@ The following gRPC clients.
 
 The following peripherals.
 
-- LIN
 - UART
 
 Fun things to look into one day.

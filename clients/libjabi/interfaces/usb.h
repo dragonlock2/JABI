@@ -10,7 +10,7 @@ class USBInterface : public Interface {
 public:
     ~USBInterface();
 
-    iface_resp_t send_request(iface_req_t req);
+    iface_dynamic_resp_t send_request(iface_dynamic_req_t req);
     static std::vector<Device> list_devices();
 
 private:

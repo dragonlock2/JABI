@@ -42,77 +42,89 @@ std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
 }
 
 void Device::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx) {
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_SET_FILTER_ID,
-        .payload_len = sizeof(can_set_filter_req_t),
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_SET_FILTER_ID,
+            .payload_len = sizeof(can_set_filter_req_t),
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(sizeof(can_set_filter_req_t), 0),
     };
 
-    auto args = reinterpret_cast<can_set_filter_req_t*>(req.payload);
+    auto args = reinterpret_cast<can_set_filter_req_t*>(req.payload.data());
     args->id       = htole<uint32_t>(id);
     args->id_mask  = htole<uint32_t>(id_mask);
     args->rtr      = rtr;
     args->rtr_mask = rtr_mask;
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != 0) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() != 0) {
         throw std::runtime_error("unexpected payload length");
     }
 }
 
 void Device::can_set_rate(int bitrate, int bitrate_data, int idx) {
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_SET_RATE_ID,
-        .payload_len = sizeof(can_set_rate_req_t),
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_SET_RATE_ID,
+            .payload_len = sizeof(can_set_rate_req_t),
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(sizeof(can_set_rate_req_t), 0),
     };
 
-    auto args = reinterpret_cast<can_set_rate_req_t*>(req.payload);
+    auto args = reinterpret_cast<can_set_rate_req_t*>(req.payload.data());
     args->bitrate      = htole<uint32_t>(bitrate);
     args->bitrate_data = htole<uint32_t>(bitrate_data);
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != 0) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() != 0) {
         throw std::runtime_error("unexpected payload length");
     }
 }
 
 void Device::can_set_mode(CANMode mode, int idx) {
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_SET_STYLE_ID,
-        .payload_len = sizeof(can_set_style_req_t),
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_SET_STYLE_ID,
+            .payload_len = sizeof(can_set_style_req_t),
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(sizeof(can_set_style_req_t), 0),
     };
 
-    auto args = reinterpret_cast<can_set_style_req_t*>(req.payload);
+    auto args = reinterpret_cast<can_set_style_req_t*>(req.payload.data());
     args->mode = static_cast<uint8_t>(mode);
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != 0) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() != 0) {
         throw std::runtime_error("unexpected payload length");
     }
 }
 
 CANState Device::can_state(int idx) {
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_STATE_ID,
-        .payload_len = 0,
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_STATE_ID,
+            .payload_len = 0,
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(),
     };
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != sizeof(can_state_resp_t)) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() != sizeof(can_state_resp_t)) {
         throw std::runtime_error("unexpected payload length");
     }
-    auto ret = reinterpret_cast<can_state_resp_t*>(resp.payload);
+    auto ret = reinterpret_cast<can_state_resp_t*>(resp.payload.data());
 
     CANState state = {
         .state  = ret->state,
@@ -127,15 +139,18 @@ void Device::can_write(CANMessage msg, int idx) {
         throw std::runtime_error("data too long");
     }
 
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_WRITE_ID,
-        .payload_len = sizeof(can_write_req_t),
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_WRITE_ID,
+            .payload_len = sizeof(can_write_req_t),
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(sizeof(can_write_req_t), 0),
     };
 
-    auto args = reinterpret_cast<can_write_req_t*>(req.payload);
+    auto args = reinterpret_cast<can_write_req_t*>(req.payload.data());
     args->id       = htole<uint32_t>(msg.id);
     args->id_type  = msg.ext;
     args->fd       = msg.fd;
@@ -143,39 +158,45 @@ void Device::can_write(CANMessage msg, int idx) {
     args->rtr      = msg.rtr;
     args->data_len = static_cast<uint8_t>(msg.data.size());
     if (!msg.rtr) {
-        memcpy(args->data, msg.data.data(), msg.data.size());
-        req.payload_len += args->data_len;
+        req.payload.reserve(req.payload.size() + msg.data.size());
+        for (auto c : msg.data) {
+            req.payload.push_back(c);
+        }
+        req.msg.payload_len = req.payload.size();
     }
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len != 0) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() != 0) {
         throw std::runtime_error("unexpected payload length");
     }
 }
 
 int Device::can_read(CANMessage &msg, int idx) {
-    iface_req_t req = {
-        .periph_id   = PERIPH_CAN_ID,
-        .periph_idx  = static_cast<uint16_t>(idx),
-        .periph_fn   = CAN_READ_ID,
-        .payload_len = 0,
-        .payload     = {0},
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_CAN_ID,
+            .periph_idx  = static_cast<uint16_t>(idx),
+            .periph_fn   = CAN_READ_ID,
+            .payload_len = 0,
+            .payload     = {0},
+        },
+        .payload = std::vector<uint8_t>(),
     };
 
-    iface_resp_t resp = interface->send_request(req);
-    if (resp.payload_len == 0) {
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    if (resp.payload.size() == 0) {
         return -1; // empty buffer, no message returned
     }
-    if (resp.payload_len < sizeof(can_read_resp_t)) {
+    if (resp.payload.size() < sizeof(can_read_resp_t)) {
         throw std::runtime_error("unexpected payload length");
     }
 
-    auto ret = reinterpret_cast<can_read_resp_t*>(resp.payload);
+    auto ret = reinterpret_cast<can_read_resp_t*>(resp.payload.data());
     ret->num_left = letoh<uint16_t>(ret->num_left);
     ret->id       = letoh<uint32_t>(ret->id);
 
-    if  ((ret->rtr && resp.payload_len != sizeof(can_read_resp_t)) ||
-        (!ret->rtr && resp.payload_len != sizeof(can_read_resp_t) + ret->data_len) ||
+    if  ((ret->rtr && resp.payload.size() != sizeof(can_read_resp_t)) ||
+        (!ret->rtr && resp.payload.size() != sizeof(can_read_resp_t) + ret->data_len) ||
           ret->data_len > CAN_MAX_LEN) {
         throw std::runtime_error("unexpected payload length");
     }

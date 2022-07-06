@@ -123,7 +123,7 @@ static void usb_get_req(iface_req_t *req) {
         iface_req_to_le(req);
         if (req->payload_len > REQ_PAYLOAD_MAX_SIZE || 
             len != (IFACE_REQ_HDR_SIZE + req->payload_len)) {
-            LOG_ERR("invalid request packet length %d", req->payload_len);
+            LOG_ERR("invalid request packet length %d %d", req->payload_len, len);
             continue;
         }
         break;

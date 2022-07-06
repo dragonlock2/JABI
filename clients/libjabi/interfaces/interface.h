@@ -10,13 +10,25 @@ namespace jabi {
 
 #include <jabi/interfaces.h>
 
+struct iface_dynamic_req_t {
+    iface_req_t msg;
+    std::vector<uint8_t> payload;
+};
+
+struct iface_dynamic_resp_t {
+    iface_resp_t msg;
+    std::vector<uint8_t> payload;
+};
+
 class Interface {
 public:
     virtual ~Interface() = default;
 
-    virtual iface_resp_t send_request(iface_req_t req) = 0;
+    virtual iface_dynamic_resp_t send_request(iface_dynamic_req_t req) = 0;
 
 protected:
+    size_t req_max_size = REQ_PAYLOAD_MAX_SIZE;
+    size_t resp_max_size = RESP_PAYLOAD_MAX_SIZE;
     std::mutex req_lock;
 
     static Device makeDevice(std::shared_ptr<Interface> i) { return Device(i); }

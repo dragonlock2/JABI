@@ -1,7 +1,8 @@
+#include <cstring>
 #include <string>
 #include "usb.h"
 
-#define USB_TIMEOUT_MS 1000
+#define USB_TIMEOUT_MS 3000
 
 namespace jabi {
 
@@ -16,18 +17,25 @@ USBInterface::~USBInterface() {
     libusb_close(dev);
 }
 
-iface_resp_t USBInterface::send_request(iface_req_t req) {
+iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
     std::scoped_lock lk(req_lock);
 
-    if (req.payload_len > REQ_PAYLOAD_MAX_SIZE) {
-        throw std::runtime_error("request payload size too large");
+    if (req.msg.payload_len > req_max_size ||
+        req.msg.payload_len != req.payload.size()) {
+        throw std::runtime_error("request payload size bad");
     }
 
-    iface_req_htole(req);
+    iface_req_htole(req.msg);
+
+    // transfer must be contiguous, allocate stack memory and copy
+    uint8_t req_buffer[sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE + req_max_size];
+    iface_req_t* req_msg = reinterpret_cast<iface_req_t*>(req_buffer);
+    memcpy(req_msg, &req.msg, IFACE_REQ_HDR_SIZE);
+    memcpy(req_msg->payload, req.payload.data(), req.payload.size());
 
     int sent_len;
-    int len = IFACE_REQ_HDR_SIZE + req.payload_len;
-    if (libusb_bulk_transfer(dev, ep_out, reinterpret_cast<unsigned char*>(&req),
+    int len = IFACE_REQ_HDR_SIZE + req.payload.size();
+    if (libusb_bulk_transfer(dev, ep_out, reinterpret_cast<unsigned char*>(req_msg),
             len, &sent_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer request failed");
     }
@@ -40,22 +48,30 @@ iface_resp_t USBInterface::send_request(iface_req_t req) {
         }
     }
 
+    // transfer must be contiguous, allocate stack memory and copy
+    uint8_t resp_buffer[sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE + resp_max_size];
+    iface_resp_t* resp_msg = reinterpret_cast<iface_resp_t*>(resp_buffer);
+
     int recv_len;
-    iface_resp_t resp;
-    resp.payload_len = 0;
-    if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(&resp),
-            sizeof(iface_resp_t), &recv_len, USB_TIMEOUT_MS) < 0) {
+    resp_msg->payload_len = 0;
+    if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(resp_msg),
+            IFACE_RESP_HDR_SIZE + resp_max_size, &recv_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer response failed");
     }
 
-    iface_resp_letoh(resp);
+    iface_resp_letoh(*resp_msg);
 
-    if (recv_len != (int) IFACE_RESP_HDR_SIZE + resp.payload_len) {
+    if (recv_len != static_cast<int>(IFACE_RESP_HDR_SIZE + resp_msg->payload_len)) {
         throw std::runtime_error("wrong USB transfer response length");
     }
-    if (resp.retcode != 0 || resp.payload_len > RESP_PAYLOAD_MAX_SIZE) {
-        throw std::runtime_error("bad response " + std::to_string(resp.retcode));
+    if (resp_msg->retcode != 0 || resp_msg->payload_len > resp_max_size) {
+        throw std::runtime_error("bad response " + std::to_string(resp_msg->retcode));
     }
+
+    iface_dynamic_resp_t resp;
+    memcpy(&resp.msg, resp_msg, IFACE_RESP_HDR_SIZE);
+    resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
+    memcpy(resp.payload.data(), &resp_msg->payload, resp.payload.size());
 
     return resp;
 }
@@ -130,26 +146,31 @@ std::vector<Device> USBInterface::list_devices() {
             auto ep_out = ep0, ep_in = ep1;
             if (ep0.bEndpointAddress & 0x80) { std::swap(ep_out, ep_in); }
 
-            Device jabi = Interface::makeDevice(
-                std::shared_ptr<USBInterface>(
-                    new USBInterface(
-                        dev,
-                        if_desc.bInterfaceNumber,
-                        ep_out.wMaxPacketSize,
-                        ep_out.bEndpointAddress,
-                        ep_in.bEndpointAddress
-                    )
+            std::shared_ptr<USBInterface> iface(
+                new USBInterface(
+                    dev,
+                    if_desc.bInterfaceNumber,
+                    ep_out.wMaxPacketSize,
+                    ep_out.bEndpointAddress,
+                    ep_in.bEndpointAddress
                 )
             );
+            Device jabi = Interface::makeDevice(iface);
             try {
-                jabi.serial();
+                if ((iface->req_max_size = jabi.req_max_size()) < REQ_PAYLOAD_MAX_SIZE ||
+                    (iface->resp_max_size = jabi.resp_max_size()) < RESP_PAYLOAD_MAX_SIZE) {
+                    throw std::runtime_error("maximum packet size too small");
+                }
             } catch(const std::runtime_error&) {
                 // reset device and try one more time
                 if (libusb_reset_device(dev) < 0) {
                     break;
                 }
                 try {
-                    jabi.serial();
+                    if ((iface->req_max_size = jabi.req_max_size()) < REQ_PAYLOAD_MAX_SIZE ||
+                        (iface->resp_max_size = jabi.resp_max_size()) < RESP_PAYLOAD_MAX_SIZE) {
+                        throw std::runtime_error("maximum packet size too small");
+                    }
                 } catch(const std::runtime_error&) {
                     break;
                 }
