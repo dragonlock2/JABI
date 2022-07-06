@@ -27,14 +27,15 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
 
     iface_req_htole(req.msg);
 
-    // transfer must be contiguous, allocate stack memory and copy
-    uint8_t req_buffer[sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE + req_max_size];
-    iface_req_t* req_msg = reinterpret_cast<iface_req_t*>(req_buffer);
+    // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
+    auto req_buffer = std::make_shared<uint8_t[]>(
+        sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE + req_max_size);
+    iface_req_t* req_msg = reinterpret_cast<iface_req_t*>(req_buffer.get());
     memcpy(req_msg, &req.msg, IFACE_REQ_HDR_SIZE);
     memcpy(req_msg->payload, req.payload.data(), req.payload.size());
 
     int sent_len;
-    int len = IFACE_REQ_HDR_SIZE + req.payload.size();
+    int len = static_cast<int>(IFACE_REQ_HDR_SIZE + req.payload.size());
     if (libusb_bulk_transfer(dev, ep_out, reinterpret_cast<unsigned char*>(req_msg),
             len, &sent_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer request failed");
@@ -48,14 +49,15 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
         }
     }
 
-    // transfer must be contiguous, allocate stack memory and copy
-    uint8_t resp_buffer[sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE + resp_max_size];
-    iface_resp_t* resp_msg = reinterpret_cast<iface_resp_t*>(resp_buffer);
+    // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
+    auto resp_buffer = std::make_shared<uint8_t[]>(
+        sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE + resp_max_size);
+    iface_resp_t* resp_msg = reinterpret_cast<iface_resp_t*>(resp_buffer.get());
 
     int recv_len;
     resp_msg->payload_len = 0;
     if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(resp_msg),
-            IFACE_RESP_HDR_SIZE + resp_max_size, &recv_len, USB_TIMEOUT_MS) < 0) {
+            static_cast<int>(IFACE_RESP_HDR_SIZE + resp_max_size), &recv_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer response failed");
     }
 

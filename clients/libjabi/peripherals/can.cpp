@@ -162,7 +162,7 @@ void Device::can_write(CANMessage msg, int idx) {
         for (auto c : msg.data) {
             req.payload.push_back(c);
         }
-        req.msg.payload_len = req.payload.size();
+        req.msg.payload_len = static_cast<uint16_t>(req.payload.size());
     }
 
     iface_dynamic_resp_t resp = interface->send_request(req);

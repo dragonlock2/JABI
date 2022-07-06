@@ -77,7 +77,7 @@ iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
             throw std::runtime_error("request payload size too large");
         }
         iface_req_htole(req.msg);
-        DWORD len = IFACE_REQ_HDR_SIZE;
+        DWORD len = static_cast<DWORD>(IFACE_REQ_HDR_SIZE);
         auto buffer = reinterpret_cast<char*>(&req.msg);
         while (len) {
             DWORD sent_len;
@@ -87,8 +87,8 @@ iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
             len -= sent_len;
             buffer += sent_len;
         }
-        DWORD len = req.payload.size();
-        auto buffer = reinterpret_cast<char*>(req.payload.data());
+        len = static_cast<DWORD>(req.payload.size());
+        buffer = reinterpret_cast<char*>(req.payload.data());
         while (len) {
             DWORD sent_len;
             if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
@@ -106,7 +106,7 @@ iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
 
         iface_dynamic_resp_t resp;
         resp.msg.payload_len = 0;
-        len = IFACE_RESP_HDR_SIZE;
+        len = static_cast<DWORD>(IFACE_RESP_HDR_SIZE);
         buffer = reinterpret_cast<char*>(&resp.msg);
         while (len) {
             DWORD recv_len;
@@ -121,7 +121,7 @@ iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
             throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
         }
         resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
-        len = resp.payload.size();
+        len = static_cast<DWORD>(resp.payload.size());
         buffer = reinterpret_cast<char*>(resp.payload.data());
         while (len) {
             DWORD recv_len;

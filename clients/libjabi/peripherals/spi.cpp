@@ -41,7 +41,7 @@ void Device::spi_set_mode(int mode, int idx) {
     };
 
     auto args = reinterpret_cast<spi_set_mode_req_t*>(req.payload.data());
-    args->mode = mode;
+    args->mode = static_cast<uint8_t>(mode);
 
     iface_dynamic_resp_t resp = interface->send_request(req);
     if (resp.payload.size() != 0) {
