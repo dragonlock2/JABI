@@ -26,7 +26,7 @@ typedef struct {
 } can_dev_data_t;
 
 #define GEN_CAN_MSGQ(node_id, prop, idx) \
-    CAN_MSGQ_DEFINE(msgq##idx, CONFIG_JABI_CAN_BUFFER_SIZE);
+    CAN_MSGQ_DEFINE(can_msgq##idx, CONFIG_JABI_CAN_BUFFER_SIZE);
 
 #define GEN_CAN_DEV_DATA(node_id, prop, idx)                      \
     {                                                             \
@@ -41,7 +41,7 @@ typedef struct {
             .id_mask = 0,                                         \
             .rtr_mask = 0,                                        \
         },                                                        \
-        .msgq = &msgq##idx,                                       \
+        .msgq = &can_msgq##idx,                                   \
     },
 
 DT_FOREACH_PROP_ELEM(JABI_PERIPH_NODE, can, GEN_CAN_MSGQ);

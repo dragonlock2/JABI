@@ -8,6 +8,7 @@ enum jabi_err_t {
     JABI_UNINITIALIZED_ERR,
     JABI_PERIPHERAL_ERR,
     JABI_INVALID_ARGS_ERR,
+    JABI_BUSY_ERR,
 };
 
 #endif // JABI_ERROR_H

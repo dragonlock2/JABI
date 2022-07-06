@@ -26,8 +26,9 @@ struct periph_api_t {
 #define PERIPH_ADC_ID      5
 #define PERIPH_DAC_ID      6
 #define PERIPH_SPI_ID      7
+#define PERIPH_UART_ID     8
 
-#define NUM_PERIPHERALS 8
+#define NUM_PERIPHERALS 9
 
 /* Helpers */
 #define PERIPH_FUNC_DEF(fn) static int16_t fn(uint16_t idx,                      \

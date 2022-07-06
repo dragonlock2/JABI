@@ -19,6 +19,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 - ADC
 - DAC
 - SPI master
+- UART
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
@@ -102,10 +103,6 @@ The following gRPC clients.
 - Android app in React Native or Kotlin (USB too?)
 - QT6 cross-platform app
 - Website using Svelte JS (WebUSB too?)
-
-The following peripherals.
-
-- UART
 
 Fun things to look into one day.
 

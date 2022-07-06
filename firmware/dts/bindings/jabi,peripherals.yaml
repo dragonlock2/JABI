@@ -19,3 +19,6 @@ properties:
 
   spi:
     type: phandles
+
+  uart:
+    type: phandles

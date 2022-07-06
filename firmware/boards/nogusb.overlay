@@ -2,7 +2,7 @@
     interfaces {
         compatible = "jabi,interfaces";
         usb;
-        uart = <&cdc_acm_uart0 &cdc_acm_uart1>;
+        uart = <&cdc_acm_uart0>;
     };
 
     peripherals {
@@ -25,6 +25,7 @@
             vrefs-mv    = <3300>;
         };
         spi = <&spi2>;
+        uart = <&cdc_acm_uart1>;
     };
 };
 

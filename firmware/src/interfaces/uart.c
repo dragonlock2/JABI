@@ -6,7 +6,7 @@ LOG_MODULE_REGISTER(iface_uart, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if (DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0)
 
-#define TIMEOUT Z_TIMEOUT_MS(10)
+#define TIMEOUT K_MSEC(10)
 
 static int read(struct k_msgq *msgq, uint8_t *buf, size_t len, k_timeout_t time) {
     for (int i = 0; i < len; i++) {

@@ -8,6 +8,7 @@ extern const struct periph_api_t pwm_periph_api;
 extern const struct periph_api_t adc_periph_api;
 extern const struct periph_api_t dac_periph_api;
 extern const struct periph_api_t spi_periph_api;
+extern const struct periph_api_t uart_periph_api;
 
 const struct periph_api_t *peripherals[] = {
     &metadata_periph_api,
@@ -18,4 +19,5 @@ const struct periph_api_t *peripherals[] = {
     &adc_periph_api,
     &dac_periph_api,
     &spi_periph_api,
+    &uart_periph_api,
 };

@@ -31,6 +31,13 @@ config JABI_THREAD_STACK_SIZE
         make sure enough to hold request/response and the peripherals
         (tip: start this large and then reduce until it crashes)
 
+config JABI_UART_RX_BUFFER_SIZE
+    int "uart rx queue buffer size"
+    default 256
+    help
+        keep larger than JABI_RESP_PAYLOAD_MAX_SIZE so can initiate reads
+        that are that large
+
 endmenu
 
 menu "Zephyr"
