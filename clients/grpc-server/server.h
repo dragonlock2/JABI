@@ -66,6 +66,11 @@ public:
     Status spi_read(ServerContext*, const SPIReadRequest* req, BytesValue* resp) override;
     Status spi_transceive(ServerContext*, const SPITransceiveRequest* req, BytesValue* resp) override;
 
+    /* UART */
+    Status uart_set_config(ServerContext*, const UARTSetConfigRequest* req, Empty*) override;
+    Status uart_write(ServerContext*, const UARTWriteRequest* req, Empty*) override;
+    Status uart_read(ServerContext*, const UARTReadRequest* req, BytesValue* resp) override;
+
 private:
     std::shared_ptr<jabi::Device> dev;
 };

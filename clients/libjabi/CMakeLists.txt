@@ -11,6 +11,7 @@ add_library(libjabi
     peripherals/adc.cpp
     peripherals/dac.cpp
     peripherals/spi.cpp
+    peripherals/uart.cpp
 )
 
 find_package(libusb CONFIG QUIET)

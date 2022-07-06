@@ -45,6 +45,11 @@ service Device {
     rpc spi_write(SPIWriteRequest) returns (google.protobuf.Empty);
     rpc spi_read(SPIReadRequest) returns (google.protobuf.BytesValue);
     rpc spi_transceive(SPITransceiveRequest) returns (google.protobuf.BytesValue);
+
+    /* UART */
+    rpc uart_set_config(UARTSetConfigRequest) returns (google.protobuf.Empty);
+    rpc uart_write(UARTWriteRequest) returns (google.protobuf.Empty);
+    rpc uart_read(UARTReadRequest) returns (google.protobuf.BytesValue);
 }
 
 /* Common */
@@ -62,6 +67,7 @@ enum InstID {
     ADC = 5;
     DAC = 6;
     SPI = 7;
+    UART = 8;
 }
 
 message NumInstRequest {
@@ -213,5 +219,39 @@ message SPIReadRequest {
 
 message SPITransceiveRequest {
     bytes data = 1;
+    uint32 idx = 2;
+}
+
+/* UART */
+message UARTSetConfigRequest {
+    enum UARTParity { // C++ namespace conflict?!
+        NONE = 0;
+        ODD = 1;
+        EVEN = 2;
+        MARK = 3;
+        SPACE = 4;
+    }
+
+    enum UARTStop {
+        B0_5 = 0;
+        B1 = 1;
+        B1_5 = 2;
+        B2 = 3;
+    }
+
+    uint32 baud = 1;
+    uint32 data_bits = 2;
+    UARTParity parity = 3;
+    UARTStop stop = 4;
+    uint32 idx = 5;
+}
+
+message UARTWriteRequest {
+    bytes data = 1;
+    uint32 idx = 2;
+}
+
+message UARTReadRequest {
+    uint32 len = 1;
     uint32 idx = 2;
 }

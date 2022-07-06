@@ -56,6 +56,18 @@ def testDevice(d):
                 continue
     print()
 
+    # UART
+    for i in range(d.num_inst(jabi.InstID.UART)):
+        try:
+            d.uart_set_config(115200, 8, jabi.UARTParity.NONE, jabi.UARTStop.B1, i)
+            print("\tSet UART", i, "to 115200 baud, 8N1")
+            d.uart_write([1,2,3,4], i)
+            print("\t Sent [1, 2, 3, 4] to UART", i)
+            print("\t Received", d.uart_read(4, i))
+        except:
+            continue
+    print()
+
     # PWM (GPIO overrides it until reset)
     for i in range(d.num_inst(jabi.InstID.PWM)):
         print("\tFlashing PWM", i, "at 1Hz")

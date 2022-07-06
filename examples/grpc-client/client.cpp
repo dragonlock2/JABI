@@ -393,4 +393,45 @@ std::vector<uint8_t> gRPCDevice::spi_transceive(std::vector<uint8_t> data, int i
     return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
 }
 
+/* UART */
+void gRPCDevice::uart_set_config(int baud, int data_bits, UARTParity parity, UARTStop stop, int idx) {
+    JABI::UARTSetConfigRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_baud(baud);
+    req.set_data_bits(data_bits);
+    req.set_parity(static_cast<JABI::UARTSetConfigRequest_UARTParity>(parity));
+    req.set_stop(static_cast<JABI::UARTSetConfigRequest_UARTStop>(stop));
+    req.set_idx(idx);
+    Status status = stub->uart_set_config(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::uart_write(std::vector<uint8_t> data, int idx) {
+    JABI::UARTWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_data(std::string(data.begin(), data.end()));
+    req.set_idx(idx);
+    Status status = stub->uart_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+std::vector<uint8_t> gRPCDevice::uart_read(size_t len, int idx) {
+    JABI::UARTReadRequest req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_len(len);
+    req.set_idx(idx);
+    Status status = stub->uart_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
 };

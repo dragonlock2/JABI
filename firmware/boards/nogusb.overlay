@@ -25,7 +25,7 @@
             vrefs-mv    = <3300>;
         };
         spi = <&spi2>;
-        uart = <&cdc_acm_uart1>;
+        uart = <&cdc_acm_uart1 &usart5>;
     };
 };
 

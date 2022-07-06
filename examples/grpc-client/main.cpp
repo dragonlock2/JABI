@@ -78,6 +78,25 @@ void testDevice(jabi::gRPCDevice &d) {
     }
     std::cout << std::endl;
 
+    /* UART */
+    lim = d.num_inst(jabi::InstID::UART);
+    for (auto i = 0; i < lim; i++) {
+        try { // errors if terminal not open or if configuring CDC-ACM port
+            // d.uart_set_config(115200, 8, jabi::UARTParity::NONE, jabi::UARTStop::B1, i);
+            std::cout << "\tSet UART " << i << " to 115200 baud, 8N1" << std::endl;
+            d.uart_write(std::vector<uint8_t>{1,2,3,4}, i);
+            std::cout << "\t Sent [1, 2, 3, 4] to UART " << i << std::endl;
+            std::cout << "\t Received [";
+            for (auto c : d.uart_read(4, i)) {
+                std::cout << (int) c << ", ";
+            }
+            std::cout << "]" << std::endl;
+        } catch(const std::runtime_error&) {
+            continue;
+        }
+    }
+    std::cout << std::endl;
+
     /* PWM (GPIO overrides it until reset) */
     lim = d.num_inst(jabi::InstID::PWM);
     for (auto i = 0; i < lim; i++) {

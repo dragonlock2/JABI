@@ -29,7 +29,8 @@ PYBIND11_MODULE(jabi, m) {
         .value("PWM", InstID::PWM)
         .value("ADC", InstID::ADC)
         .value("DAC", InstID::DAC)
-        .value("SPI", InstID::SPI);
+        .value("SPI", InstID::SPI)
+        .value("UART", InstID::UART);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -78,6 +79,20 @@ PYBIND11_MODULE(jabi, m) {
         .value("DOWN", GPIOPull::DOWN)
         .value("BOTH", GPIOPull::BOTH);
 
+    /* UART */
+    py::enum_<UARTParity>(m, "UARTParity")
+        .value("NONE", UARTParity::NONE)
+        .value("ODD", UARTParity::ODD)
+        .value("EVEN", UARTParity::EVEN)
+        .value("MARK", UARTParity::MARK)
+        .value("SPACE", UARTParity::SPACE);
+
+    py::enum_<UARTStop>(m, "UARTStop")
+        .value("B0_5", UARTStop::B0_5)
+        .value("B1", UARTStop::B1)
+        .value("B1_5", UARTStop::B0_5)
+        .value("B2", UARTStop::B2);
+
     /* Device */
     py::class_<Device>(m, "Device")
         /* Metadata */
@@ -123,7 +138,13 @@ PYBIND11_MODULE(jabi, m) {
         .def("spi_set_bitorder", &Device::spi_set_bitorder, "msb"_a, "idx"_a=0)
         .def("spi_write", &Device::spi_write, "data"_a, "idx"_a=0)
         .def("spi_read", &Device::spi_read, "len"_a, "idx"_a=0)
-        .def("spi_transceive", &Device::spi_transceive, "data"_a, "idx"_a=0);
+        .def("spi_transceive", &Device::spi_transceive, "data"_a, "idx"_a=0)
+
+        /* UART */
+        .def("uart_set_config", &Device::uart_set_config, "baud"_a=115200,
+            "data_bits"_a=8, "parity"_a=UARTParity::NONE, "stop"_a=UARTStop::B1, "idx"_a=0)
+        .def("uart_write", &Device::uart_write, "data"_a, "idx"_a=0)
+        .def("uart_read", &Device::uart_read, "len"_a, "idx"_a=0);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")

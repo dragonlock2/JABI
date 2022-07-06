@@ -20,6 +20,7 @@ enum class InstID {
     ADC      = JABI::InstID::ADC,
     DAC      = JABI::InstID::DAC,
     SPI      = JABI::InstID::SPI,
+    UART     = JABI::InstID::UART,
 };
 
 /* CAN */
@@ -74,6 +75,22 @@ enum class GPIOPull {
     BOTH = JABI::GPIOPull::BOTH,
 };
 
+/* UART */
+enum class UARTParity {
+    NONE  = JABI::UARTSetConfigRequest_UARTParity_NONE,
+    ODD   = JABI::UARTSetConfigRequest_UARTParity_ODD,
+    EVEN  = JABI::UARTSetConfigRequest_UARTParity_EVEN,
+    MARK  = JABI::UARTSetConfigRequest_UARTParity_MARK,
+    SPACE = JABI::UARTSetConfigRequest_UARTParity_SPACE,
+};
+
+enum class UARTStop {
+    B0_5 = JABI::UARTSetConfigRequest_UARTStop_B0_5,
+    B1   = JABI::UARTSetConfigRequest_UARTStop_B1,
+    B1_5 = JABI::UARTSetConfigRequest_UARTStop_B1_5,
+    B2   = JABI::UARTSetConfigRequest_UARTStop_B2,
+};
+
 class gRPCDevice {
 public:
     gRPCDevice(std::shared_ptr<grpc::Channel> channel)
@@ -121,6 +138,12 @@ public:
     void spi_write(std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> spi_read(size_t len, int idx=0);
     std::vector<uint8_t> spi_transceive(std::vector<uint8_t> data, int idx=0);
+
+    /* UART */
+    void uart_set_config(int baud=115200, int data_bits=8,
+        UARTParity parity=UARTParity::NONE, UARTStop stop=UARTStop::B1, int idx=0);
+    void uart_write(std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> uart_read(size_t len, int idx=0);
 
 private:
     std::unique_ptr<JABI::Device::Stub> stub;

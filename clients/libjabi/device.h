@@ -21,6 +21,7 @@ enum class InstID {
     ADC      = PERIPH_ADC_ID,
     DAC      = PERIPH_DAC_ID,
     SPI      = PERIPH_SPI_ID,
+    UART     = PERIPH_UART_ID
 };
 
 /* CAN */
@@ -75,6 +76,22 @@ enum class GPIOPull {
     BOTH = 3,
 };
 
+/* UART */
+enum class UARTParity {
+    NONE  = 0,
+    ODD   = 1,
+    EVEN  = 2,
+    MARK  = 3,
+    SPACE = 4,
+};
+
+enum class UARTStop {
+    B0_5 = 0,
+    B1   = 1,
+    B1_5 = 2,
+    B2   = 3,
+};
+
 class Device {
 public:
     /* Metadata */
@@ -119,6 +136,12 @@ public:
     void spi_write(std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> spi_read(size_t len, int idx=0);
     std::vector<uint8_t> spi_transceive(std::vector<uint8_t> data, int idx=0);
+
+    /* UART */
+    void uart_set_config(int baud=115200, int data_bits=8,
+        UARTParity parity=UARTParity::NONE, UARTStop stop=UARTStop::B1, int idx=0);
+    void uart_write(std::vector<uint8_t> data, int idx=0);
+    std::vector<uint8_t> uart_read(size_t len, int idx=0);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}

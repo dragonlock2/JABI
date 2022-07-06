@@ -121,6 +121,8 @@ PERIPH_FUNC_DEF(uart_set_config) {
             LOG_ERR("invalid number of stop bits %d", args->stop_bits);
             return JABI_INVALID_ARGS_ERR;
     }
+    cfg.flow_ctrl = UART_CFG_FLOW_CTRL_NONE;
+
     if (uart_configure(uart_devs[idx].dev, &cfg)) {
         LOG_ERR("failed to configure");
         return JABI_PERIPHERAL_ERR;

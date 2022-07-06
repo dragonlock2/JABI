@@ -199,3 +199,25 @@ Status JABIServiceImpl::spi_transceive(ServerContext*, const SPITransceiveReques
         resp->set_value(std::string(v.begin(), v.end()));
     )
 }
+
+/* UART */
+Status JABIServiceImpl::uart_set_config(ServerContext*, const UARTSetConfigRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->uart_set_config(req->baud(), req->data_bits(), static_cast<jabi::UARTParity>(req->parity()),
+            static_cast<jabi::UARTStop>(req->stop()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::uart_write(ServerContext*, const UARTWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        auto s = req->data();
+        dev->uart_write(std::vector<uint8_t>(s.begin(), s.end()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::uart_read(ServerContext*, const UARTReadRequest* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto v = dev->uart_read(req->len(), req->idx());
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}
