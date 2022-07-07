@@ -13,13 +13,13 @@ Microcontroller peripherals are made available over each interface via a custom 
 
 - Metadata
 - CAN FD
-- I2C master
+- SPI controller
+- I2C controller
+- UART
 - GPIO
-- PWM output
+- PWM
 - ADC
 - DAC
-- SPI master
-- UART
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
