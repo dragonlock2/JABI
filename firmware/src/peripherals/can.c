@@ -177,7 +177,7 @@ PERIPH_FUNC_DEF(can_state) {
     return JABI_NO_ERR;
 }
 
-static void can_write_cb(const struct device *, int, void*) {}
+static void can_write_cb(const struct device *dev, int error, void* user_data) {}
 
 PERIPH_FUNC_DEF(can_write) {
     PERIPH_FUNC_GET_ARGS(can, write);

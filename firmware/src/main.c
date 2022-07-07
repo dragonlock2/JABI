@@ -7,6 +7,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(jabi, CONFIG_LOG_DEFAULT_LEVEL);
 
+#define LOCK_TIMEOUT K_MSEC(100)
+
 extern const struct iface_api_t *interfaces[];
 extern const struct periph_api_t *peripherals[];
 
@@ -62,7 +64,12 @@ void process_interface(void* p1, void* p2, void* p3) {
         }
 
         struct k_sem *lock = peripheral_locks[req.periph_id][req.periph_idx];
-        k_sem_take(lock, K_FOREVER);
+        if (k_sem_take(lock, LOCK_TIMEOUT)) {
+            LOG_ERR("%s failed to acquire lock for %d %d",
+                iface->name, req.periph_id, req.periph_idx);
+            resp.retcode = JABI_BUSY_ERR;
+            goto send_resp;
+        }
         resp.retcode = api->fns[req.periph_fn](req.periph_idx, 
                                                req.payload, req.payload_len,
                                                resp.payload, &payload_len);
