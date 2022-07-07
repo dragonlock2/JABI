@@ -20,7 +20,11 @@ if(NOT ${libusb_FOUND})
     find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES libusb-1.0)
 endif()
 
-target_link_libraries(libjabi ${LIBUSB_LIBRARIES})
+if(MSVC)
+    target_link_libraries(libjabi ${LIBUSB_LIBRARIES})
+else()
+    target_link_libraries(libjabi pthread ${LIBUSB_LIBRARIES})
+endif()
 
 target_include_directories(libjabi PUBLIC
     ${LIBUSB_INCLUDE_DIRS}
