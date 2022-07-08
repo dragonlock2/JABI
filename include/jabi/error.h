@@ -9,6 +9,7 @@ enum jabi_err_t {
     JABI_PERIPHERAL_ERR,
     JABI_INVALID_ARGS_ERR,
     JABI_BUSY_ERR,
+    JABI_TIMEOUT_ERR,
 };
 
 #endif // JABI_ERROR_H

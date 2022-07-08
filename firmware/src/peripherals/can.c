@@ -23,6 +23,8 @@ typedef struct {
     int std_id;
     int ext_id;
     struct k_msgq *msgq;
+    struct k_sem tx_lock;
+    bool tx_was_busy;
 } can_dev_data_t;
 
 #define GEN_CAN_MSGQ(node_id, prop, idx) \
@@ -42,6 +44,7 @@ typedef struct {
             .rtr_mask = 0,                                        \
         },                                                        \
         .msgq = &can_msgq##idx,                                   \
+        .tx_was_busy = false,                                     \
     },
 
 DT_FOREACH_PROP_ELEM(JABI_PERIPH_NODE, can, GEN_CAN_MSGQ);
@@ -62,6 +65,7 @@ static int can_init(uint16_t idx) {
         LOG_ERR("failed to add filters for can%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
+    k_sem_init(&can->tx_lock, 0, 1);
     return JABI_NO_ERR;
 }
 
@@ -177,7 +181,13 @@ PERIPH_FUNC_DEF(can_state) {
     return JABI_NO_ERR;
 }
 
-static void can_write_cb(const struct device *dev, int error, void* user_data) {}
+static void can_write_cb(const struct device *dev, int error, void* user_data) {
+    if (error) { // shouldn't happen w/ auto recovery
+        LOG_ERR("message send error %d?!", error);
+    }
+    can_dev_data_t *can = (can_dev_data_t*) user_data;
+    k_sem_give(&can->tx_lock);
+}
 
 PERIPH_FUNC_DEF(can_write) {
     PERIPH_FUNC_GET_ARGS(can, write);
@@ -222,11 +232,22 @@ PERIPH_FUNC_DEF(can_write) {
     memcpy(msg.data, args->data, can_dlc_to_bytes(msg.dlc));
 
     can_dev_data_t *can = &can_devs[idx];
-    if (can_send(can->dev, &msg, SEND_TIMEOUT, can_write_cb, NULL)) {
+    if (can->tx_was_busy) {
+        if (k_sem_take(&can->tx_lock, K_NO_WAIT)) {
+            return JABI_BUSY_ERR;
+        }
+    }
+    if (can_send(can->dev, &msg, K_NO_WAIT, can_write_cb, can)) {
         LOG_ERR("couldn't send message");
         return JABI_PERIPHERAL_ERR;
     }
-
+    // wait for completion to ensure FIFO sending
+    if (k_sem_take(&can->tx_lock, SEND_TIMEOUT)) {
+        LOG_ERR("message didn't send in time (still in queue tho)");
+        can->tx_was_busy = true;
+        return JABI_BUSY_ERR;
+    }
+    can->tx_was_busy = false;
     *resp_len = 0;
     return JABI_NO_ERR;
 }
