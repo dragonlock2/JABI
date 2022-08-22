@@ -13,6 +13,7 @@ Microcontroller peripherals are made available over each interface via a custom 
 
 - Metadata
 - CAN FD
+- LIN
 - SPI controller
 - I2C controller
 - UART

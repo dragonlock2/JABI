@@ -48,6 +48,10 @@ static void uart_handler(const struct device *dev, void *data) {
                 continue;
             }
             int len = uart_fifo_fill(dev, dev_data->tx_ptr, dev_data->tx_len);
+            if (len < 0) {
+                LOG_ERR("failed to write uart?!");
+                continue;
+            }
             dev_data->tx_len -= len;
             dev_data->tx_ptr += len;
         }

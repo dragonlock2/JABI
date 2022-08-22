@@ -12,6 +12,12 @@ config JABI_CAN_BUFFER_SIZE
     help
         must be >0
 
+config JABI_LIN_BUFFER_SIZE
+    int "LIN buffer size"
+    default 64
+    help
+        must be >0
+
 config JABI_REQ_PAYLOAD_MAX_SIZE
     int "interface request payload maximum size"
     default 128

@@ -7,9 +7,10 @@
 
     peripherals {
         compatible = "jabi,peripherals";
-        uart = <&uart2>; // TODO replace with LIN once driver written
         can = <&flexcan0>;
-        gpio = <&led_red &led_green &led_blue &lin_cmdr_en &lin_pwr_en &can_pwr_en>;
+        lin = <&lin0>;
+        gpio = <&led_red &led_green &led_blue &btn0 &btn1 &btn2
+                &lin_cmdr_en &lin_pwr_en &can_pwr_en>;
     };
 };
 

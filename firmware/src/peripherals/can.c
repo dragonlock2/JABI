@@ -102,7 +102,7 @@ PERIPH_FUNC_DEF(can_set_filter) {
     }
     can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
     if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
-        LOG_ERR("failed to change filters for can%d", idx);
+        LOG_ERR("failed to change filters for can%d, old filter also removed", idx);
         return JABI_PERIPHERAL_ERR;
     }
 
