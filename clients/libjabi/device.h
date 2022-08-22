@@ -92,6 +92,34 @@ enum class UARTStop {
     B2   = 3,
 };
 
+/* LIN */
+enum class LINMode {
+    COMMANDER = 0,
+    RESPONDER = 1,
+};
+
+enum class LINChecksum {
+    CLASSIC  = 0,
+    ENHANCED = 1,
+    AUTO     = 2,
+};
+
+struct LINStatus {
+    int  id;
+    bool success;
+};
+
+struct LINMessage {
+    int id;
+    LINChecksum type;
+    std::vector<uint8_t> data;
+
+    LINMessage();
+    LINMessage(int id, std::vector<uint8_t> data, LINChecksum type=LINChecksum::ENHANCED);
+};
+
+std::ostream &operator<<(std::ostream &os, LINMessage const &m);
+
 class Device {
 public:
     /* Metadata */
@@ -142,6 +170,15 @@ public:
         UARTParity parity=UARTParity::NONE, UARTStop stop=UARTStop::B1, int idx=0);
     void uart_write(std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> uart_read(size_t len, int idx=0);
+
+    /* LIN */
+    void lin_set_mode(LINMode mode, int idx=0);
+    void lin_set_rate(int bitrate, int idx=0);
+    void lin_set_filter(int id, int len=0, LINChecksum type=LINChecksum::AUTO, int idx=0);
+    LINMode lin_mode(int idx=0);
+    LINStatus lin_status(int idx=0);
+    void lin_write(LINMessage msg, int idx=0);
+    int lin_read(LINMessage &msg, int id=0xFF, int idx=0);
 
 private:
     Device(std::shared_ptr<Interface> i) : interface(i) {}
