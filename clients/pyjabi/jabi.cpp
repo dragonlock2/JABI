@@ -19,6 +19,14 @@ py::object can_read_simple(Device &d, int idx) {
     return py::cast(msg);
 }
 
+py::object lin_read_simple(Device &d, int id, int idx) {
+    LINMessage msg;
+    if (d.lin_read(msg, id, idx) == -1) {
+        return py::none();
+    }
+    return py::cast(msg);
+}
+
 PYBIND11_MODULE(jabi, m) {
     /* Metadata */
     py::enum_<InstID>(m, "InstID")
@@ -30,7 +38,8 @@ PYBIND11_MODULE(jabi, m) {
         .value("ADC", InstID::ADC)
         .value("DAC", InstID::DAC)
         .value("SPI", InstID::SPI)
-        .value("UART", InstID::UART);
+        .value("UART", InstID::UART)
+        .value("LIN", InstID::LIN);
 
     /* CAN */
     py::enum_<CANMode>(m, "CANMode")
@@ -93,6 +102,32 @@ PYBIND11_MODULE(jabi, m) {
         .value("B1_5", UARTStop::B0_5)
         .value("B2", UARTStop::B2);
 
+    /* LIN */
+    py::enum_<LINMode>(m, "LINMode")
+        .value("COMMANDER", LINMode::COMMANDER)
+        .value("RESPONDER", LINMode::RESPONDER);
+
+    py::enum_<LINChecksum>(m, "LINChecksum")
+        .value("CLASSIC", LINChecksum::CLASSIC)
+        .value("ENHANCED", LINChecksum::ENHANCED)
+        .value("AUTO", LINChecksum::AUTO);
+
+    py::class_<LINStatus>(m, "LINStatus")
+        .def_readwrite("id", &LINStatus::id)
+        .def_readwrite("success", &LINStatus::success)
+        .def("__repr__", [](const LINStatus &m){
+            std::stringstream s; s << m; return s.str(); });
+
+    py::class_<LINMessage>(m, "LINMessage")
+        .def(py::init<>())
+        .def(py::init<int, std::vector<uint8_t>, LINChecksum>(),
+            "id"_a, "data"_a, "type"_a=LINChecksum::ENHANCED)
+        .def_readwrite("id", &LINMessage::id)
+        .def_readwrite("type", &LINMessage::type)
+        .def_readwrite("data", &LINMessage::data) // Note can't set individual elements
+        .def("__repr__", [](const LINMessage &m){
+            std::stringstream s; s << m; return s.str(); });
+
     /* Device */
     py::class_<Device>(m, "Device")
         /* Metadata */
@@ -144,7 +179,17 @@ PYBIND11_MODULE(jabi, m) {
         .def("uart_set_config", &Device::uart_set_config, "baud"_a=115200,
             "data_bits"_a=8, "parity"_a=UARTParity::NONE, "stop"_a=UARTStop::B1, "idx"_a=0)
         .def("uart_write", &Device::uart_write, "data"_a, "idx"_a=0)
-        .def("uart_read", &Device::uart_read, "len"_a, "idx"_a=0);
+        .def("uart_read", &Device::uart_read, "len"_a, "idx"_a=0)
+
+        /* LIN */
+        .def("lin_set_mode", &Device::lin_set_mode, "mode"_a, "idx"_a=0)
+        .def("lin_set_rate", &Device::lin_set_rate, "bitrate"_a, "idx"_a=0)
+        .def("lin_set_filter", &Device::lin_set_filter, "id"_a, "len"_a=0,
+            "type"_a=LINChecksum::AUTO, "idx"_a=0)
+        .def("lin_mode", &Device::lin_mode, "idx"_a=0)
+        .def("lin_status", &Device::lin_status, "idx"_a=0)
+        .def("lin_write", &Device::lin_write, "msg"_a, "idx"_a=0)
+        .def("lin_read", &lin_read_simple, "id"_a=0xFF, "idx"_a=0);
 
     /* Interfaces */
     py::class_<USBInterface>(m, "USBInterface")

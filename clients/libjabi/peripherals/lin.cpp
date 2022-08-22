@@ -20,6 +20,13 @@ LINMessage::LINMessage(int id, std::vector<uint8_t> data, LINChecksum type)
     id(id), type(type), data(data)
 {}
 
+std::ostream &operator<<(std::ostream &os, LINStatus const &m) {
+    std::stringstream s;
+    s << std::hex << std::showbase << "LINStatus(id=" << m.id;
+    s << ",success=" << (m.success ? "true" : "false") << ")";
+    return os << s.str();
+}
+
 std::ostream &operator<<(std::ostream &os, LINMessage const &m) {
     std::stringstream s;
     s << std::hex << std::showbase << "LINMessage(id=" << m.id;

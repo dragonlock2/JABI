@@ -21,7 +21,8 @@ enum class InstID {
     ADC      = PERIPH_ADC_ID,
     DAC      = PERIPH_DAC_ID,
     SPI      = PERIPH_SPI_ID,
-    UART     = PERIPH_UART_ID
+    UART     = PERIPH_UART_ID,
+    LIN      = PERIPH_LIN_ID,
 };
 
 /* CAN */
@@ -118,6 +119,7 @@ struct LINMessage {
     LINMessage(int id, std::vector<uint8_t> data, LINChecksum type=LINChecksum::ENHANCED);
 };
 
+std::ostream &operator<<(std::ostream &os, LINStatus const &m);
 std::ostream &operator<<(std::ostream &os, LINMessage const &m);
 
 class Device {
