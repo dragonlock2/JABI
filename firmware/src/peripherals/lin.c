@@ -198,8 +198,6 @@ static void lin_write_cb(const struct device *dev, int error, void* user_data) {
     uint32_t int_data = (uint32_t) user_data;
     lin_write_cb_data_t *data = (lin_write_cb_data_t*) &int_data;
 
-    LOG_DBG("%d %d", data->idx, data->id);
-
     lin_status_resp_t stat = {
         .id = data->id,
         .retcode = error,
@@ -271,7 +269,7 @@ PERIPH_FUNC_DEF(lin_read) {
     PERIPH_FUNC_GET_RET(lin, read);
     PERIPH_FUNC_CHECK_ARGS_LEN(lin, read);
 
-    LOG_DBG("id=%d", args->id);
+    LOG_DBG("(id=%d)", args->id);
 
     struct zlin_frame msg;
     lin_dev_data_t *lin = &lin_devs[idx];
