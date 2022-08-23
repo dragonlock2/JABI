@@ -110,8 +110,9 @@ PERIPH_FUNC_DEF(lin_set_filter) {
     PERIPH_FUNC_GET_ARGS(lin, set_filter);
     PERIPH_FUNC_CHECK_ARGS_LEN(lin, set_filter);
 
+    lin_set_filter_req_t *tmp = args;
     LOG_DBG("(id=%d,checksum_type=%d,data_len=%d)",
-        args->id, args->checksum_type, args->data_len);
+        tmp->id, tmp->checksum_type, tmp->data_len);
 
     if (args->id >= LIN_NUM_ID || args->data_len > LIN_MAX_DLEN) {
         LOG_ERR("invalid id or data");
@@ -174,13 +175,36 @@ PERIPH_FUNC_DEF(lin_status) {
     return JABI_NO_ERR;
 }
 
+/* Workaround to pass idx and id to callback w/o dynamic memory
+ * or adding an array to lin_dev_data_t
+ */
+typedef struct {
+    uint16_t idx;
+    uint8_t id;
+    uint8_t res;
+} __packed lin_write_cb_data_t;
+
+BUILD_ASSERT(sizeof(lin_write_cb_data_t) == sizeof(uint32_t));
+
+static uint32_t lin_write_cb_data_encode(uint16_t idx, uint8_t id) {
+    uint32_t int_data = 0;
+    lin_write_cb_data_t *data = (lin_write_cb_data_t*) &int_data;
+    data->idx = idx;
+    data->id  = id;
+    return int_data;
+}
+
 static void lin_write_cb(const struct device *dev, int error, void* user_data) {
-    lin_dev_data_t *lin = CONTAINER_OF(dev, lin_dev_data_t, dev);
+    uint32_t int_data = (uint32_t) user_data;
+    lin_write_cb_data_t *data = (lin_write_cb_data_t*) &int_data;
+
+    LOG_DBG("%d %d", data->idx, data->id);
+
     lin_status_resp_t stat = {
-        .id = (uint8_t) (int) user_data,
+        .id = data->id,
         .retcode = error,
     };
-    if (k_msgq_put(lin->results, &stat, K_NO_WAIT)) {
+    if (k_msgq_put(lin_devs[data->idx].results, &stat, K_NO_WAIT)) {
         LOG_ERR("overflow, unable to store status of messsage %d %d",
             stat.id, stat.retcode);
     }
@@ -217,7 +241,8 @@ PERIPH_FUNC_DEF(lin_write) {
 
     lin_dev_data_t *lin = &lin_devs[idx];
     if (lin->mode == 0) { // commander
-        if (lin_send(lin->dev, &msg, K_FOREVER, lin_write_cb, (void*) (int) msg.id)) { // bounded latency
+        if (lin_send(lin->dev, &msg, K_FOREVER, lin_write_cb,
+                (void*) lin_write_cb_data_encode(idx, msg.id))) { // bounded latency
             LOG_ERR("failed sending frame, likely invalid args??");
             return JABI_INVALID_ARGS_ERR;
         }
@@ -228,7 +253,8 @@ PERIPH_FUNC_DEF(lin_write) {
             return JABI_PERIPHERAL_ERR;
         }
     } else { // responder
-        int ret = lin_send(lin->dev, &msg, K_NO_WAIT, lin_write_cb, (void*) (int) msg.id);
+        int ret = lin_send(lin->dev, &msg, K_NO_WAIT, lin_write_cb,
+            (void*) lin_write_cb_data_encode(idx, msg.id));
         if (ret == -EAGAIN) {
             return JABI_BUSY_ERR;
         } else if (ret) {
@@ -254,7 +280,8 @@ PERIPH_FUNC_DEF(lin_read) {
             LOG_ERR("invalid id");
             return JABI_INVALID_ARGS_ERR;
         }
-        if (lin_receive(lin->dev, args->id, K_FOREVER, lin_write_cb, (void*) (int) args->id)) { // bounded latency
+        if (lin_receive(lin->dev, args->id, K_FOREVER, lin_write_cb,
+                (void*) lin_write_cb_data_encode(idx, args->id))) { // bounded latency
             LOG_ERR("failed sending frame, likely invalid args??");
             return JABI_INVALID_ARGS_ERR;
         }
