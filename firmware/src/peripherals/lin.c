@@ -23,7 +23,6 @@ typedef struct {
 #define GEN_LIN_DEV_DATA(node_id, prop, idx)                      \
     {                                                             \
         .dev = DEVICE_DT_GET(DT_PROP_BY_IDX(node_id, prop, idx)), \
-        .mode = 1,                                                \
         .results = &lin_results##idx,                             \
         .msgs = &lin_msgq##idx,                                   \
     },
@@ -36,7 +35,8 @@ static lin_dev_data_t lin_devs[] = {
 
 static int lin_init(uint16_t idx) {
     lin_dev_data_t *lin = &lin_devs[idx];
-    if (lin_set_mode(lin->dev, lin->mode)) {
+    lin->mode = 1;
+    if (lin_set_mode(lin->dev, LIN_MODE_RESPONDER)) {
         LOG_ERR("failed to set mode for lin%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
