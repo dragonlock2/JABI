@@ -71,6 +71,15 @@ public:
     Status uart_write(ServerContext*, const UARTWriteRequest* req, Empty*) override;
     Status uart_read(ServerContext*, const UARTReadRequest* req, BytesValue* resp) override;
 
+    /* LIN */
+    Status lin_set_mode(ServerContext*, const LINSetModeRequest* req, Empty*) override;
+    Status lin_set_rate(ServerContext*, const LINSetRateRequest* req, Empty*) override;
+    Status lin_set_filter(ServerContext*, const LINSetFilterRequest* req, Empty*) override;
+    Status lin_mode(ServerContext*, const Index* req, LINModeResponse* resp) override;
+    Status lin_status(ServerContext*, const Index* req, LINStatusResponse* resp) override;
+    Status lin_write(ServerContext*, const LINWriteRequest* req, Empty*) override;
+    Status lin_read(ServerContext*, const LINReadRequest* req, LINReadResponse* resp) override;
+
 private:
     std::shared_ptr<jabi::Device> dev;
 };

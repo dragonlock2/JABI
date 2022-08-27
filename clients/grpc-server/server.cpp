@@ -221,3 +221,60 @@ Status JABIServiceImpl::uart_read(ServerContext*, const UARTReadRequest* req, By
         resp->set_value(std::string(v.begin(), v.end()));
     )
 }
+
+/* LIN */
+Status JABIServiceImpl::lin_set_mode(ServerContext*, const LINSetModeRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->lin_set_mode(static_cast<jabi::LINMode>(req->mode()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::lin_set_rate(ServerContext*, const LINSetRateRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->lin_set_rate(req->rate(), req->idx());
+    )
+}
+
+Status JABIServiceImpl::lin_set_filter(ServerContext*, const LINSetFilterRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        dev->lin_set_filter(req->id(), req->len(),
+            static_cast<jabi::LINChecksum>(req->type()), req->idx());
+    )
+}
+
+Status JABIServiceImpl::lin_mode(ServerContext*, const Index* req, LINModeResponse* resp) {
+    CHECK_EXCEPT(
+        resp->set_mode(static_cast<JABI::LINMode>(dev->lin_mode(req->idx())));
+    )
+}
+
+Status JABIServiceImpl::lin_status(ServerContext*, const Index* req, LINStatusResponse* resp) {
+    CHECK_EXCEPT(
+        jabi::LINStatus s = dev->lin_status(req->idx());
+        resp->set_id(s.id);
+        resp->set_success(s.success);
+    )
+}
+
+Status JABIServiceImpl::lin_write(ServerContext*, const LINWriteRequest* req, Empty*) {
+    CHECK_EXCEPT(
+        jabi::LINMessage m;
+        m.id   = req->msg().id();
+        m.type = static_cast<jabi::LINChecksum>(req->msg().type());
+        auto s = req->msg().data();
+        m.data = std::vector<uint8_t>(s.begin(), s.end());
+        dev->lin_write(m, req->idx());
+    )
+}
+
+Status JABIServiceImpl::lin_read(ServerContext*, const LINReadRequest* req, LINReadResponse* resp) {
+    CHECK_EXCEPT(
+        jabi::LINMessage msg;
+        resp->set_num_left(dev->lin_read(msg, req->id(), req->idx()));
+        LINMessage* m = new LINMessage();
+        m->set_id(msg.id);
+        m->set_type(static_cast<JABI::LINChecksum>(msg.type));
+        m->set_data(std::string(msg.data.begin(), msg.data.end()));
+        resp->set_allocated_msg(m);
+    )
+}

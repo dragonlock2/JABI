@@ -434,4 +434,137 @@ std::vector<uint8_t> gRPCDevice::uart_read(size_t len, int idx) {
     return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
 }
 
+/* LIN */
+LINMessage::LINMessage()
+:
+    id(0), type(LINChecksum::CLASSIC)
+{}
+
+LINMessage::LINMessage(int id, std::vector<uint8_t> data, LINChecksum type)
+:
+    id(id), type(type), data(data)
+{}
+
+std::ostream &operator<<(std::ostream &os, LINStatus const &m) {
+    std::stringstream s;
+    s << std::hex << std::showbase << "LINStatus(id=" << m.id;
+    s << ",success=" << (m.success ? "true" : "false") << ")";
+    return os << s.str();
+}
+
+std::ostream &operator<<(std::ostream &os, LINMessage const &m) {
+    std::stringstream s;
+    s << std::hex << std::showbase << "LINMessage(id=" << m.id;
+    s << ",type=";
+    switch (m.type) {
+        case LINChecksum::CLASSIC:  s << "classic";  break;
+        case LINChecksum::ENHANCED: s << "enhanced"; break;
+        case LINChecksum::AUTO:     s << "auto";     break;
+        default:                    s << "unknown";  break;
+    }
+    s << ",data={";
+    for (auto i : m.data) { s << static_cast<int>(i) << ","; }
+    s << "})";
+    return os << s.str();
+}
+
+void gRPCDevice::lin_set_mode(LINMode mode, int idx) {
+    JABI::LINSetModeRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_mode(static_cast<JABI::LINMode>(mode));
+    req.set_idx(idx);
+    Status status = stub->lin_set_mode(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::lin_set_rate(int bitrate, int idx) {
+    JABI::LINSetRateRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_rate(bitrate);
+    req.set_idx(idx);
+    Status status = stub->lin_set_rate(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+void gRPCDevice::lin_set_filter(int id, int len, LINChecksum type, int idx) {
+    JABI::LINSetFilterRequest req;
+    Empty resp;
+    ClientContext ctx;
+    req.set_id(id);
+    req.set_len(len);
+    req.set_type(static_cast<JABI::LINChecksum>(type));
+    req.set_idx(idx);
+    Status status = stub->lin_set_filter(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+LINMode gRPCDevice::lin_mode(int idx) {
+    JABI::Index req;
+    JABI::LINModeResponse resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    Status status = stub->lin_mode(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return static_cast<jabi::LINMode>(resp.mode());
+}
+
+LINStatus gRPCDevice::lin_status(int idx) {
+    JABI::Index req;
+    JABI::LINStatusResponse resp;
+    ClientContext ctx;
+    req.set_idx(idx);
+    Status status = stub->lin_status(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    jabi::LINStatus s = {
+        .id = static_cast<int>(resp.id()),
+        .success = resp.success(),
+    };
+    return s;
+}
+
+void gRPCDevice::lin_write(LINMessage msg, int idx) {
+    JABI::LINWriteRequest req;
+    Empty resp;
+    ClientContext ctx;
+    JABI::LINMessage* m = new JABI::LINMessage();
+    m->set_id(msg.id);
+    m->set_type(static_cast<JABI::LINChecksum>(msg.type));
+    m->set_data(std::string(msg.data.begin(), msg.data.end()));
+    req.set_allocated_msg(m);
+    req.set_idx(idx);
+    Status status = stub->lin_write(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+}
+
+int gRPCDevice::lin_read(LINMessage &msg, int id, int idx) {
+    JABI::LINReadRequest req;
+    JABI::LINReadResponse resp;
+    ClientContext ctx;
+    req.set_id(id);
+    req.set_idx(idx);
+    Status status = stub->lin_read(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    msg.id   = resp.msg().id();
+    msg.type = static_cast<jabi::LINChecksum>(resp.msg().type());
+    auto s   = resp.msg().data();
+    msg.data = std::vector<uint8_t>(s.begin(), s.end());
+    return resp.num_left();
+}
+
 };

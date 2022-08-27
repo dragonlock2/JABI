@@ -43,6 +43,46 @@ void testDevice(jabi::gRPCDevice &d) {
     }
     std::cout << std::endl;
 
+    /* LIN */
+    lim = d.num_inst(jabi::InstID::LIN);
+    for (auto i = 0; i < lim; i++) {
+        std::cout << "\tDoing some transactions as commander at 19.2kbps on LIN " << i << std::endl;
+        d.lin_set_mode(jabi::LINMode::COMMANDER, i);
+        d.lin_set_rate(19200, i);
+        for (auto j = 0; j < 64; j++) {
+            d.lin_set_filter(j, 0, jabi::LINChecksum::AUTO, i);
+        }
+        d.lin_write(jabi::LINMessage(42, std::vector<uint8_t>{69, 42}, jabi::LINChecksum::ENHANCED), i);
+        std::cout << "\t Sent a messsage" << std::endl;
+        try {
+            jabi::LINMessage msg;
+            if (d.lin_read(msg, 16, i) != -1) {
+                std::cout << "\t Received " << msg << std::endl;
+            }
+        } catch(const std::runtime_error&) {
+            std::cout << "\t Didn't receive a message from 16" << std::endl;
+        }
+
+        std::cout << "\tListening to messages as responder on LIN " << i << std::endl;
+        d.lin_set_mode(jabi::LINMode::RESPONDER, i);
+        d.lin_write(jabi::LINMessage(16, std::vector<uint8_t>{69, 42}, jabi::LINChecksum::ENHANCED), i);
+        std::cout << "\t Queued a message on ID 16" << std::endl;
+        std::this_thread::sleep_for(1000ms);
+        jabi::LINStatus s = d.lin_status(i);
+        if (s.id == 16 && s.success) {
+            std::cout << "\t Successfully sent message" << std::endl;
+        } else {
+            std::cout << "\t Failed to send message" << std::endl;
+        }
+        // less LOC, but one extra check
+        std::cout << "\t Printing receive messages" << std::endl;
+        jabi::LINMessage msg;
+        while (d.lin_read(msg, i) != -1) {
+            std::cout << "\t " << msg << std::endl;
+        }
+    }
+    std::cout << std::endl;
+
     /* SPI */
     lim = d.num_inst(jabi::InstID::SPI);
     for (auto i = 0; i < lim; i++) {

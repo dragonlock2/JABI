@@ -50,6 +50,15 @@ service Device {
     rpc uart_set_config(UARTSetConfigRequest) returns (google.protobuf.Empty);
     rpc uart_write(UARTWriteRequest) returns (google.protobuf.Empty);
     rpc uart_read(UARTReadRequest) returns (google.protobuf.BytesValue);
+
+    /* LIN */
+    rpc lin_set_mode(LINSetModeRequest) returns (google.protobuf.Empty);
+    rpc lin_set_rate(LINSetRateRequest) returns (google.protobuf.Empty);
+    rpc lin_set_filter(LINSetFilterRequest) returns (google.protobuf.Empty);
+    rpc lin_mode(Index) returns (LINModeResponse);
+    rpc lin_status(Index) returns (LINStatusResponse);
+    rpc lin_write(LINWriteRequest) returns (google.protobuf.Empty);
+    rpc lin_read(LINReadRequest) returns (LINReadResponse);
 }
 
 /* Common */
@@ -68,6 +77,7 @@ enum InstID {
     DAC = 6;
     SPI = 7;
     UART = 8;
+    LIN = 9;
 }
 
 message NumInstRequest {
@@ -254,4 +264,63 @@ message UARTWriteRequest {
 message UARTReadRequest {
     uint32 len = 1;
     uint32 idx = 2;
+}
+
+/* LIN */
+enum LINMode {
+    COMMANDER = 0;
+    RESPONDER = 1;
+}
+
+enum LINChecksum {
+    CLASSIC = 0;
+    ENHANCED = 1;
+    AUTO = 2;
+}
+
+message LINSetModeRequest {
+    LINMode mode = 1;
+    uint32 idx = 2;
+}
+
+message LINSetRateRequest {
+    uint32 rate = 1;
+    uint32 idx = 2;
+}
+
+message LINSetFilterRequest {
+    uint32 id = 1;
+    uint32 len = 2;
+    LINChecksum type = 3;
+    uint32 idx = 4;
+}
+
+message LINModeResponse {
+    LINMode mode = 1;
+}
+
+message LINStatusResponse {
+    uint32 id = 1;
+    bool success = 2;
+}
+
+message LINMessage {
+    uint32 id = 1;
+    LINChecksum type = 2;
+    bytes data = 3;
+}
+
+message LINWriteRequest {
+    LINMessage msg = 1;
+    uint32 idx = 2;
+}
+
+message LINReadRequest {
+    uint32 id = 1;
+    uint32 idx = 2;
+}
+
+message LINReadResponse {
+    int32 num_left = 1;
+    LINMessage msg = 2;
 }
