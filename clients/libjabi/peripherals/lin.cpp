@@ -98,9 +98,9 @@ void Device::lin_set_filter(int id, int len, LINChecksum type, int idx) {
     };
 
     auto args = reinterpret_cast<lin_set_filter_req_t*>(req.payload.data());
-    args->id = id;
+    args->id = (uint8_t) id;
     args->checksum_type = static_cast<uint8_t>(type);
-    args->data_len = len;
+    args->data_len = (uint8_t) len;
 
     iface_dynamic_resp_t resp = interface->send_request(req);
     if (resp.payload.size() != 0) {
@@ -172,7 +172,7 @@ void Device::lin_write(LINMessage msg, int idx) {
     };
 
     auto args = reinterpret_cast<lin_write_req_t*>(req.payload.data());
-    args->id            = msg.id;
+    args->id = (uint8_t) msg.id;
     args->checksum_type = static_cast<uint8_t>(msg.type);
     for (auto c : msg.data) {
         req.payload.push_back(c);
@@ -198,7 +198,7 @@ int Device::lin_read(LINMessage &msg, int id, int idx) {
     };
 
     auto args = reinterpret_cast<lin_read_req_t*>(req.payload.data());
-    args->id = id;
+    args->id = (uint8_t) id;
 
     iface_dynamic_resp_t resp = interface->send_request(req);
     if (resp.payload.size() == 0) {
