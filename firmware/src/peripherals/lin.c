@@ -289,7 +289,10 @@ PERIPH_FUNC_DEF(lin_read) {
             LOG_ERR("error receiving frame");
             return JABI_PERIPHERAL_ERR;
         }
-        k_msgq_get(lin->msgs, &msg, K_FOREVER); // bounded latency
+        if (k_msgq_get(lin->msgs, &msg, K_MSEC(500))) {
+            LOG_ERR("no received message, is filter correct?");
+            return JABI_TIMEOUT_ERR;
+        }
     } else { // responder
         if (k_msgq_get(lin->msgs, &msg, K_NO_WAIT)) {
             *resp_len = 0;

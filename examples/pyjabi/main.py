@@ -30,6 +30,34 @@ def testDevice(d):
             print("\t", msg)
     print()
 
+    # LIN
+    for i in range(d.num_inst(jabi.InstID.LIN)):
+        print("\tDoing some transactions as commander at 19.2kbps on LIN", i)
+        d.lin_set_mode(jabi.LINMode.COMMANDER, i)
+        d.lin_set_rate(19200, i)
+        for j in range(64):
+            d.lin_set_filter(j, 0, jabi.LINChecksum.AUTO, i)
+        d.lin_write(jabi.LINMessage(42, [69, 42], jabi.LINChecksum.ENHANCED), i)
+        print("\t Sent a message")
+        try:
+            if msg := d.lin_read(16, i):
+                print("\t Received", msg)
+        except:
+            print("\t Didn't receive a message from 16")
+
+        print("\tListening to messages as responder on LIN", i)
+        d.lin_set_mode(jabi.LINMode.RESPONDER, i)
+        d.lin_write(jabi.LINMessage(16, [69, 42], jabi.LINChecksum.ENHANCED), i)
+        print("\t Queued a message on ID 16")
+        time.sleep(1)
+        if (s := d.lin_status(idx=i)).id == 16 and s.success:
+            print("\t Successfully sent message")
+        else:
+            print("\t Failed to send message")
+        print("\t Printing received messages")
+        while (msg := d.can_read(i)):
+            print("\t", msg)
+
     # SPI
     for i in range(d.num_inst(jabi.InstID.SPI)):
         print("\tSetting SPI to 250kHz, MODE0, LSB first")
