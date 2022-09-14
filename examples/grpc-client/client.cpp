@@ -239,6 +239,21 @@ std::vector<uint8_t> gRPCDevice::i2c_read(int addr, size_t len, int idx) {
     return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
 }
 
+std::vector<uint8_t> gRPCDevice::i2c_transceive(int addr, std::vector<uint8_t> data, size_t read_len, int idx) {
+    JABI::I2CTransceiveRequest req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_addr(addr);
+    req.set_data(std::string(data.begin(), data.end()));
+    req.set_read_len(read_len);
+    req.set_idx(idx);
+    Status status = stub->i2c_transceive(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
 /* GPIO */
 void gRPCDevice::gpio_set_mode(int idx, GPIODir dir, GPIOPull pull, bool init_val) {
     JABI::GPIOSetModeRequest req;

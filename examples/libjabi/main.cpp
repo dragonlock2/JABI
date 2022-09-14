@@ -111,6 +111,7 @@ void testDevice(jabi::Device d) {
             try {
                 d.i2c_write(j, std::vector<uint8_t>(), i);
                 // d.i2c_read(j, 0, i);
+                // d.i2c_transceive(j, std::vector<uint8_t>(), 0, i);
                 std::cout << "\t Found " << j << std::endl;
             } catch(const std::runtime_error&) {}
         }

@@ -151,6 +151,7 @@ PYBIND11_MODULE(jabi, m) {
         .def("i2c_set_freq", &Device::i2c_set_freq, "preset"_a, "idx"_a=0)
         .def("i2c_write", &Device::i2c_write, "addr"_a, "data"_a, "idx"_a=0)
         .def("i2c_read", &Device::i2c_read, "addr"_a, "len"_a, "idx"_a=0)
+        .def("i2c_transceive", &Device::i2c_transceive, "addr"_a, "data"_a, "read_len"_a, "idx"_a=0)
 
         /* GPIO */
         .def("gpio_set_mode", &Device::gpio_set_mode, 

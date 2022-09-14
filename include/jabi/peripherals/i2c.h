@@ -27,9 +27,19 @@ PACKED(i2c_read_j_req_t,
 
 typedef uint8_t i2c_read_j_resp_t;
 
+// writes, then reads using restart
+PACKED(i2c_transceive_req_t,
+    uint16_t addr;
+    uint16_t data_len;
+    uint8_t data[];
+);
+
+typedef uint8_t i2c_transceive_resp_t;
+
 /* Function indices */
-#define I2C_SET_FREQ_ID 0
-#define I2C_WRITE_ID    1
-#define I2C_READ_ID     2
+#define I2C_SET_FREQ_ID   0
+#define I2C_WRITE_ID      1
+#define I2C_READ_ID       2
+#define I2C_TRANSCEIVE_ID 3
 
 #endif // JABI_PERIPHERALS_I2C_H

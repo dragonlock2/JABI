@@ -143,6 +143,7 @@ public:
     void i2c_set_freq(I2CFreq preset, int idx=0);
     void i2c_write(int addr, std::vector<uint8_t> data, int idx=0);
     std::vector<uint8_t> i2c_read(int addr, size_t len, int idx=0);
+    std::vector<uint8_t> i2c_transceive(int addr, std::vector<uint8_t> data, size_t read_len, int idx=0);
 
     /* GPIO */
     void gpio_set_mode(int idx, GPIODir dir=GPIODir::INPUT,

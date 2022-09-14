@@ -43,6 +43,7 @@ public:
     Status i2c_set_freq(ServerContext*, const I2CSetFreqRequest* req, Empty*) override;
     Status i2c_write(ServerContext*, const I2CWriteRequest* req, Empty*) override;
     Status i2c_read(ServerContext*, const I2CReadRequest* req, BytesValue* resp) override;
+    Status i2c_transceive(ServerContext*, const I2CTransceiveRequest* req, BytesValue* resp) override;
 
     /* GPIO */
     Status gpio_set_mode(ServerContext*, const GPIOSetModeRequest* req, Empty*) override;

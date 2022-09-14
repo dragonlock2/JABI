@@ -92,10 +92,40 @@ PERIPH_FUNC_DEF(i2c_read_j) {
     return JABI_NO_ERR;
 }
 
+PERIPH_FUNC_DEF(i2c_transceive) {
+    PERIPH_FUNC_GET_ARGS(i2c, transceive);
+    PERIPH_FUNC_GET_RET(i2c, transceive);
+    args->addr = sys_le16_to_cpu(args->addr);
+    args->data_len = sys_le16_to_cpu(args->data_len);
+
+    if (req_len < sizeof(i2c_transceive_req_t)) {
+        LOG_ERR("invalid amount of data provided");
+        return JABI_INVALID_ARGS_FORMAT_ERR;
+    }
+    uint32_t data_len = req_len - sizeof(i2c_transceive_req_t);
+
+    if (args->data_len > RESP_PAYLOAD_MAX_SIZE) {
+        LOG_ERR("requested read too long");
+        return JABI_INVALID_ARGS_ERR;
+    }
+
+    LOG_DBG("(addr=0x%x,data_len=%d)", args->addr, args->data_len);
+    LOG_HEXDUMP_DBG(args->data, data_len, "data=");
+
+    if (i2c_write_read(i2c_devs[idx], args->addr, args->data, data_len, ret, args->data_len)) {
+        LOG_ERR("failed to read data");
+        return JABI_PERIPHERAL_ERR;
+    }
+
+    *resp_len = args->data_len;
+    return JABI_NO_ERR;
+}
+
 static const periph_func_t i2c_periph_fns[] = {
     i2c_set_freq,
     i2c_write_j,
     i2c_read_j,
+    i2c_transceive,
 };
 
 const struct periph_api_t i2c_periph_api = {

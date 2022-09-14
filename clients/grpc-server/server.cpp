@@ -118,6 +118,14 @@ Status JABIServiceImpl::i2c_read(ServerContext*, const I2CReadRequest* req, Byte
     )
 }
 
+Status JABIServiceImpl::i2c_transceive(ServerContext*, const I2CTransceiveRequest* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto s = req->data();
+        auto v = dev->i2c_transceive(req->addr(), std::vector<uint8_t>(s.begin(), s.end()), req->read_len(), req->idx());
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}
+
 /* GPIO */
 Status JABIServiceImpl::gpio_set_mode(ServerContext*, const GPIOSetModeRequest* req, Empty*) {
     CHECK_EXCEPT(

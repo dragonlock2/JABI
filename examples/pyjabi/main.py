@@ -79,6 +79,7 @@ def testDevice(d):
             try:
                 d.i2c_write(j, [], i)
                 # d.i2c_read(j, 0, i)
+                # d.i2c_transceive(j, [], 0, i)
                 print("\t Found", j)
             except:
                 continue
