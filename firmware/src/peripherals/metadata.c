@@ -69,7 +69,7 @@ PERIPH_FUNC_DEF(req_max_size) {
 
     LOG_DBG("()");
 
-    ret->size = sys_cpu_to_le32(REQ_PAYLOAD_MAX_SIZE);
+    ret->size = sys_cpu_to_le16(REQ_PAYLOAD_MAX_SIZE);
     *resp_len = sizeof(metadata_req_max_size_resp_t);
     return JABI_NO_ERR;
 }
@@ -80,7 +80,7 @@ PERIPH_FUNC_DEF(resp_max_size) {
 
     LOG_DBG("()");
 
-    ret->size = sys_cpu_to_le32(RESP_PAYLOAD_MAX_SIZE);
+    ret->size = sys_cpu_to_le16(RESP_PAYLOAD_MAX_SIZE);
     *resp_len = sizeof(metadata_resp_max_size_resp_t);
     return JABI_NO_ERR;
 }

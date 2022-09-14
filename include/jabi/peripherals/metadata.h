@@ -17,11 +17,11 @@ typedef uint8_t metadata_echo_req_t;
 typedef uint8_t metadata_echo_resp_t;
 
 PACKED(metadata_req_max_size_resp_t,
-    uint32_t size;
+    uint16_t size;
 );
 
 PACKED(metadata_resp_max_size_resp_t,
-    uint32_t size;
+    uint16_t size;
 );
 
 /* Function indices */

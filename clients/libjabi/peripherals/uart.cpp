@@ -33,6 +33,9 @@ void Device::uart_set_config(int baud, int data_bits,
 }
 
 void Device::uart_write(std::vector<uint8_t> data, int idx) {
+    if (data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_UART_ID,

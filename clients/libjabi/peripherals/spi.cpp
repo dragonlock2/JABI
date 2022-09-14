@@ -71,6 +71,9 @@ void Device::spi_set_bitorder(bool msb, int idx) {
 }
 
 void Device::spi_write(std::vector<uint8_t> data, int idx) {
+    if (data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_SPI_ID,
@@ -111,6 +114,9 @@ std::vector<uint8_t> Device::spi_read(size_t len, int idx) {
 }
 
 std::vector<uint8_t> Device::spi_transceive(std::vector<uint8_t> data, int idx) {
+    if (data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_SPI_ID,

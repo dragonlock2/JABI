@@ -26,6 +26,9 @@ public:
 
     virtual iface_dynamic_resp_t send_request(iface_dynamic_req_t req) = 0;
 
+    size_t get_req_max_size() { return req_max_size; }
+    size_t get_resp_max_size() { return resp_max_size; }
+
 protected:
     size_t req_max_size = REQ_PAYLOAD_MAX_SIZE;
     size_t resp_max_size = RESP_PAYLOAD_MAX_SIZE;

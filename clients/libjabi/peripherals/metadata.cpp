@@ -48,6 +48,9 @@ int Device::num_inst(InstID id) {
 }
 
 std::string Device::echo(std::string str) {
+    if (str.length() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_METADATA_ID,
@@ -78,7 +81,7 @@ size_t Device::req_max_size() {
     iface_dynamic_resp_t resp = interface->send_request(req);
 
     auto ret = reinterpret_cast<metadata_req_max_size_resp_t*>(resp.payload.data());
-    return letoh<uint32_t>(ret->size);
+    return letoh<uint16_t>(ret->size);
 }
 
 size_t Device::resp_max_size() {
@@ -96,7 +99,7 @@ size_t Device::resp_max_size() {
     iface_dynamic_resp_t resp = interface->send_request(req);
 
     auto ret = reinterpret_cast<metadata_resp_max_size_resp_t*>(resp.payload.data());
-    return letoh<uint32_t>(ret->size);
+    return letoh<uint16_t>(ret->size);
 }
 
 };

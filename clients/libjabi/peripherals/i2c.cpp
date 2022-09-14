@@ -29,6 +29,9 @@ void Device::i2c_set_freq(I2CFreq preset, int idx) {
 }
 
 void Device::i2c_write(int addr, std::vector<uint8_t> data, int idx) {
+    if (sizeof(i2c_write_j_req_t) + data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_I2C_ID,
@@ -75,6 +78,9 @@ std::vector<uint8_t> Device::i2c_read(int addr, size_t len, int idx) {
 }
 
 std::vector<uint8_t> Device::i2c_transceive(int addr, std::vector<uint8_t> data, size_t read_len, int idx) {
+    if (sizeof(i2c_transceive_req_t) + data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_I2C_ID,
