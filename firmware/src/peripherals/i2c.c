@@ -1,9 +1,9 @@
-#include <drivers/i2c.h>
-#include <sys/byteorder.h>
+#include <zephyr/drivers/i2c.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 #include <jabi/peripherals/i2c.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_i2c, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_NODE_HAS_PROP(JABI_PERIPH_NODE, i2c)

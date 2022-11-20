@@ -1,8 +1,8 @@
-#include <sys/byteorder.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 #include <jabi/peripherals/metadata.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_metadata, CONFIG_LOG_DEFAULT_LEVEL);
 
 static int metadata_init(uint16_t idx) {

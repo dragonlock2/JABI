@@ -1,9 +1,9 @@
-#include <drivers/spi.h>
-#include <sys/byteorder.h>
+#include <zephyr/drivers/spi.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 #include <jabi/peripherals/spi.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_spi, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_NODE_HAS_PROP(JABI_PERIPH_NODE, spi)

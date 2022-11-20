@@ -1,9 +1,9 @@
-#include <drivers/adc.h>
-#include <sys/byteorder.h>
+#include <zephyr/drivers/adc.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 #include <jabi/peripherals/adc.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_adc, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(jabi_adc)

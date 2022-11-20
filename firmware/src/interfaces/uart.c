@@ -1,7 +1,7 @@
-#include <drivers/uart.h>
+#include <zephyr/drivers/uart.h>
 #include <jabi.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(iface_uart, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if (DT_PROP_LEN(JABI_IFACE_NODE, uart) > 0)

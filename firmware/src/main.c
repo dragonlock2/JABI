@@ -1,10 +1,10 @@
-#include <zephyr.h>
-#include <sys/slist.h>
-#include <usb/usb_device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/sys/slist.h>
+#include <zephyr/usb/usb_device.h>
 #include <stdlib.h>
 #include <jabi.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(jabi, CONFIG_LOG_DEFAULT_LEVEL);
 
 #define LOCK_TIMEOUT K_MSEC(100)

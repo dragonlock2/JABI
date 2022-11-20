@@ -1,9 +1,9 @@
-#include <drivers/can.h>
-#include <sys/byteorder.h>
+#include <zephyr/drivers/can.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 #include <jabi/peripherals/can.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_can, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_NODE_HAS_PROP(JABI_PERIPH_NODE, can)
@@ -18,8 +18,8 @@ LOG_MODULE_REGISTER(periph_can, CONFIG_LOG_DEFAULT_LEVEL);
 
 typedef struct {
     const struct device *dev;
-    struct zcan_filter filter_std;
-    struct zcan_filter filter_ext;
+    struct can_filter filter_std;
+    struct can_filter filter_ext;
     int std_id;
     int ext_id;
     struct k_msgq *msgq;
@@ -57,6 +57,10 @@ static int can_init(uint16_t idx) {
     can_dev_data_t *can = &can_devs[idx];
     if (can_set_mode(can->dev, CAN_MODE_NORMAL | MODE_FLAG)) {
         LOG_ERR("failed to set mode for can%d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
+    if (can_start(can->dev) == -EIO) {
+        LOG_ERR("failed to start can%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
     can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
@@ -120,6 +124,10 @@ PERIPH_FUNC_DEF(can_set_rate) {
     LOG_DBG("(bitrate=%d,bitrate_data=%d)", args->bitrate, args->bitrate_data);
 
     can_dev_data_t *can = &can_devs[idx];
+    if (can_stop(can->dev) == -EIO) { // note stays stopped if invalid bitrates
+        LOG_ERR("failed to stop can %d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
     if (can_set_bitrate(can->dev, args->bitrate)) {
         LOG_ERR("failed to set bitrate for can %d", idx);
         return JABI_PERIPHERAL_ERR;
@@ -130,6 +138,10 @@ PERIPH_FUNC_DEF(can_set_rate) {
         return JABI_PERIPHERAL_ERR;
     }
 #endif // CONFIG_CAN_FD_MODE
+    if (can_start(can->dev) == -EIO) {
+        LOG_ERR("failed to restart can %d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
 
     *resp_len = 0;
     return JABI_NO_ERR;
@@ -151,8 +163,16 @@ PERIPH_FUNC_DEF(can_set_style) {
             return JABI_INVALID_ARGS_ERR;
     }
     can_dev_data_t *can = &can_devs[idx];
+    if (can_stop(can->dev) == -EIO) { // note stays stopped if fails
+        LOG_ERR("failed to stop can %d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
     if (can_set_mode(can->dev, mode | MODE_FLAG)) {
         LOG_ERR("failed to set mode for can%d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
+    if (can_start(can->dev) == -EIO) {
+        LOG_ERR("failed to restart can %d", idx);
         return JABI_PERIPHERAL_ERR;
     }
 
@@ -215,7 +235,7 @@ PERIPH_FUNC_DEF(can_write) {
         LOG_WRN("id 0x%x too large for standard id", args->id);
     }
 
-    struct zcan_frame msg = {
+    struct can_frame msg = {
         .id      = args->id,
         .id_type = args->id_type ? CAN_EXTENDED_IDENTIFIER : CAN_STANDARD_IDENTIFIER,
         .fd      = args->fd ? 1 : 0,
@@ -258,7 +278,7 @@ PERIPH_FUNC_DEF(can_read) {
 
     LOG_DBG("()");
 
-    struct zcan_frame msg;
+    struct can_frame msg;
     can_dev_data_t *can = &can_devs[idx];
     if (k_msgq_get(can->msgq, &msg, K_NO_WAIT)) {
         *resp_len = 0;

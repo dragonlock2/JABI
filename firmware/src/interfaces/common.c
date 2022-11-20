@@ -1,5 +1,5 @@
-#include <device.h>
-#include <sys/byteorder.h>
+#include <zephyr/device.h>
+#include <zephyr/sys/byteorder.h>
 #include <jabi.h>
 
 extern const struct iface_api_t usb_iface_api;

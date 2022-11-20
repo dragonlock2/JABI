@@ -1,8 +1,8 @@
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
 #include <jabi.h>
 #include <jabi/peripherals/gpio.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(periph_gpio, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_NODE_HAS_PROP(JABI_PERIPH_NODE, gpio)
