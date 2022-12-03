@@ -100,18 +100,13 @@ pip install clients/pyjabi
 
 The following gRPC clients.
 
-- iOS app in React Native or Swift
-- Android app in React Native or Kotlin (USB too?)
-- QT6 cross-platform app
-- Website using Svelte JS (WebUSB too?)
+- Google Flutter cross-platform app
 
 Fun things to look into one day.
 
 - Alternative functions for pins
-- Improve security and robustness (encryption? CRC? gRPC SSL?)
-- Proper RPC server on the microcontroller (gRPC? Thrift?)
-- Multiple USB interfaces for multiple clients (raw USB is \~25% faster than CDC-ACM)
-- Ethernet support - thread pool from CS162!
-- BLE and WiFi support (need to make a dev board)
+- Thrift support [coming to Zephyr](https://github.com/zephyrproject-rtos/zephyr/issues/51620)
+    - Network (Ethernet, WiFi) support
+- BLE support
 - USB Linux drivers to show up under `/dev`
 - USB HS dev board for comparable performance to STLINK-V3
