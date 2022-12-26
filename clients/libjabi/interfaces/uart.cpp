@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #endif // _WIN32
 
-#define UART_TIMEOUT std::chrono::milliseconds(3000)
+#define UART_TIMEOUT std::chrono::milliseconds(2000)
 
 namespace jabi {
 
@@ -58,6 +58,14 @@ UARTInterface::UARTInterface(std::string port, int baud) {
         throw std::runtime_error("couldn't set COM state");
     }
 
+    // return even if 0 bytes read (for timeout calculation)
+    COMMTIMEOUTS timeouts = {0};
+    timeouts.ReadIntervalTimeout = MAXDWORD;
+
+    if (!SetCommTimeouts(hFile, &timeouts)) {
+        throw std::runtime_error("couldn't set COM timeouts");
+    }
+
     if (!PurgeComm(hFile, PURGE_RXABORT | PURGE_RXCLEAR |
                           PURGE_TXABORT | PURGE_TXCLEAR)) {
         throw std::runtime_error("couldn't purge COM port");
@@ -71,74 +79,75 @@ UARTInterface::~UARTInterface() {
 iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
     std::scoped_lock lk(req_lock);
 
-    std::future<iface_dynamic_resp_t> lock = std::async([this, &req]{
-        if (req.msg.payload_len > req_max_size ||
-            req.msg.payload_len != req.payload.size()) {
-            throw std::runtime_error("request payload size too large");
-        }
-        iface_req_htole(req.msg);
-        DWORD len = static_cast<DWORD>(IFACE_REQ_HDR_SIZE);
-        auto buffer = reinterpret_cast<char*>(&req.msg);
-        while (len) {
-            DWORD sent_len;
-            if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
-                throw std::runtime_error("write failed");
-            }
-            len -= sent_len;
-            buffer += sent_len;
-        }
-        len = static_cast<DWORD>(req.payload.size());
-        buffer = reinterpret_cast<char*>(req.payload.data());
-        while (len) {
-            DWORD sent_len;
-            if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
-                throw std::runtime_error("write failed");
-            }
-            len -= sent_len;
-            buffer += sent_len;
-        }
-
-        DWORD flags;
-        COMSTAT comstat;
-        if (!ClearCommError(hFile, &flags, &comstat)) {
-            throw std::runtime_error("failed to clear error?");
-        }
-
-        iface_dynamic_resp_t resp;
-        resp.msg.payload_len = 0;
-        len = static_cast<DWORD>(IFACE_RESP_HDR_SIZE);
-        buffer = reinterpret_cast<char*>(&resp.msg);
-        while (len) {
-            DWORD recv_len;
-            if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
-                throw std::runtime_error("read failed");
-            }
-            len -= recv_len;
-            buffer += recv_len;
-        }
-        iface_resp_letoh(resp.msg);
-        if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
-            throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
-        }
-        resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
-        len = static_cast<DWORD>(resp.payload.size());
-        buffer = reinterpret_cast<char*>(resp.payload.data());
-        while (len) {
-            DWORD recv_len;
-            if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
-                throw std::runtime_error("read failed");
-            }
-            len -= recv_len;
-            buffer += recv_len;
-        }
-
-        return resp;
-    });
-    
-    if (lock.wait_for(UART_TIMEOUT) == std::future_status::timeout) {
-        throw std::runtime_error("UART timeout");
+    if (req.msg.payload_len > req_max_size ||
+        req.msg.payload_len != req.payload.size()) {
+        throw std::runtime_error("request payload size too large");
     }
-    return lock.get();
+    iface_req_htole(req.msg);
+    DWORD len = static_cast<DWORD>(IFACE_REQ_HDR_SIZE);
+    auto buffer = reinterpret_cast<char*>(&req.msg);
+    while (len) {
+        DWORD sent_len;
+        if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
+            throw std::runtime_error("write failed");
+        }
+        len -= sent_len;
+        buffer += sent_len;
+    }
+    len = static_cast<DWORD>(req.payload.size());
+    buffer = reinterpret_cast<char*>(req.payload.data());
+    while (len) {
+        DWORD sent_len;
+        if (!WriteFile(hFile, buffer, len, &sent_len, NULL)) {
+            throw std::runtime_error("write failed");
+        }
+        len -= sent_len;
+        buffer += sent_len;
+    }
+
+    DWORD flags;
+    COMSTAT comstat;
+    if (!ClearCommError(hFile, &flags, &comstat)) {
+        throw std::runtime_error("failed to clear error?");
+    }
+
+    // only check timeout while waiting for bytes
+    auto start = std::chrono::steady_clock::now();
+    iface_dynamic_resp_t resp;
+    resp.msg.payload_len = 0;
+    len = static_cast<DWORD>(IFACE_RESP_HDR_SIZE);
+    buffer = reinterpret_cast<char*>(&resp.msg);
+    while (len) {
+        if (std::chrono::steady_clock::now() - start > UART_TIMEOUT) {
+            throw std::runtime_error("UART timeout");
+        }
+        DWORD recv_len;
+        if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
+            throw std::runtime_error("read failed");
+        }
+        len -= recv_len;
+        buffer += recv_len;
+    }
+    iface_resp_letoh(resp.msg);
+    if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
+        throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
+    }
+    resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
+    len = static_cast<DWORD>(resp.payload.size());
+    buffer = reinterpret_cast<char*>(resp.payload.data());
+    while (len) {
+        if (std::chrono::steady_clock::now() - start > UART_TIMEOUT) {
+            throw std::runtime_error("UART timeout");
+        }
+        DWORD recv_len;
+        if (!ReadFile(hFile, buffer, len, &recv_len, NULL)) {
+            throw std::runtime_error("read failed");
+        }
+        len -= recv_len;
+        buffer += recv_len;
+    }
+
+    return resp;
 }
 
 #else
@@ -163,7 +172,7 @@ UARTInterface::UARTInterface(std::string port, int baud) {
     tty.c_cflag |= CLOCAL;
     tty.c_cflag |= CREAD; // turn on read
 
-    tty.c_cc[VMIN]  = 0; // return even if 0 bytes received
+    tty.c_cc[VMIN]  = 0; // return even if 0 bytes received (needed for timeout)
     tty.c_cc[VTIME] = 0; // zero read timeout
 
     if (tcsetattr(fd, TCSANOW, &tty)) {
@@ -200,69 +209,68 @@ UARTInterface::~UARTInterface() {
 
 iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
     std::scoped_lock lk(req_lock);
-
-    std::future<iface_dynamic_resp_t> lock = std::async([this, &req]{
-        if (req.msg.payload_len > req_max_size ||
-            req.msg.payload_len != req.payload.size()) {
-            throw std::runtime_error("request payload size bad");
-        }
-        iface_req_htole(req.msg);
-        int len = IFACE_REQ_HDR_SIZE;
-        auto buffer = reinterpret_cast<unsigned char*>(&req.msg);
-        while (len) {
-            int sent_len;
-            if ((sent_len = write(fd, buffer, len)) < 0) {
-                throw std::runtime_error("write failed");
-            }
-            len -= sent_len;
-            buffer += sent_len;
-        }
-        len = req.payload.size();
-        buffer = reinterpret_cast<unsigned char*>(req.payload.data());
-        while (len) {
-            int sent_len;
-            if ((sent_len = write(fd, buffer, len)) < 0) {
-                throw std::runtime_error("write failed");
-            }
-            len -= sent_len;
-            buffer += sent_len;
-        }
-
-        iface_dynamic_resp_t resp;
-        resp.msg.payload_len = 0;
-        len = IFACE_RESP_HDR_SIZE;
-        buffer = reinterpret_cast<unsigned char*>(&resp.msg);
-        while (len) {
-            int recv_len;
-            if ((recv_len = read(fd, buffer, len)) < 0) {
-                throw std::runtime_error("read failed");
-            }
-            len -= recv_len;
-            buffer += recv_len;
-        }
-        iface_resp_letoh(resp.msg);
-        if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
-            throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
-        }
-        resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
-        len = resp.payload.size();
-        buffer = reinterpret_cast<unsigned char*>(resp.payload.data());
-        while (len) {
-            int recv_len;
-            if ((recv_len = read(fd, buffer, len)) < 0) {
-                throw std::runtime_error("read failed");
-            }
-            len -= recv_len;
-            buffer += recv_len;
-        }
-
-        return resp;
-    });
-
-    if (lock.wait_for(UART_TIMEOUT) == std::future_status::timeout) {
-        throw std::runtime_error("UART timeout");
+    if (req.msg.payload_len > req_max_size ||
+        req.msg.payload_len != req.payload.size()) {
+        throw std::runtime_error("request payload size bad");
     }
-    return lock.get();
+    iface_req_htole(req.msg);
+    int len = IFACE_REQ_HDR_SIZE;
+    auto buffer = reinterpret_cast<unsigned char*>(&req.msg);
+    while (len) {
+        int sent_len;
+        if ((sent_len = write(fd, buffer, len)) < 0) {
+            throw std::runtime_error("write failed");
+        }
+        len -= sent_len;
+        buffer += sent_len;
+    }
+    len = req.payload.size();
+    buffer = reinterpret_cast<unsigned char*>(req.payload.data());
+    while (len) {
+        int sent_len;
+        if ((sent_len = write(fd, buffer, len)) < 0) {
+            throw std::runtime_error("write failed");
+        }
+        len -= sent_len;
+        buffer += sent_len;
+    }
+
+    // only check timeout while waiting for bytes
+    auto start = std::chrono::steady_clock::now();
+    iface_dynamic_resp_t resp;
+    resp.msg.payload_len = 0;
+    len = IFACE_RESP_HDR_SIZE;
+    buffer = reinterpret_cast<unsigned char*>(&resp.msg);
+    while (len) {
+        if (std::chrono::steady_clock::now() - start > UART_TIMEOUT) {
+            throw std::runtime_error("UART timeout");
+        }
+        int recv_len;
+        if ((recv_len = read(fd, buffer, len)) < 0) {
+            throw std::runtime_error("read failed");
+        }
+        len -= recv_len;
+        buffer += recv_len;
+    }
+    iface_resp_letoh(resp.msg);
+    if (resp.msg.retcode != 0 || resp.msg.payload_len > resp_max_size) {
+        throw std::runtime_error("bad response " + std::to_string(resp.msg.retcode));
+    }
+    resp.payload = std::vector<uint8_t>(resp.msg.payload_len, 0);
+    len = resp.payload.size();
+    buffer = reinterpret_cast<unsigned char*>(resp.payload.data());
+    while (len) {
+        if (std::chrono::steady_clock::now() - start > UART_TIMEOUT) {
+            throw std::runtime_error("UART timeout");
+        }
+        int recv_len;
+        if ((recv_len = read(fd, buffer, len)) < 0) {
+            throw std::runtime_error("read failed");
+        }
+        len -= recv_len;
+        buffer += recv_len;
+    }
+    return resp;
 }
 
 #endif // _WIN32
