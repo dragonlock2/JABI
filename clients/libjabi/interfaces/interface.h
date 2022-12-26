@@ -34,7 +34,7 @@ protected:
     size_t resp_max_size = RESP_PAYLOAD_MAX_SIZE;
     std::mutex req_lock;
 
-    static Device makeDevice(std::shared_ptr<Interface> i) { return Device(i); }
+    static Device make_device(std::shared_ptr<Interface> i) { return Device(i); }
 };
 
 inline void iface_req_htole(iface_req_t &req) {

@@ -269,7 +269,7 @@ iface_dynamic_resp_t UARTInterface::send_request(iface_dynamic_req_t req) {
 
 Device UARTInterface::get_device(std::string port, int baud) {
     std::shared_ptr<UARTInterface> iface(new UARTInterface(port, baud));
-    auto dev = Interface::makeDevice(iface);
+    auto dev = Interface::make_device(iface);
     if ((iface->req_max_size = dev.req_max_size()) < REQ_PAYLOAD_MAX_SIZE ||
         (iface->resp_max_size = dev.resp_max_size()) < RESP_PAYLOAD_MAX_SIZE) {
         throw std::runtime_error("maximum packet size too small");

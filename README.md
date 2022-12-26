@@ -94,7 +94,7 @@ pip install clients/pyjabi
 
 ## Known Issues
 
-- UART interface timeout doesn't work when binded in Python.
+- UART interface timeout doesn't work when binded in Python (GIL!).
 
 ## TODO
 

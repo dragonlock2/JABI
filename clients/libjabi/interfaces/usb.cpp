@@ -28,8 +28,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
     iface_req_htole(req.msg);
 
     // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
-    auto req_buffer = std::make_unique<uint8_t[]>(
-        sizeof(iface_req_t) - REQ_PAYLOAD_MAX_SIZE + req_max_size);
+    auto req_buffer = std::make_unique<uint8_t[]>(IFACE_REQ_HDR_SIZE + req_max_size);
     iface_req_t* req_msg = reinterpret_cast<iface_req_t*>(req_buffer.get());
     memcpy(req_msg, &req.msg, IFACE_REQ_HDR_SIZE);
     memcpy(req_msg->payload, req.payload.data(), req.payload.size());
@@ -50,8 +49,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
     }
 
     // transfer must be contiguous, allocate buffer from heap (MSVC complains about stack)
-    auto resp_buffer = std::make_unique<uint8_t[]>(
-        sizeof(iface_resp_t) - RESP_PAYLOAD_MAX_SIZE + resp_max_size);
+    auto resp_buffer = std::make_unique<uint8_t[]>(IFACE_RESP_HDR_SIZE + resp_max_size);
     iface_resp_t* resp_msg = reinterpret_cast<iface_resp_t*>(resp_buffer.get());
 
     int recv_len;
@@ -83,7 +81,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
  *   - bInterfaceClass of 0xFF (Vendor Specific)
  *   - iInterface string descriptor of "JABI USB"
  *   - only 2 bulk transfer endpoints (1 IN, 1 OUT)
- *   - responds to a get_serial() request
+ *   - responds to a req_max_size() and resp_max_size() request
  */
 std::vector<Device> USBInterface::list_devices() {
     if (libusb_init(NULL) < 0) {
@@ -157,7 +155,7 @@ std::vector<Device> USBInterface::list_devices() {
                     ep_in.bEndpointAddress
                 )
             );
-            Device jabi = Interface::makeDevice(iface);
+            Device jabi = Interface::make_device(iface);
             try {
                 if ((iface->req_max_size = jabi.req_max_size()) < REQ_PAYLOAD_MAX_SIZE ||
                     (iface->resp_max_size = jabi.resp_max_size()) < RESP_PAYLOAD_MAX_SIZE) {
