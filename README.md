@@ -27,6 +27,7 @@ Clients connect to the microcontroller over any one of the interfaces. The follo
 - `libjabi` - C++ library
 - `pyjabi` - Python library
 - `grpc-server` - gRPC server
+- `jabi-rs` - Rust library
 
 ## Setup
 
@@ -92,6 +93,10 @@ pip install clients/pyjabi
 
 [`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [examples/grpc-client](examples/grpc-client).
 
+#### jabi-rs
+
+[`jabi-rs`](clients/jabi-rs) is provided as a standard library crate and can be added locally to any project in `Cargo.toml`. An example project is in [examples/jabi-rs](examples/jabi-rs).
+
 ## TODO
 
 The following gRPC clients.
@@ -100,6 +105,9 @@ The following gRPC clients.
 
 Fun things to look into one day.
 
+- Better documentation...
+- Unit testing...
+- Deploying clients to package managers, no more local install!
 - Alternative functions for pins
 - Thrift support [coming to Zephyr](https://github.com/zephyrproject-rtos/zephyr/issues/51620)
     - Network (Ethernet, WiFi) support
