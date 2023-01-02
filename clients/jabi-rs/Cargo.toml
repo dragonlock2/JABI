@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 serial = "0.4.0"
 deku = "0.15.1"
+rusb = "0.9.1"

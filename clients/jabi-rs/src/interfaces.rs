@@ -2,9 +2,7 @@ pub mod uart;
 pub mod usb;
 
 use crate::Error;
-use deku::{DekuContainerWrite, DekuUpdate, DekuWrite};
-
-pub const REQ_PAYLOAD_MAX_SIZE: usize = 128; // safe minimum
+use deku::{DekuContainerWrite, DekuRead, DekuUpdate, DekuWrite};
 
 #[derive(DekuWrite)]
 #[deku(endian = "little")]
@@ -19,7 +17,19 @@ pub struct InterfaceRequest {
     pub payload: Vec<u8>,
 }
 
+#[derive(DekuRead)]
+#[deku(endian = "little")]
+pub struct InterfaceResponse {
+    pub retcode: i16,
+    pub payload_len: u16,
+
+    #[deku(count = "payload_len")]
+    pub payload: Vec<u8>,
+}
+
 pub trait Interface {
     fn send(&mut self, req: &InterfaceRequest) -> Result<Vec<u8>, Error>;
     fn set_max_req_size(&mut self, size: usize);
+    fn set_max_resp_size(&mut self, _size: usize) {}
+    fn reset(&mut self) {}
 }
