@@ -1,15 +1,13 @@
-// TODO add concurrency support, clone helper
-
 use crate::interfaces::{Interface, InterfaceRequest};
 use crate::Error;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 pub struct Device {
-    pub(crate) iface: Arc<Mutex<dyn Interface>>,
+    pub(crate) iface: Arc<Mutex<dyn Interface + Send>>,
 }
 
 impl Device {
-    pub(crate) fn iface(&self) -> MutexGuard<'_, (dyn Interface + 'static)> {
+    pub(crate) fn iface(&self) -> MutexGuard<'_, (dyn Interface + Send + 'static)> {
         self.iface.lock().unwrap()
     }
 
@@ -21,6 +19,14 @@ impl Device {
                 Err(Error::PacketTimeout)
             }
             v => v,
+        }
+    }
+}
+
+impl Clone for Device {
+    fn clone(&self) -> Self {
+        Self {
+            iface: Arc::clone(&self.iface),
         }
     }
 }
