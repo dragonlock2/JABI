@@ -60,6 +60,16 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // UART
+    for i in 0..d.num_inst(jabi::InstID::UART)? {
+        d.uart_set_config(i, 115200, 8, jabi::UARTParity::None, jabi::UARTStop::B1)?;
+        println!("\tSet UART {i} to 115200 baud, 8N1");
+        d.uart_write(i, &vec![1, 2, 3, 4])?;
+        println!("\t Sent [1, 2, 3, 4] to UART {i}");
+        println!("\t Received {:?}", d.uart_read(i, 4)?);
+    }
+    println!();
+
     // PWM (GPIO overrides it until reset)
     for i in 0..d.num_inst(jabi::InstID::PWM)? {
         println!("\tFlashing PWM {i} at 1Hz");

@@ -10,6 +10,7 @@ mod peripherals {
     pub mod metadata;
     pub mod pwm;
     pub mod spi;
+    pub mod uart;
 }
 
 pub use crate::device::Device;
@@ -25,5 +26,7 @@ pub use crate::peripherals::gpio::GPIODir;
 pub use crate::peripherals::gpio::GPIOPull;
 pub use crate::peripherals::i2c::I2CFreq;
 pub use crate::peripherals::metadata::InstID;
+pub use crate::peripherals::uart::UARTParity;
+pub use crate::peripherals::uart::UARTStop;
 
 // TODO re-export other enums, structs
