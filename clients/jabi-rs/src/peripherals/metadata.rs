@@ -2,9 +2,9 @@ use crate::interfaces::InterfaceRequest;
 use crate::Error;
 use deku::{DekuContainerRead, DekuContainerWrite, DekuRead, DekuUpdate, DekuWrite};
 
-#[derive(Debug)]
 pub enum InstID {
     Metadata = 0,
+    CAN = 1,
 }
 
 enum Func {
@@ -46,7 +46,6 @@ impl crate::Device {
         struct NumInstResponse {
             num_idx: u16,
         }
-
         let req = NumInstRequest {
             periph_id: id as u16,
         };
