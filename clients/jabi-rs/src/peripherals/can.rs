@@ -173,14 +173,14 @@ impl crate::Device {
     pub fn can_write(&self, idx: usize, msg: &CANMessage) -> Result<(), Error> {
         #[derive(DekuWrite)]
         #[deku(endian = "little")]
-        struct WriteRequest {
+        struct WriteRequest<'a> {
             id: u32,
             id_type: u8,
             fd: u8,
             brs: u8,
             rtr: u8,
             data_len: u8,
-            data: Vec<u8>,
+            data: &'a [u8],
         }
         if msg.data.len() > CAN_DATA_MAX_LEN {
             return Err(Error::InvalidArgs);
@@ -192,11 +192,7 @@ impl crate::Device {
             brs: msg.brs as u8,
             rtr: msg.rtr as u8,
             data_len: msg.data.len() as u8,
-            data: if msg.rtr {
-                Vec::new()
-            } else {
-                msg.data.clone()
-            },
+            data: if msg.rtr { &[] } else { &msg.data },
         };
         let resp = self.send(&gen_req(Func::Write, idx, req.to_bytes().unwrap())?)?;
         if resp.len() == 0 {

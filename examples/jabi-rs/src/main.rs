@@ -11,7 +11,7 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
 
     // CAN
     for i in 0..d.num_inst(jabi::InstID::CAN)? {
-        println!("\tListening only to 0x69420 messages on CAN {}", i);
+        println!("\tListening only to 0x69420 messages on CAN {i}");
         d.can_set_rate(i, 125000, 1000000)?;
         d.can_set_filter(i, 0x69420, 0xFFFFF, false, false)?;
         d.can_set_mode(i, jabi::CANMode::Normal)?;
@@ -24,7 +24,19 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
         std::thread::sleep(std::time::Duration::from_millis(500));
         println!("\tPrinting received messages");
         while let Some(msg) = d.can_read(i)? {
-            println!("\t{}", msg);
+            println!("\t{msg}");
+        }
+    }
+    println!();
+
+    // I2C
+    for i in 0..d.num_inst(jabi::InstID::I2C)? {
+        println!("\tScanning for devices on I2C {i}");
+        d.i2c_set_freq(i, jabi::I2CFreq::Standard)?;
+        for j in 0..128 {
+            if d.i2c_write(i, j, &[]).is_ok() {
+                println!("\t Found {j}");
+            }
         }
     }
     println!();
@@ -40,7 +52,7 @@ fn main() {
         }
     }
     print!("Found UART: ");
-    if test_device(&jabi::uart::get_device("/dev/tty.usbmodem14102", 230400).unwrap()).is_err() {
+    if test_device(&jabi::uart::get_device("COM5", 230400).unwrap()).is_err() {
         println!("failed somewhere...");
     }
     println!("done!");

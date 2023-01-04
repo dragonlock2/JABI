@@ -5,6 +5,14 @@ use deku::{DekuContainerRead, DekuContainerWrite, DekuRead, DekuUpdate, DekuWrit
 pub enum InstID {
     Metadata = 0,
     CAN = 1,
+    I2C = 2,
+    GPIO = 3,
+    PWM = 4,
+    ADC = 5,
+    DAC = 6,
+    SPI = 7,
+    UART = 8,
+    LIN = 9,
 }
 
 enum Func {
