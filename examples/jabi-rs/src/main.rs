@@ -31,6 +31,46 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // LIN
+    for i in 0..d.num_inst(jabi::InstID::LIN)? {
+        println!("\tDoing some transactions as commander at 19.2kbps on LIN {i}");
+        d.lin_set_mode(i, jabi::LINMode::Commander)?;
+        d.lin_set_rate(i, 19200)?;
+        for j in 0..64 {
+            d.lin_set_filter(i, j, 0, jabi::LINChecksum::Auto)?;
+        }
+        d.lin_write(
+            i,
+            &jabi::LINMessage::new(42, vec![69, 42], jabi::LINChecksum::Enhanced),
+        )?;
+        println!("\t Sent a message");
+        if let Ok(Some(msg)) = d.lin_read(i, 16) {
+            println!("\t Received {}", msg);
+        } else {
+            println!("\t Didn't receive a message from 16");
+        }
+
+        println!("\tListening to messages as responder on LIN {i}");
+        d.lin_set_mode(i, jabi::LINMode::Responder)?;
+        d.lin_write(
+            i,
+            &jabi::LINMessage::new(16, vec![69, 42], jabi::LINChecksum::Enhanced),
+        )?;
+        println!("\t Queued a message on ID 16");
+        std::thread::sleep(Duration::from_secs(1));
+        let status = d.lin_status(i)?;
+        if status.id == 16 && status.success {
+            println!("\t Successfully sent message");
+        } else {
+            println!("\t Failed to send message");
+        }
+        println!("\t Printing received messages");
+        while let Some(msg) = d.lin_read(i, 0xFF)? {
+            println!("\t{msg}");
+        }
+    }
+    println!();
+
     // SPI
     for i in 0..d.num_inst(jabi::InstID::SPI)? {
         println!("\tSetting SPI {i} to 250kHz, MODE0, LSB first");

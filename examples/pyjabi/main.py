@@ -57,6 +57,7 @@ def testDevice(d):
         print("\t Printing received messages")
         while (msg := d.can_read(i)):
             print("\t", msg)
+    print()
 
     # SPI
     for i in range(d.num_inst(jabi.InstID.SPI)):
