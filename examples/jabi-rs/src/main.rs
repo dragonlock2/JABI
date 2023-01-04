@@ -41,6 +41,22 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // GPIO
+    for i in 0..d.num_inst(jabi::InstID::GPIO)? {
+        println!("\tFlashing GPIO {i}");
+        d.gpio_set_mode(i, jabi::GPIODir::Output, jabi::GPIOPull::None, false)?;
+        for _ in 0..6 {
+            d.gpio_write(i, false)?;
+            std::thread::sleep(std::time::Duration::from_millis(25));
+            d.gpio_write(i, true)?;
+            std::thread::sleep(std::time::Duration::from_millis(25));
+        }
+    }
+    for i in 0..d.num_inst(jabi::InstID::GPIO)? {
+        d.gpio_set_mode(i, jabi::GPIODir::Input, jabi::GPIOPull::Up, false)?;
+        println!("\tRead GPIO {i} w/ pullups: {}", d.gpio_read(i)?);
+    }
+
     Ok(())
 }
 
