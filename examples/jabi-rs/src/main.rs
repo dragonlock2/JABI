@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     // Metadata
     println!(
@@ -21,7 +23,7 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
         d.can_write(i, &jabi::CANMessage::new_rtr(0x69420, 2, true))?;
         println!("\tSent some messages");
 
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        std::thread::sleep(Duration::from_millis(500));
         println!("\tPrinting received messages");
         while let Some(msg) = d.can_read(i)? {
             println!("\t{msg}");
@@ -41,21 +43,32 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // PWM (GPIO overrides it until reset)
+    for i in 0..d.num_inst(jabi::InstID::PWM)? {
+        println!("\tFlashing PWM {i} at 1Hz");
+        d.pwm_write(i, Duration::from_millis(500), Duration::from_millis(1000))?;
+        std::thread::sleep(Duration::from_millis(100));
+    }
+    if d.num_inst(jabi::InstID::PWM)? > 0 {
+        std::thread::sleep(Duration::from_secs(3));
+    }
+
     // GPIO
     for i in 0..d.num_inst(jabi::InstID::GPIO)? {
         println!("\tFlashing GPIO {i}");
         d.gpio_set_mode(i, jabi::GPIODir::Output, jabi::GPIOPull::None, false)?;
         for _ in 0..6 {
             d.gpio_write(i, false)?;
-            std::thread::sleep(std::time::Duration::from_millis(25));
+            std::thread::sleep(Duration::from_millis(25));
             d.gpio_write(i, true)?;
-            std::thread::sleep(std::time::Duration::from_millis(25));
+            std::thread::sleep(Duration::from_millis(25));
         }
     }
     for i in 0..d.num_inst(jabi::InstID::GPIO)? {
         d.gpio_set_mode(i, jabi::GPIODir::Input, jabi::GPIOPull::Up, false)?;
         println!("\tRead GPIO {i} w/ pullups: {}", d.gpio_read(i)?);
     }
+    println!();
 
     Ok(())
 }
