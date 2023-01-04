@@ -31,6 +31,23 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // SPI
+    for i in 0..d.num_inst(jabi::InstID::SPI)? {
+        println!("\tSetting SPI {i} to 250kHz, MODE0, LSB first");
+        d.spi_set_freq(i, 250000)?;
+        d.spi_set_mode(i, 0)?;
+        d.spi_set_bitorder(i, false)?;
+
+        d.spi_write(i, &vec![69])?;
+        println!("\t Wrote 69");
+        println!("\t Read {}", d.spi_read(i, 1)?[0]);
+        println!(
+            "\t Transceived out [1, 2, 3, 4], in {:?}",
+            d.spi_transceive(i, &vec![1, 2, 3, 4])?
+        );
+    }
+    println!();
+
     // I2C
     for i in 0..d.num_inst(jabi::InstID::I2C)? {
         println!("\tScanning for devices on I2C {i}");

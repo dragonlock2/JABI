@@ -9,6 +9,7 @@ mod peripherals {
     pub mod i2c;
     pub mod metadata;
     pub mod pwm;
+    pub mod spi;
 }
 
 pub use crate::device::Device;
