@@ -70,6 +70,18 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     }
     println!();
 
+    // ADC
+    for i in 0..d.num_inst(jabi::InstID::ADC)? {
+        println!("\tRead ADC {i} as {}V", d.adc_read(i)?);
+    }
+    println!();
+
+    // DAC
+    for i in 0..d.num_inst(jabi::InstID::DAC)? {
+        println!("\tSetting DAC {i} to 690mV");
+        d.dac_write(i, 0.690)?;
+    }
+
     Ok(())
 }
 

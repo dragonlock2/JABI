@@ -2,7 +2,9 @@ mod device;
 mod error;
 mod interfaces;
 mod peripherals {
+    pub mod adc;
     pub mod can;
+    pub mod dac;
     pub mod gpio;
     pub mod i2c;
     pub mod metadata;
