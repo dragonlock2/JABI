@@ -9,8 +9,14 @@
         compatible = "jabi,peripherals";
         can = <&flexcan0>;
         i2c = <&i2c0>;
-        gpio = <&led_red &led_green &led_blue &user_button &sd_detect &usbid_0 &usbid_1>;
-        spi = <&spi0>;
+        gpio = <&led_red &led_green &led_blue &user_button &sd_detect &usbid_0 &usbid_1 &sd_cs>;
+        spi = <&spi0 &spi1>;
+    };
+
+    leds {
+        sd_cs: sd_cs {
+            gpios = <&gpioe 4 GPIO_ACTIVE_LOW>;
+        };
     };
 };
 
@@ -18,4 +24,12 @@
     cdc_acm_uart0: cdc_acm_uart0 {
         compatible = "zephyr,cdc-acm-uart";
     };
+};
+
+&spi1 {
+    /delete-property/ cs-gpios;
+};
+
+&sdhc0 {
+    status = "disabled";
 };
