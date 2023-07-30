@@ -335,8 +335,8 @@ PERIPH_FUNC_DEF(can_read) {
     ret->num_left = sys_cpu_to_le16(k_msgq_num_used_get(can->msgq));
     ret->id       = sys_cpu_to_le32(msg.id);
     ret->id_type  = msg.flags & CAN_FRAME_IDE;
-    ret->fd       = msg.flags & CAN_FRAME_FDF;
-    ret->brs      = msg.flags & CAN_FRAME_BRS;
+    ret->fd       = msg.flags & CAN_FRAME_FDF; // not always accurate
+    ret->brs      = msg.flags & CAN_FRAME_BRS; // not always accurate
     ret->rtr      = msg.flags & CAN_FRAME_RTR;
     ret->data_len = can_dlc_to_bytes(msg.dlc);
     *resp_len = sizeof(can_read_resp_t);
