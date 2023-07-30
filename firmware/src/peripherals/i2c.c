@@ -38,7 +38,7 @@ PERIPH_FUNC_DEF(i2c_set_freq) {
             LOG_ERR("invalid speed preset");
             return JABI_INVALID_ARGS_ERR;
     }
-    if (i2c_configure(i2c_devs[idx], I2C_MODE_MASTER | I2C_SPEED_SET(speed))) {
+    if (i2c_configure(i2c_devs[idx], I2C_MODE_CONTROLLER | I2C_SPEED_SET(speed))) {
         LOG_ERR("failed to set config");
         return JABI_PERIPHERAL_ERR;
     }

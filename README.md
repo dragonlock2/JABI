@@ -12,7 +12,7 @@ Interfaces are the available methods by which a single client may connect. Multi
 Microcontroller peripherals are made available over each interface via a custom basic RPC. Each interface listens for request packets and dispatches them to the appropriate peripheral. Multiple instances of each peripheral type is supported. The following peripherals are currently supported.
 
 - Metadata
-- CAN FD
+- CAN (FD)
 - LIN
 - SPI controller
 - I2C controller
@@ -109,7 +109,7 @@ Fun things to look into one day.
 - Unit testing...
 - Deploying clients to package managers, no more local install!
 - Alternative functions for pins
-- Thrift support [coming to Zephyr](https://github.com/zephyrproject-rtos/zephyr/issues/51620)
+- Move to Thrift for RPC (natively supported in Zephyr!)
     - Network (Ethernet, WiFi) support
 - BLE support
 - USB Linux drivers to show up under `/dev`

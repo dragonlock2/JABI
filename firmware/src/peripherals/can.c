@@ -17,11 +17,16 @@ LOG_MODULE_REGISTER(periph_can, CONFIG_LOG_DEFAULT_LEVEL);
 #define SEND_TIMEOUT K_MSEC(500) // smaller than libjabi timeout
 
 typedef struct {
+    struct can_filter filter;
+    int id;
+} can_filter_data_t;
+
+typedef struct {
     const struct device *dev;
-    struct can_filter filter_std;
-    struct can_filter filter_ext;
-    int std_id;
-    int ext_id;
+    can_filter_data_t filter_std;
+    can_filter_data_t filter_ext;
+    can_filter_data_t filter_std_fd;
+    can_filter_data_t filter_ext_fd;
     struct k_msgq *msgq;
     struct k_sem tx_lock;
     bool tx_was_busy;
@@ -30,21 +35,31 @@ typedef struct {
 #define GEN_CAN_MSGQ(node_id, prop, idx) \
     CAN_MSGQ_DEFINE(can_msgq##idx, CONFIG_JABI_CAN_BUFFER_SIZE);
 
-#define GEN_CAN_DEV_DATA(node_id, prop, idx)                      \
-    {                                                             \
-        .dev = DEVICE_DT_GET(DT_PROP_BY_IDX(node_id, prop, idx)), \
-        .filter_std = {                                           \
-            .id_type = CAN_STANDARD_IDENTIFIER,                   \
-            .id_mask = 0,                                         \
-            .rtr_mask = 0,                                        \
-        },                                                        \
-        .filter_ext = {                                           \
-            .id_type = CAN_EXTENDED_IDENTIFIER,                   \
-            .id_mask = 0,                                         \
-            .rtr_mask = 0,                                        \
-        },                                                        \
-        .msgq = &can_msgq##idx,                                   \
-        .tx_was_busy = false,                                     \
+#define GEN_CAN_DEV_DATA(node_id, prop, idx)                                             \
+    {                                                                                    \
+        .dev = DEVICE_DT_GET(DT_PROP_BY_IDX(node_id, prop, idx)),                        \
+        .filter_std.filter = {                                                           \
+            .id = 0,                                                                     \
+            .mask = 0,                                                                   \
+            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA,                                   \
+        },                                                                               \
+        .filter_ext.filter = {                                                           \
+            .id = 0,                                                                     \
+            .mask = 0,                                                                   \
+            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_IDE,                  \
+        },                                                                               \
+        .filter_std_fd.filter = {                                                        \
+            .id = 0,                                                                     \
+            .mask = 0,                                                                   \
+            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_FDF,                  \
+        },                                                                               \
+        .filter_ext_fd.filter = {                                                        \
+            .id = 0,                                                                     \
+            .mask = 0,                                                                   \
+            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_IDE | CAN_FILTER_FDF, \
+        },                                                                               \
+        .msgq = &can_msgq##idx,                                                          \
+        .tx_was_busy = false,                                                            \
     },
 
 DT_FOREACH_PROP_ELEM(JABI_PERIPH_NODE, can, GEN_CAN_MSGQ);
@@ -63,12 +78,20 @@ static int can_init(uint16_t idx) {
         LOG_ERR("failed to start can%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
-    can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
-    can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
-    if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
+    can->filter_std.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std.filter);
+    can->filter_ext.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext.filter);
+    if (can->filter_std.id == -ENOSPC || can->filter_ext.id == -ENOSPC) {
         LOG_ERR("failed to add filters for can%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
+#ifdef CONFIG_CAN_FD_MODE
+    can->filter_std_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std_fd.filter);
+    can->filter_ext_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext_fd.filter);
+    if (can->filter_std_fd.id == -ENOSPC || can->filter_ext_fd.id == -ENOSPC) {
+        LOG_ERR("failed to add FD filters for can%d", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
+#endif
     k_sem_init(&can->tx_lock, 0, 1);
     return JABI_NO_ERR;
 }
@@ -89,26 +112,50 @@ PERIPH_FUNC_DEF(can_set_filter) {
         tmp->id, tmp->id_mask, tmp->rtr, tmp->rtr_mask);
 
     can_dev_data_t *can = &can_devs[idx];
-    can_remove_rx_filter(can->dev, can->std_id);
-    can_remove_rx_filter(can->dev, can->ext_id);
+    can_remove_rx_filter(can->dev, can->filter_std.id);
+    can_remove_rx_filter(can->dev, can->filter_ext.id);
+#ifdef CONFIG_CAN_FD_MODE
+    can_remove_rx_filter(can->dev, can->filter_std_fd.id);
+    can_remove_rx_filter(can->dev, can->filter_ext_fd.id);
+#endif
 
-    can->filter_std.id       = args->id;
-    can->filter_std.id_mask  = args->id_mask;
-    can->filter_std.rtr      = args->rtr ? CAN_REMOTEREQUEST : CAN_DATAFRAME;
-    can->filter_std.rtr_mask = args->rtr_mask ? 1 : 0;
-    can->filter_ext.id       = args->id;
-    can->filter_ext.id_mask  = args->id_mask;
-    can->filter_ext.rtr      = args->rtr ? CAN_REMOTEREQUEST : CAN_DATAFRAME;
-    can->filter_ext.rtr_mask = args->rtr_mask ? 1 : 0;
+    uint8_t flags = 0;
+    if (args->rtr_mask) {
+        flags = args->rtr ? CAN_FILTER_RTR : CAN_FILTER_DATA;
+    } else {
+        flags = CAN_FILTER_RTR | CAN_FILTER_DATA;
+    }
+    can->filter_std.filter.id       = args->id;
+    can->filter_ext.filter.id       = args->id;
+    can->filter_std_fd.filter.id    = args->id;
+    can->filter_ext_fd.filter.id    = args->id;
+    can->filter_std.filter.mask     = args->id_mask;
+    can->filter_ext.filter.mask     = args->id_mask;
+    can->filter_std_fd.filter.mask  = args->id_mask;
+    can->filter_ext_fd.filter.mask  = args->id_mask;
+    can->filter_std.filter.flags    = flags;
+    can->filter_ext.filter.flags    = flags | CAN_FILTER_IDE;
+    can->filter_std_fd.filter.flags = flags | CAN_FILTER_FDF;
+    can->filter_ext_fd.filter.flags = flags | CAN_FILTER_IDE | CAN_FILTER_FDF;
 
     if (args->id_mask <= CAN_STD_ID_MASK) {
-        can->std_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std);
+        can->filter_std.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std.filter);
     }
-    can->ext_id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext);
-    if (can->std_id == -ENOSPC || can->ext_id == -ENOSPC) {
+    can->filter_ext.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext.filter);
+    if (can->filter_std.id == -ENOSPC || can->filter_ext.id == -ENOSPC) {
         LOG_ERR("failed to change filters for can%d, old filter also removed", idx);
         return JABI_PERIPHERAL_ERR;
     }
+#ifdef CONFIG_CAN_FD_MODE
+    if (args->id_mask <= CAN_STD_ID_MASK) {
+        can->filter_std_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std_fd.filter);
+    }
+    can->filter_ext_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext_fd.filter);
+    if (can->filter_std_fd.id == -ENOSPC || can->filter_ext_fd.id == -ENOSPC) {
+        LOG_ERR("failed to change FD filters for can%d, old filter also removed", idx);
+        return JABI_PERIPHERAL_ERR;
+    }
+#endif // CONFIG_CAN_FD_MODE
 
     *resp_len = 0;
     return JABI_NO_ERR;
@@ -236,12 +283,12 @@ PERIPH_FUNC_DEF(can_write) {
     }
 
     struct can_frame msg = {
-        .id      = args->id,
-        .id_type = args->id_type ? CAN_EXTENDED_IDENTIFIER : CAN_STANDARD_IDENTIFIER,
-        .fd      = args->fd ? 1 : 0,
-        .brs     = args->brs ? 1 : 0,
-        .rtr     = args->rtr ? CAN_REMOTEREQUEST : CAN_DATAFRAME,
-        .dlc     = can_bytes_to_dlc(args->data_len),
+        .id    = args->id,
+        .dlc   = can_bytes_to_dlc(args->data_len),
+        .flags = (args->id_type ? CAN_FRAME_IDE : 0) |
+                 (args->rtr     ? CAN_FRAME_RTR : 0) |
+                 (args->fd      ? CAN_FRAME_FDF : 0) |
+                 (args->brs     ? CAN_FRAME_BRS : 0),
     };
     if (args->data_len != can_dlc_to_bytes(msg.dlc)) {
         LOG_WRN("data_len too small for packet, padding with zeros");
@@ -287,10 +334,10 @@ PERIPH_FUNC_DEF(can_read) {
 
     ret->num_left = sys_cpu_to_le16(k_msgq_num_used_get(can->msgq));
     ret->id       = sys_cpu_to_le32(msg.id);
-    ret->id_type  = msg.id_type == CAN_EXTENDED_IDENTIFIER;
-    ret->fd       = msg.fd;
-    ret->brs      = msg.brs;
-    ret->rtr      = msg.rtr == CAN_REMOTEREQUEST;
+    ret->id_type  = msg.flags & CAN_FRAME_IDE;
+    ret->fd       = msg.flags & CAN_FRAME_FDF;
+    ret->brs      = msg.flags & CAN_FRAME_BRS;
+    ret->rtr      = msg.flags & CAN_FRAME_RTR;
     ret->data_len = can_dlc_to_bytes(msg.dlc);
     *resp_len = sizeof(can_read_resp_t);
     if (!ret->rtr) {

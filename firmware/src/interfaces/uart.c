@@ -1,3 +1,4 @@
+#include <zephyr/kernel.h>
 #include <zephyr/drivers/uart.h>
 #include <jabi.h>
 
