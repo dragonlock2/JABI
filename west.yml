@@ -6,7 +6,7 @@ manifest:
   projects:
     - name: zephyrboards
       remote: dragonlock2
-      revision: 99a69a434e5e58fa4bd8425176d6b884554f5fab
+      revision: ce6266d9ef271dc6f0ec8a41f4e46c587bc2e67b
       import: true
 
   self:
