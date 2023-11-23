@@ -55,7 +55,7 @@ def testDevice(d):
         else:
             print("\t Failed to send message")
         print("\t Printing received messages")
-        while (msg := d.can_read(i)):
+        while (msg := d.lin_read(i)):
             print("\t", msg)
     print()
 
@@ -138,5 +138,5 @@ if __name__ == "__main__":
         testDevice(d)
 
     print("Found UART: ", end="")
-    testDevice(jabi.UARTInterface.get_device("COM5", 230400))
+    testDevice(jabi.UARTInterface.get_device("/dev/tty.usbserial-0001", 57600))
     print("done!")

@@ -1,0 +1,17 @@
+/ {
+    interfaces {
+        compatible = "jabi,interfaces";
+        uart = <&uart0>;
+    };
+
+    peripherals {
+        compatible = "jabi,peripherals";
+        lin = <&lin0>; // TODO add rest
+        uart = <&uart2 &uart3 &uart4>; // TODO remove
+        gpio = <&led_r &led_g &led_b &pwr_en>;
+    };
+};
+
+&uart0 {
+    current-speed = <57600>; // losing bytes when higher
+};
