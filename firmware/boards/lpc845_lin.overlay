@@ -6,8 +6,7 @@
 
     peripherals {
         compatible = "jabi,peripherals";
-        lin = <&lin0>; // TODO add rest
-        uart = <&uart2 &uart3 &uart4>; // TODO remove
+        lin = <&lin0 &lin1 &lin2 &lin3>;
         gpio = <&led_r &led_g &led_b &pwr_en>;
     };
 };
