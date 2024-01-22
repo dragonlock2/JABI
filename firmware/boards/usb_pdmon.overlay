@@ -1,0 +1,20 @@
+/ {
+    interfaces {
+        compatible = "jabi,interfaces";
+        usb;
+        uart = <>;
+    };
+
+    peripherals {
+        compatible = "jabi,peripherals";
+        gpio = <&led_r &led_g &led_b &vbus_en>;
+        uart = <&usart2>;
+        adc { // TODO make easier to setup
+            compatible = "jabi,adc";
+            devices     = <&adc1 &adc1>;
+            channels    = <0     1>; // ibus_mon, vbus_mon 
+            resolutions = <12    12>;
+            vrefs-mv    = <3300  36300>;
+        };
+    };
+};
