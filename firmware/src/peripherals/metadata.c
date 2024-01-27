@@ -85,12 +85,20 @@ PERIPH_FUNC_DEF(resp_max_size) {
     return JABI_NO_ERR;
 }
 
+__attribute__((weak)) // allow boards to override
+int16_t jabi_metadata_custom(uint16_t idx, uint8_t *req, uint16_t req_len,
+        uint8_t *resp, uint16_t *resp_len) {
+    LOG_ERR("board doesn't support custom commands");
+    return JABI_NOT_SUPPORTED_ERR;
+}
+
 static const periph_func_t metadata_periph_fns[] = {
     serial,
     num_inst,
     echo,
     req_max_size,
     resp_max_size,
+    jabi_metadata_custom,
 };
 
 const struct periph_api_t metadata_periph_api = {

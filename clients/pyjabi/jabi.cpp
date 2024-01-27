@@ -136,6 +136,7 @@ PYBIND11_MODULE(jabi, m) {
         .def("echo", &Device::echo)
         .def("req_max_size", &Device::req_max_size)
         .def("resp_max_size", &Device::resp_max_size)
+        .def("custom", &Device::custom)
 
         /* CAN */
         .def("can_set_filter", &Device::can_set_filter,

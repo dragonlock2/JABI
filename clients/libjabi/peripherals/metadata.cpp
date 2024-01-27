@@ -102,4 +102,23 @@ size_t Device::resp_max_size() {
     return letoh<uint16_t>(ret->size);
 }
 
+std::vector<uint8_t> Device::custom(std::vector<uint8_t> data) {
+    if (data.size() > interface->get_req_max_size()) {
+        throw std::runtime_error("data too long");
+    }
+    iface_dynamic_req_t req = {
+        .msg = {
+            .periph_id   = PERIPH_METADATA_ID,
+            .periph_idx  = 0,
+            .periph_fn   = METADATA_CUSTOM_ID,
+            .payload_len = static_cast<uint16_t>(data.size()),
+            .payload     = {0},
+        },
+        .payload = data,
+    };
+
+    iface_dynamic_resp_t resp = interface->send_request(req);
+    return resp.payload;
+}
+
 };
