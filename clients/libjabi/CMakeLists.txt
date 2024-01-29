@@ -15,15 +15,16 @@ add_library(libjabi
     peripherals/lin.cpp
 )
 
-find_package(libusb CONFIG QUIET)
-if(NOT ${libusb_FOUND})
-    find_library(LIBUSB_LIBRARIES NAMES usb-1.0)
-    find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES libusb-1.0)
-endif()
-
 if(MSVC)
-    target_link_libraries(libjabi ${LIBUSB_LIBRARIES})
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
+    target_link_libraries(libjabi PkgConfig::libusb)
 else()
+    find_package(libusb CONFIG QUIET)
+    if(NOT ${libusb_FOUND})
+        find_library(LIBUSB_LIBRARIES NAMES usb-1.0)
+        find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h PATH_SUFFIXES libusb-1.0)
+    endif()
     target_link_libraries(libjabi pthread ${LIBUSB_LIBRARIES})
 endif()
 

@@ -17,7 +17,6 @@ target_include_directories(jabiproto SYSTEM PUBLIC
 )
 
 target_link_libraries(jabiproto PUBLIC
-    ${Protobuf_LIBRARIES}
     gRPC::grpc++
 )
 

@@ -63,12 +63,12 @@ First let's install a few dependencies.
     - `apt install git cmake libusb-1.0-0-dev libssl-dev`
     - Install [grpc](https://github.com/grpc/grpc/blob/master/BUILDING.md) from source.
 - Windows
-    - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler. It's also an IDE.
+    - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
-    - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt` under the right triplet (e.g. `x64-windows`).
+    - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt`.
     - Use [Zadig](https://zadig.akeo.ie) to install the [WinUSB](https://github.com/libusb/libusb/wiki/Windows#driver-installation) driver on any `JABI USB` devices.
 
-We use CMake for our build system which has the following standard build process. For macOS gRPC projects, you may need to do `cmake .. -DOPENSSL_ROOT_DIR=$(brew --prefix openssl)` instead.
+We use CMake for our build system which has the following standard build process.
 
 ```
 cd <project path>
