@@ -21,6 +21,7 @@ enum Func {
     Echo = 2,
     ReqMaxSize = 3,
     RespMaxSize = 4,
+    Custom = 5,
 }
 
 fn gen_req(f: Func, payload: Vec<u8>) -> Result<InterfaceRequest, Error> {
@@ -92,5 +93,9 @@ impl crate::Device {
             Ok(((s, _), ret)) if s.len() == 0 => Ok(ret.size as usize),
             _ => Err(Error::PacketFormat),
         }
+    }
+
+    pub fn custom(&self, data: Vec<u8>) -> Result<Vec<u8>, Error> {
+        self.send(&gen_req(Func::Custom, data)?)
     }
 }
