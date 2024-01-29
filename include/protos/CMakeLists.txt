@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20.0)
 
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Protobuf REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 
 add_library(jabiproto

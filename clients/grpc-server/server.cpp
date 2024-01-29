@@ -40,6 +40,13 @@ Status JABIServiceImpl::resp_max_size(ServerContext*, const Empty*, UInt32Value*
     )
 }
 
+Status JABIServiceImpl::custom(ServerContext*, const BytesValue* req, BytesValue* resp) {
+    CHECK_EXCEPT(
+        auto v = dev->custom(std::vector<uint8_t>(req->value().begin(), req->value().end()));
+        resp->set_value(std::string(v.begin(), v.end()));
+    )
+}
+
 /* CAN */
 Status JABIServiceImpl::can_set_filter(ServerContext*, const CANSetFilterRequest* req, Empty*) {
     CHECK_EXCEPT(

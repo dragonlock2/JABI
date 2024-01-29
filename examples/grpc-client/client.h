@@ -132,6 +132,7 @@ public:
     std::string echo(std::string str);
     size_t req_max_size();
     size_t resp_max_size();
+    std::vector<uint8_t> custom(std::vector<uint8_t> data);
 
     /* CAN */
     void can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx=0);

@@ -10,6 +10,7 @@ service Device {
     rpc echo (google.protobuf.StringValue) returns (google.protobuf.StringValue);
     rpc req_max_size (google.protobuf.Empty) returns (google.protobuf.UInt32Value);
     rpc resp_max_size (google.protobuf.Empty) returns (google.protobuf.UInt32Value);
+    rpc custom(google.protobuf.BytesValue) returns (google.protobuf.BytesValue);
 
     /* CAN */
     rpc can_set_filter(CANSetFilterRequest) returns (google.protobuf.Empty);

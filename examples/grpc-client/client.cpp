@@ -72,6 +72,18 @@ size_t gRPCDevice::resp_max_size() {
     return resp.value();
 }
 
+std::vector<uint8_t> gRPCDevice::custom(std::vector<uint8_t> data) {
+    BytesValue req;
+    BytesValue resp;
+    ClientContext ctx;
+    req.set_value(std::string(data.begin(), data.end()));
+    Status status = stub->custom(&ctx, req, &resp);
+    if (!status.ok()) {
+        throw std::runtime_error("fail");
+    }
+    return std::vector<uint8_t>(resp.value().begin(), resp.value().end());
+}
+
 /* CAN */
 CANMessage::CANMessage()
 :
