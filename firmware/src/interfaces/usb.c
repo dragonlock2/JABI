@@ -10,6 +10,7 @@ LOG_MODULE_REGISTER(iface_usb, CONFIG_LOG_DEFAULT_LEVEL);
 
 /* USB configuration */
 #define JABI_IF_STR "JABI USB" // host will search for this
+#define JABI_VENDOR_CODE (0x69)
 
 USBD_CLASS_DESCR_DEFINE(primary, 0) struct {
     struct usb_if_descriptor if0;
@@ -73,6 +74,61 @@ static void usb_jabi_interface_config(struct usb_desc_header *head,
     usb_if_desc.if0.iInterface = usb_get_str_descriptor_idx(&usb_str_desc);
 }
 
+static int custom_handler(struct usb_setup_packet *setup, int32_t *len, uint8_t **data) {
+    // from https://github.com/pbatard/libwdi/wiki/WCID-Devices
+    static uint8_t msos1_str_desc[] = {
+        0x12,                   // 18 byte length
+        0x03,                   // string type
+        0x4D, 0x00, 0x53, 0x00, // "MSFT100" in UTF16LE
+        0x46, 0x00, 0x54, 0x00,
+        0x31, 0x00, 0x30, 0x00,
+        0x30, 0x00,
+        JABI_VENDOR_CODE,       // vendor code
+        0x00,                   // pad
+    };
+
+    // from zephyr/samples/subsys/usb/webusb/src/main.c
+    if (usb_reqtype_is_to_device(setup)) {
+        return -ENOTSUP;
+    }
+    if (USB_GET_DESCRIPTOR_TYPE(setup->wValue) == USB_DESC_STRING &&
+        USB_GET_DESCRIPTOR_INDEX(setup->wValue) == 0xEE) {
+        *data = msos1_str_desc;
+        *len = sizeof(msos1_str_desc);
+        return 0;
+    }
+    return -EINVAL;
+}
+
+static int vendor_handler(struct usb_setup_packet *setup, int32_t *len, uint8_t **data) {
+    // from https://github.com/pbatard/libwdi/wiki/WCID-Devices
+    static uint8_t msos1_compatid_desc[] = {
+        0x28, 0x00, 0x00, 0x00,                         // 40 byte length
+        0x00, 0x01,                                     // version 1.0
+        0x04, 0x00,                                     // wIndex
+        0x01,                                           // 1 section
+        0x00, 0x00, 0x00, 0x00,                         // reserved
+        0x00, 0x00, 0x00,
+        0x00,                                           // interface this applies to
+        0x01,                                           // reserved
+        'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,       // compatible ID
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // sub-compatible ID
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00,             // reserved
+    };
+    msos1_compatid_desc[16] = usb_if_desc.if0.bInterfaceNumber;
+
+    // from zephyr/samples/subsys/usb/webusb/src/main.c
+    if (usb_reqtype_is_to_device(setup)) {
+        return -ENOTSUP;
+    }
+    if (setup->bRequest == JABI_VENDOR_CODE && setup->wIndex == 0x0004) {
+        *data = msos1_compatid_desc;
+		*len = sizeof(msos1_compatid_desc);
+		return 0;
+    }
+    return -EINVAL;
+}
+
 USBD_DEFINE_CFG_DATA(usb_config) = {
     .usb_device_description = NULL,
     .interface_descriptor = &usb_if_desc.if0,
@@ -80,8 +136,8 @@ USBD_DEFINE_CFG_DATA(usb_config) = {
     .cb_usb_status = NULL,
     .interface = {
         .class_handler = NULL,
-        .vendor_handler = NULL,
-        .custom_handler = NULL,
+        .vendor_handler = vendor_handler,
+        .custom_handler = custom_handler,
     },
     .num_endpoints = ARRAY_SIZE(ep_cfg),
     .endpoint = ep_cfg,

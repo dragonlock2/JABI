@@ -66,7 +66,6 @@ First let's install a few dependencies.
     - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
     - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt`.
-    - From Device Manager, associate the "WinUsb Device" driver (under "Universal Serial Bus devices") with any `JABI USB` devices.
 
 We use CMake for our build system which has the following standard build process.
 
