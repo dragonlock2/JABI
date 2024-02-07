@@ -1,5 +1,6 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/usb/usb_device.h>
+#include <usb_descriptor.h>
 #include <jabi.h>
 
 #include <zephyr/logging/log.h>
@@ -7,34 +8,14 @@ LOG_MODULE_REGISTER(iface_usb, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if DT_PROP(JABI_IFACE_NODE, usb)
 
-#define JABI_IF_STR "JABI USB"
+/* USB configuration */
+#define JABI_IF_STR "JABI USB" // host will search for this
 
-#define AUTO_EP_IN  0x80
-#define AUTO_EP_OUT 0x00
-
-#ifdef CONFIG_USB_DC_HAS_HS_SUPPORT
-#define MPS 512
-#else
-#define MPS 64
-#endif // IS_ENABLED(CONFIG_USB_DC_HAS_HS_SUPPORT)
-
-#define UTF16LE_LEN(s) (sizeof(s) * 2 - 2)
-
-extern int usb_get_str_descriptor_idx(void *ptr);
-
-struct usb_jabi_config {
+USBD_CLASS_DESCR_DEFINE(primary, 0) struct {
     struct usb_if_descriptor if0;
     struct usb_ep_descriptor if0_out_ep;
     struct usb_ep_descriptor if0_in_ep;
-} __packed;
-
-struct usb_jabi_str {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    uint8_t bString[UTF16LE_LEN(JABI_IF_STR)];
-} __packed;
-
-USBD_CLASS_DESCR_DEFINE(primary, 0) struct usb_jabi_config usb_cfg = {
+} __packed usb_if_desc = {
     .if0 = {
         .bLength = sizeof(struct usb_if_descriptor),
         .bDescriptorType = USB_DESC_INTERFACE,
@@ -46,28 +27,30 @@ USBD_CLASS_DESCR_DEFINE(primary, 0) struct usb_jabi_config usb_cfg = {
         .bInterfaceProtocol = 0,
         .iInterface = 0,
     },
-
     .if0_out_ep = {
         .bLength = sizeof(struct usb_ep_descriptor),
         .bDescriptorType = USB_DESC_ENDPOINT,
         .bEndpointAddress = AUTO_EP_OUT,
         .bmAttributes = USB_DC_EP_BULK,
-        .wMaxPacketSize = sys_cpu_to_le16(MPS),
+        .wMaxPacketSize = sys_cpu_to_le16(CONFIG_JABI_USB_MPS),
         .bInterval = 0x00,
     },
-
     .if0_in_ep = {
         .bLength = sizeof(struct usb_ep_descriptor),
         .bDescriptorType = USB_DESC_ENDPOINT,
         .bEndpointAddress = AUTO_EP_IN,
         .bmAttributes = USB_DC_EP_BULK,
-        .wMaxPacketSize = sys_cpu_to_le16(MPS),
+        .wMaxPacketSize = sys_cpu_to_le16(CONFIG_JABI_USB_MPS),
         .bInterval = 0x00,
     },
 };
 
-USBD_STRING_DESCR_USER_DEFINE(primary) struct usb_jabi_str usb_if_str = {
-    .bLength = (UTF16LE_LEN(JABI_IF_STR) + 2),
+USBD_STRING_DESCR_USER_DEFINE(primary) struct {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bString[USB_BSTRING_LENGTH(JABI_IF_STR)];
+} __packed usb_str_desc = {
+    .bLength = USB_STRING_DESCRIPTOR_LENGTH(JABI_IF_STR),
     .bDescriptorType = USB_DESC_STRING,
     .bString = JABI_IF_STR,
 };
@@ -83,19 +66,16 @@ static struct usb_ep_cfg_data ep_cfg[] = {
     },
 };
 
-#define JABI_EP_OUT (ep_cfg[0].ep_addr)
-#define JABI_EP_IN  (ep_cfg[1].ep_addr)
-
 static void usb_jabi_interface_config(struct usb_desc_header *head,
                                       uint8_t bInterfaceNumber) {
     ARG_UNUSED(head);
-    usb_cfg.if0.bInterfaceNumber = bInterfaceNumber;
-    usb_cfg.if0.iInterface = usb_get_str_descriptor_idx(&usb_if_str);
+    usb_if_desc.if0.bInterfaceNumber = bInterfaceNumber;
+    usb_if_desc.if0.iInterface = usb_get_str_descriptor_idx(&usb_str_desc);
 }
 
 USBD_DEFINE_CFG_DATA(usb_config) = {
     .usb_device_description = NULL,
-    .interface_descriptor = &usb_cfg.if0,
+    .interface_descriptor = &usb_if_desc.if0,
     .interface_config = usb_jabi_interface_config,
     .cb_usb_status = NULL,
     .interface = {
@@ -107,6 +87,7 @@ USBD_DEFINE_CFG_DATA(usb_config) = {
     .endpoint = ep_cfg,
 };
 
+/* JABI API implementation */
 static int usb_init() {
     return 0;
 }
@@ -114,7 +95,7 @@ static int usb_init() {
 static void usb_get_req(iface_req_t *req) {
     while (1) { // loop until packet received
         req->payload_len = 0;
-        int len = usb_transfer_sync(JABI_EP_OUT, (uint8_t*) req,
+        int len = usb_transfer_sync(ep_cfg[0].ep_addr, (uint8_t*) req,
                                     sizeof(iface_req_t), USB_TRANS_READ);
         if (len < 0) {
             LOG_ERR("transfer failed");
@@ -136,7 +117,7 @@ static void usb_send_resp(iface_resp_t *resp) {
     }
     iface_resp_to_le(resp);
     size_t expect_len = IFACE_RESP_HDR_SIZE + resp->payload_len;
-    int len = usb_transfer_sync(JABI_EP_IN, (uint8_t*) resp, 
+    int len = usb_transfer_sync(ep_cfg[1].ep_addr, (uint8_t*) resp,
                                 expect_len, USB_TRANS_WRITE);
     if (len < 0 || len != expect_len) {
         LOG_ERR("failed to send response %d", len);

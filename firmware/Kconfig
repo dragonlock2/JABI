@@ -6,6 +6,11 @@ config JABI_SERIAL
     help
         must be non-empty
 
+config JABI_USB_MPS
+    int "max packet size of USB bulk transfers"
+    default 512 if USB_DC_HAS_HS_SUPPORT
+    default 64
+
 config JABI_CAN_BUFFER_SIZE
     int "CAN buffer size"
     default 32
