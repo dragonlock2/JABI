@@ -2,7 +2,7 @@
     interfaces {
         compatible = "jabi,interfaces";
         usb;
-        uart = <&cdc_acm_uart0>;
+        uart = <>;
     };
 
     peripherals {
@@ -20,12 +20,6 @@
         sd_cs: sd_cs {
             gpios = <&gpioe 4 GPIO_ACTIVE_LOW>;
         };
-    };
-};
-
-&zephyr_udc0 {
-    cdc_acm_uart0: cdc_acm_uart0 {
-        compatible = "zephyr,cdc-acm-uart";
     };
 };
 

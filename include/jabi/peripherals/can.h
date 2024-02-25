@@ -8,8 +8,6 @@
 PACKED(can_set_filter_req_t,
     uint32_t id;
     uint32_t id_mask;
-    uint8_t  rtr; /* 0=data frame, 1=remote request */
-    uint8_t  rtr_mask;
 );
 
 PACKED(can_set_rate_req_t,

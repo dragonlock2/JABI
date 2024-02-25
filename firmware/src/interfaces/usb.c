@@ -1,12 +1,13 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/usb/usb_device.h>
-#include <usb_descriptor.h>
 #include <jabi.h>
+
+#if DT_PROP(JABI_IFACE_NODE, usb)
+
+#include <usb_descriptor.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(iface_usb, CONFIG_LOG_DEFAULT_LEVEL);
-
-#if DT_PROP(JABI_IFACE_NODE, usb)
 
 /* USB configuration */
 #define JABI_IF_STR "JABI USB" // host will search for this

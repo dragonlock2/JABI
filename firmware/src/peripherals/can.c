@@ -25,8 +25,6 @@ typedef struct {
     const struct device *dev;
     can_filter_data_t filter_std;
     can_filter_data_t filter_ext;
-    can_filter_data_t filter_std_fd;
-    can_filter_data_t filter_ext_fd;
     struct k_msgq *msgq;
     struct k_sem tx_lock;
     bool tx_was_busy;
@@ -41,22 +39,12 @@ typedef struct {
         .filter_std.filter = {                                                           \
             .id = 0,                                                                     \
             .mask = 0,                                                                   \
-            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA,                                   \
+            .flags = 0,                                                                  \
         },                                                                               \
         .filter_ext.filter = {                                                           \
             .id = 0,                                                                     \
             .mask = 0,                                                                   \
-            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_IDE,                  \
-        },                                                                               \
-        .filter_std_fd.filter = {                                                        \
-            .id = 0,                                                                     \
-            .mask = 0,                                                                   \
-            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_FDF,                  \
-        },                                                                               \
-        .filter_ext_fd.filter = {                                                        \
-            .id = 0,                                                                     \
-            .mask = 0,                                                                   \
-            .flags = CAN_FILTER_RTR | CAN_FILTER_DATA | CAN_FILTER_IDE | CAN_FILTER_FDF, \
+            .flags = CAN_FILTER_IDE,                                                     \
         },                                                                               \
         .msgq = &can_msgq##idx,                                                          \
         .tx_was_busy = false,                                                            \
@@ -84,14 +72,6 @@ static int can_init(uint16_t idx) {
         LOG_ERR("failed to add filters for can%d", idx);
         return JABI_PERIPHERAL_ERR;
     }
-#ifdef CONFIG_CAN_FD_MODE
-    can->filter_std_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std_fd.filter);
-    can->filter_ext_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext_fd.filter);
-    if (can->filter_std_fd.id == -ENOSPC || can->filter_ext_fd.id == -ENOSPC) {
-        LOG_ERR("failed to add FD filters for can%d", idx);
-        return JABI_PERIPHERAL_ERR;
-    }
-#endif
     k_sem_init(&can->tx_lock, 0, 1);
     return JABI_NO_ERR;
 }
@@ -108,35 +88,19 @@ PERIPH_FUNC_DEF(can_set_filter) {
     args->id_mask = sys_le32_to_cpu(args->id_mask);
 
     can_set_filter_req_t *tmp = args; // LOG_DBG uses the name args...
-    LOG_DBG("(id=0x%x,id_mask=0x%x,rtr=%d,rtr_mask=%d)",
-        tmp->id, tmp->id_mask, tmp->rtr, tmp->rtr_mask);
+    LOG_DBG("(id=0x%x,id_mask=0x%x)", tmp->id, tmp->id_mask);
 
     can_dev_data_t *can = &can_devs[idx];
     can_remove_rx_filter(can->dev, can->filter_std.id);
     can_remove_rx_filter(can->dev, can->filter_ext.id);
-#ifdef CONFIG_CAN_FD_MODE
-    can_remove_rx_filter(can->dev, can->filter_std_fd.id);
-    can_remove_rx_filter(can->dev, can->filter_ext_fd.id);
-#endif
 
-    uint8_t flags = 0;
-    if (args->rtr_mask) {
-        flags = args->rtr ? CAN_FILTER_RTR : CAN_FILTER_DATA;
-    } else {
-        flags = CAN_FILTER_RTR | CAN_FILTER_DATA;
-    }
-    can->filter_std.filter.id       = args->id;
-    can->filter_ext.filter.id       = args->id;
-    can->filter_std_fd.filter.id    = args->id;
-    can->filter_ext_fd.filter.id    = args->id;
-    can->filter_std.filter.mask     = args->id_mask;
-    can->filter_ext.filter.mask     = args->id_mask;
-    can->filter_std_fd.filter.mask  = args->id_mask;
-    can->filter_ext_fd.filter.mask  = args->id_mask;
-    can->filter_std.filter.flags    = flags;
-    can->filter_ext.filter.flags    = flags | CAN_FILTER_IDE;
-    can->filter_std_fd.filter.flags = flags | CAN_FILTER_FDF;
-    can->filter_ext_fd.filter.flags = flags | CAN_FILTER_IDE | CAN_FILTER_FDF;
+    // RTR frames rejected by default, set CONFIG_CAN_ACCEPT_RTR=y to allow
+    can->filter_std.filter.id    = args->id;
+    can->filter_ext.filter.id    = args->id;
+    can->filter_std.filter.mask  = args->id_mask;
+    can->filter_ext.filter.mask  = args->id_mask;
+    can->filter_std.filter.flags = 0;
+    can->filter_ext.filter.flags = CAN_FILTER_IDE;
 
     if (args->id_mask <= CAN_STD_ID_MASK) {
         can->filter_std.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std.filter);
@@ -146,16 +110,6 @@ PERIPH_FUNC_DEF(can_set_filter) {
         LOG_ERR("failed to change filters for can%d, old filter also removed", idx);
         return JABI_PERIPHERAL_ERR;
     }
-#ifdef CONFIG_CAN_FD_MODE
-    if (args->id_mask <= CAN_STD_ID_MASK) {
-        can->filter_std_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_std_fd.filter);
-    }
-    can->filter_ext_fd.id = can_add_rx_filter_msgq(can->dev, can->msgq, &can->filter_ext_fd.filter);
-    if (can->filter_std_fd.id == -ENOSPC || can->filter_ext_fd.id == -ENOSPC) {
-        LOG_ERR("failed to change FD filters for can%d, old filter also removed", idx);
-        return JABI_PERIPHERAL_ERR;
-    }
-#endif // CONFIG_CAN_FD_MODE
 
     *resp_len = 0;
     return JABI_NO_ERR;

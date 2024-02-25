@@ -14,7 +14,8 @@ LOG_MODULE_REGISTER(periph_spi, CONFIG_LOG_DEFAULT_LEVEL);
         .configs[0] = {                                                           \
             .frequency = 1000000,                                                 \
             .operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_LINES_SINGLE, \
-            .cs = NULL,                                                           \
+            .slave = 0,                                                           \
+            .cs = {{0}},                                                          \
         },                                                                        \
         .curr_cfg = 0,                                                            \
         .stale = false,                                                           \
