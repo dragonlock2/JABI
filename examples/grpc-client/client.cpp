@@ -116,14 +116,12 @@ std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
     return os << s.str();
 }
 
-void gRPCDevice::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx) {
+void gRPCDevice::can_set_filter(int id, int id_mask, int idx) {
     JABI::CANSetFilterRequest req;
     Empty resp;
     ClientContext ctx;
     req.set_id(id);
     req.set_id_mask(id_mask);
-    req.set_rtr(rtr);
-    req.set_rtr_mask(rtr_mask);
     req.set_idx(idx);
     Status status = stub->can_set_filter(&ctx, req, &resp);
     if (!status.ok()) {

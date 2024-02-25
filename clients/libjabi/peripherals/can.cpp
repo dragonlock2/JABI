@@ -41,7 +41,7 @@ std::ostream &operator<<(std::ostream &os, CANMessage const &m) {
     return os << s.str();
 }
 
-void Device::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx) {
+void Device::can_set_filter(int id, int id_mask, int idx) {
     iface_dynamic_req_t req = {
         .msg = {
             .periph_id   = PERIPH_CAN_ID,
@@ -54,10 +54,8 @@ void Device::can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int id
     };
 
     auto args = reinterpret_cast<can_set_filter_req_t*>(req.payload.data());
-    args->id       = htole<uint32_t>(id);
-    args->id_mask  = htole<uint32_t>(id_mask);
-    args->rtr      = rtr;
-    args->rtr_mask = rtr_mask;
+    args->id      = htole<uint32_t>(id);
+    args->id_mask = htole<uint32_t>(id_mask);
 
     iface_dynamic_resp_t resp = interface->send_request(req);
     if (resp.payload.size() != 0) {

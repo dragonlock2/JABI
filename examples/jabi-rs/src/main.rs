@@ -15,7 +15,7 @@ fn test_device(d: &jabi::Device) -> Result<(), jabi::Error> {
     for i in 0..d.num_inst(jabi::InstID::CAN)? {
         println!("\tListening only to 0x69420 messages on CAN {i}");
         d.can_set_rate(i, 125000, 1000000)?;
-        d.can_set_filter(i, 0x69420, 0xFFFFF, false, false)?;
+        d.can_set_filter(i, 0x69420, 0xFFFFF)?;
         d.can_set_mode(i, jabi::CANMode::Normal)?;
         println!("\t{}", d.can_state(i)?);
 

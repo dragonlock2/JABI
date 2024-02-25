@@ -90,9 +90,7 @@ message NumInstRequest {
 message CANSetFilterRequest {
     uint32 id = 1;
     uint32 id_mask = 2;
-    bool rtr = 3;
-    bool rtr_mask = 4;
-    uint32 idx = 5;
+    uint32 idx = 3;
 }
 
 message CANSetRateRequest {

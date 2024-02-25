@@ -135,7 +135,7 @@ public:
     std::vector<uint8_t> custom(std::vector<uint8_t> data);
 
     /* CAN */
-    void can_set_filter(int id, int id_mask, bool rtr, bool rtr_mask, int idx=0);
+    void can_set_filter(int id, int id_mask, int idx=0);
     void can_set_rate(int bitrate, int bitrate_data, int idx=0);
     void can_set_mode(CANMode mode, int idx=0);
     CANState can_state(int idx=0);

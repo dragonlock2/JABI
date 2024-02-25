@@ -50,7 +50,7 @@ Status JABIServiceImpl::custom(ServerContext*, const BytesValue* req, BytesValue
 /* CAN */
 Status JABIServiceImpl::can_set_filter(ServerContext*, const CANSetFilterRequest* req, Empty*) {
     CHECK_EXCEPT(
-        dev->can_set_filter(req->id(), req->id_mask(), req->rtr(), req->rtr_mask(), req->idx());
+        dev->can_set_filter(req->id(), req->id_mask(), req->idx());
     )
 }
 

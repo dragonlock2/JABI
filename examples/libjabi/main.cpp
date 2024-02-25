@@ -21,7 +21,7 @@ void testDevice(jabi::Device d) {
     for (auto i = 0; i < lim; i++) {
         std::cout << "\tListening only to 0x69420 messages on CAN " << i << std::endl;
         d.can_set_rate(125000, 1000000, i);
-        d.can_set_filter(0x69420, 0xFFFFF, 0, 0, i);
+        d.can_set_filter(0x69420, 0xFFFFF, i);
         d.can_set_mode(jabi::CANMode::NORMAL, i);
         auto s = d.can_state(i);
         std::cout << "\tstate: " << s.state << " tx_err: " << s.tx_err;

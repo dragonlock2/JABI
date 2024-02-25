@@ -15,7 +15,7 @@ def testDevice(d):
     for i in range(d.num_inst(jabi.InstID.CAN)):
         print("\tListening only to 0x69420 messages on CAN", i)
         d.can_set_rate(125000, 1000000, i)
-        d.can_set_filter(0x69420, 0xFFFFF, 0, 0, i)
+        d.can_set_filter(0x69420, 0xFFFFF, i)
         d.can_set_mode(jabi.CANMode.NORMAL, i)
         s = d.can_state(i)
         print("\tstate:", s.state, "tx_err:", s.tx_err, "rx_err:", s.rx_err)

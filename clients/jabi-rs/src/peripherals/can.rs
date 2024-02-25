@@ -103,23 +103,14 @@ impl crate::Device {
         idx: usize, // Rust doesn't allow default args (yet)...
         id: u32,
         id_mask: u32,
-        rtr: bool,
-        rtr_mask: bool,
     ) -> Result<(), Error> {
         #[derive(DekuWrite)]
         #[deku(endian = "little")]
         struct SetFilterRequest {
             id: u32,
             id_mask: u32,
-            rtr: u8,
-            rtr_mask: u8,
         }
-        let req = SetFilterRequest {
-            id,
-            id_mask,
-            rtr: rtr as u8,
-            rtr_mask: rtr_mask as u8,
-        };
+        let req = SetFilterRequest { id, id_mask };
         let resp = self.send(&gen_req(Func::SetFilter, idx, req.to_bytes().unwrap())?)?;
         if resp.len() == 0 {
             Ok(())

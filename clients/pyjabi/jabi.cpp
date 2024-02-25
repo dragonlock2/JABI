@@ -139,8 +139,7 @@ PYBIND11_MODULE(jabi, m) {
         .def("custom", &Device::custom)
 
         /* CAN */
-        .def("can_set_filter", &Device::can_set_filter,
-            "id"_a, "id_mask"_a, "rtr"_a, "rtr_mask"_a, "idx"_a=0)
+        .def("can_set_filter", &Device::can_set_filter, "id"_a, "id_mask"_a, "idx"_a=0)
         .def("can_set_rate", &Device::can_set_rate,
             "bitrate"_a, "bitrate_data"_a, "idx"_a=0)
         .def("can_set_mode", &Device::can_set_mode, "mode"_a, "idx"_a=0)
