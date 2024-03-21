@@ -94,7 +94,7 @@ pip install clients/pyjabi
 
 #### jabi-rs
 
-[`jabi-rs`](clients/jabi-rs) is provided as a standard library crate and can be added locally to any project in `Cargo.toml`. An example project is in [examples/jabi-rs](examples/jabi-rs).
+[`jabi-rs`](clients/jabi-rs) is published on [crates.io](https://crates.io/crates/jabi). For the latest changes, it can be added locally to any project in `Cargo.toml`. An example project is in [examples/jabi-rs](examples/jabi-rs).
 
 ## TODO
 
