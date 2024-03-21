@@ -2,10 +2,12 @@
 name = "jabi"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "Apache-2.0"
+description = "Rust library for JABI (Just Another Bridge Interface)"
+repository = "https://github.com/dragonlock2/JABI"
+readme = "../../README.md"
 
 [dependencies]
-serial = "0.4.0"
-deku = "0.15.1"
-rusb = "0.9.1"
+serial = "0.4"
+deku = "0.16"
+rusb = "0.9"
