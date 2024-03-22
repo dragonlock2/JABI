@@ -7,6 +7,8 @@ description = "Rust library for JABI (Just Another Bridge Interface)"
 repository = "https://github.com/dragonlock2/JABI"
 readme = "../../README.md"
 
+# 'cargo publish' to update
+
 [dependencies]
 serial = "0.4"
 deku = "0.16"

@@ -3,8 +3,7 @@
 #include <grpcpp/grpcpp.h>
 #include "jabi.grpc.pb.h"
 
-#include <libjabi/interfaces/usb.h>
-#include <libjabi/interfaces/uart.h>
+#include <jabi.h>
 
 using grpc::Server;
 using grpc::ServerBuilder;

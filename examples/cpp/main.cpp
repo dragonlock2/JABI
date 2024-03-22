@@ -2,8 +2,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include <libjabi/interfaces/usb.h>
-#include <libjabi/interfaces/uart.h>
+#include <jabi.h>
 
 using namespace std::chrono_literals;
 

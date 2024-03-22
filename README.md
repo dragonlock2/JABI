@@ -24,10 +24,10 @@ Microcontroller peripherals are made available over each interface via a custom 
 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
-- `libjabi` - C++ library
-- `pyjabi` - Python library
-- `grpc-server` - gRPC server
-- `jabi-rs` - Rust library
+- C++
+- Python
+- gRPC
+- Rust
 
 ## Setup
 
@@ -55,7 +55,7 @@ west flash
 
 ### Clients
 
-First let's install a few dependencies.
+If you want to build from source, you'll need to install a few dependencies.
 
 - macOS
     - `brew install git cmake libusb grpc openssl`
@@ -67,34 +67,25 @@ First let's install a few dependencies.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
     - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt`.
 
-We use CMake for our build system which has the following standard build process.
+#### C++
+
+C++ support is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [examples/cpp](examples/cpp).
+
+#### Python
+
+A Python library is published on [PyPI](TODO). For the latest changes, it can be built and installed locally by running the following. An example using it is in [examples/python](examples/python).
 
 ```
-cd <project path>
-mkdir build && cd build
-cmake ..
-cmake --build .
+pip install clients/python
 ```
 
-#### libjabi
+#### gRPC
 
-[`libjabi`](clients/libjabi) is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [examples/libjabi](examples/libjabi).
+Protobuf definitions are located in [`jabi.proto`](include/protos/jabi.proto). [`grpc-server`](clients/grpc-server) is a reference server implementation that bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [examples/grpc-client](examples/grpc-client).
 
-#### pyjabi
+#### Rust
 
-[`pyjabi`](clients/pyjabi) can be installed from a local directory using `pip` for easy management. An example using it is in [examples/pyjabi](examples/pyjabi).
-
-```
-pip install clients/pyjabi
-```
-
-#### grpc-server
-
-[`grpc-server`](clients/grpc-server) bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [examples/grpc-client](examples/grpc-client).
-
-#### jabi-rs
-
-[`jabi-rs`](clients/jabi-rs) is published on [crates.io](https://crates.io/crates/jabi). For the latest changes, it can be added locally to any project in `Cargo.toml`. An example project is in [examples/jabi-rs](examples/jabi-rs).
+A Rust crate is published on [crates.io](https://crates.io/crates/jabi). For the latest changes, it can be added locally. An example project is in [examples/rust](examples/rust).
 
 ## TODO
 
@@ -106,7 +97,6 @@ Fun things to look into one day.
 
 - Better documentation...
 - Unit testing...
-- Deploying clients to package managers, no more local install!
 - Alternative functions for pins
 - Move to Thrift for RPC (natively supported in Zephyr!)
     - Network (Ethernet, WiFi) support

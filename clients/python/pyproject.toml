@@ -1,0 +1,28 @@
+[project]
+name = "jabi"
+version = "0.1.0"
+authors = [
+    { name = "Matthew Tran", email = "matthewlamtran@berkeley.edu" },
+]
+description = "Python library for JABI (Just Another Bridge Interface)"
+readme = "tmp/README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/dragonlock2/JABI"
+Issues = "https://github.com/dragonlock2/JABI/issues"
+
+[build-system]
+requires = ["setuptools>=69", "pybind11>=2.11"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["libusb", "tmp"]
+
+[tool.setuptools]
+include-package-data = false

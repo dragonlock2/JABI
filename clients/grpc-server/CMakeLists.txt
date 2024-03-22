@@ -13,10 +13,10 @@ else()
 endif()
 
 add_subdirectory(../../include/protos ${CMAKE_CURRENT_BINARY_DIR}/protos)
-add_subdirectory(../libjabi ${CMAKE_CURRENT_BINARY_DIR}/libjabi)
+add_subdirectory(../cpp ${CMAKE_CURRENT_BINARY_DIR}/cpp)
 add_executable(main
     main.cpp
     server.cpp
 )
 
-target_link_libraries(main jabiproto libjabi ${GETOPT_LIBRARIES})
+target_link_libraries(main jabiproto jabi ${GETOPT_LIBRARIES})

@@ -1,0 +1,7 @@
+graft tmp/clients/cpp
+graft tmp/include
+include tmp/README.md
+
+recursive-include libusb *.c *.h
+recursive-include libusb *.sh *.ac *.am *.in *.extra
+recursive-include libusb AUTHORS ChangeLog NEWS README

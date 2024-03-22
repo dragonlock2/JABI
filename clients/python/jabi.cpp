@@ -3,9 +3,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <libjabi/device.h>
-#include <libjabi/interfaces/usb.h>
-#include <libjabi/interfaces/uart.h>
+#include <jabi.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals;

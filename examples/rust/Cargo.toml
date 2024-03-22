@@ -1,8 +1,8 @@
 [package]
-name = "jabi-rs-test"
+name = "rust-test"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 # jabi = "0.1.0"
-jabi = { path = "../../clients/jabi-rs" }
+jabi = { path = "../../clients/rust" }
