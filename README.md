@@ -53,25 +53,29 @@ west build -b <board>
 west flash
 ```
 
-### Clients
+### Dependencies
 
-If you want to build from source, you'll need to install a few dependencies.
+If you want to build from source, you may need to install a few dependencies.
 
 - macOS
-    - `brew install git cmake libusb grpc openssl`
+    - `brew install git cmake autoconf automake libtool libusb grpc openssl`
 - Linux
-    - `apt install git cmake libusb-1.0-0-dev libssl-dev`
+    - `apt install git cmake autotools-dev autoconf libusb-1.0-0-dev libssl-dev`
     - Install [grpc](https://github.com/grpc/grpc/blob/master/BUILDING.md) from source.
 - Windows
     - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
     - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt`.
+- Windows (MSYS2/MinGW)
+    - Install [MSYS2](https://www.msys2.org/) to install the following packages.
+    - `pacman -S mingw-w64-ucrt-x86_64-gcc git mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-autotools mingw-w64-ucrt-x86_64-libusb mingw-w64-ucrt-x86_64-grpc`
+        - If you're not on `x86_64`, your exact package names may be different.
 
-#### C++
+### C++
 
 C++ support is provided as a CMake library and can be added to any CMake project using `add_subdirectory`. An example project is in [examples/cpp](examples/cpp).
 
-#### Python
+### Python
 
 A Python library is published on [PyPI](TODO). For the latest changes, it can be built and installed locally by running the following. An example using it is in [examples/python](examples/python).
 
@@ -79,11 +83,11 @@ A Python library is published on [PyPI](TODO). For the latest changes, it can be
 pip install clients/python
 ```
 
-#### gRPC
+### gRPC
 
 Protobuf definitions are located in [`jabi.proto`](include/protos/jabi.proto). [`grpc-server`](clients/grpc-server) is a reference server implementation that bridges one device to a network and can handle parallel requests. It provides various arguments for selecting the desired device. An example client is in [examples/grpc-client](examples/grpc-client).
 
-#### Rust
+### Rust
 
 A Rust crate is published on [crates.io](https://crates.io/crates/jabi). For the latest changes, it can be added locally. An example project is in [examples/rust](examples/rust).
 
