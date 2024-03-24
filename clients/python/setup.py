@@ -17,11 +17,22 @@ if not temp_dir.exists(): # note won't copy updated files!
     for f in ["README.md"]:
         copyfile(root_dir / f, temp_dir / f)
 
+def msvc_platform():
+    bits = 64 if sys.maxsize > 2**32 else 32
+    if platform.machine() in ["x86", "AMD64"]:
+        plat = "Win32" if bits == 32 else "x64"
+    elif platform.machine() in ["ARM", "ARM64"]:
+        plat = "ARM" if bits == 32 else "ARM64"
+    else:
+        plat = ""
+    return plat
+
 class build_jabi(build_ext):
     def run(self):
         # build libusb from source
         msvc = sys.platform == "win32" and "GCC" not in sys.version
-        if msvc and not Path("libusb/build").exists():
+        plat = msvc_platform()
+        if msvc and not list(Path(f"libusb/build").glob(f"**/{plat}")):
             msbuild = subprocess.check_output([
                 "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe",
                 "-requires", "Microsoft.Component.MSBuild", "-find", "MSBuild/**/Bin/MSBuild.exe",
@@ -29,12 +40,6 @@ class build_jabi(build_ext):
             ]).decode('utf-8').strip()
             if not msbuild:
                 raise Exception("pls install msvc")
-            plat = {
-                "x86": "Win32",
-                "AMD64": "x64",
-                "ARM": "ARM",
-                "ARM64": "ARM64",
-            }.get(platform.machine(), "x64")
             cmds = [
                 [msbuild, "/p:configuration=release", f"/p:platform={plat}", "/target:libusb_static", "msvc/libusb.sln"]
             ]
@@ -53,7 +58,7 @@ class build_jabi(build_ext):
 
         # link libusb
         if msvc:
-            self.library_dirs.append(str(list(Path("libusb/build").glob("**/libusb-1.0.lib"))[0].parent))
+            self.library_dirs.append(str(list(Path("libusb/build").glob(f"**/{plat}/**/libusb-1.0.lib"))[0].parent))
             self.libraries.append("libusb-1.0")
         else:
             self.library_dirs.append("libusb/libusb/.libs")
@@ -80,4 +85,4 @@ setup(ext_modules=[
 )
 
 # python -m build
-# python -m twine upload dist/*
+# python -m twine upload dist/**/*

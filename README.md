@@ -60,7 +60,7 @@ If you want to build from source, you may need to install a few dependencies.
 - macOS
     - `brew install git cmake autoconf automake libtool libusb grpc openssl`
 - Linux
-    - `apt install git cmake autotools-dev autoconf libusb-1.0-0-dev libssl-dev`
+    - `apt install git cmake autotools-dev autoconf libtool libusb-1.0-0-dev libssl-dev`
     - Install [grpc](https://github.com/grpc/grpc/blob/master/BUILDING.md) from source.
 - Windows
     - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler.

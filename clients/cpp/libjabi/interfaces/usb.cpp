@@ -1,20 +1,21 @@
 #include <cstring>
 #include <string>
+#include <libusb.h>
 #include "usb.h"
 
 #define USB_TIMEOUT_MS 3000
 
 namespace jabi {
 
-USBInterface::USBInterface(libusb_device_handle *dev, int ifnum, int wMaxPacketSize,
+USBInterface::USBInterface(void *dev, int ifnum, int wMaxPacketSize,
     unsigned char ep_out, unsigned char ep_in)
 :
     dev(dev), ifnum(ifnum), wMaxPacketSize(wMaxPacketSize), ep_out(ep_out), ep_in(ep_in)
 {}
 
 USBInterface::~USBInterface() {
-    libusb_release_interface(dev, ifnum);
-    libusb_close(dev);
+    libusb_release_interface(static_cast<libusb_device_handle*>(dev), ifnum);
+    libusb_close(static_cast<libusb_device_handle*>(dev));
 }
 
 iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
@@ -35,7 +36,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
 
     int sent_len;
     int len = static_cast<int>(IFACE_REQ_HDR_SIZE + req.payload.size());
-    if (libusb_bulk_transfer(dev, ep_out, reinterpret_cast<unsigned char*>(req_msg),
+    if (libusb_bulk_transfer(static_cast<libusb_device_handle*>(dev), ep_out, reinterpret_cast<unsigned char*>(req_msg),
             len, &sent_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer request failed");
     }
@@ -43,7 +44,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
         throw std::runtime_error("wrong USB transfer request length");
     }
     if (len % wMaxPacketSize == 0) { // manually send ZLP
-        if (libusb_bulk_transfer(dev, ep_out, NULL, 0, NULL, USB_TIMEOUT_MS) < 0) {
+        if (libusb_bulk_transfer(static_cast<libusb_device_handle*>(dev), ep_out, NULL, 0, NULL, USB_TIMEOUT_MS) < 0) {
             throw std::runtime_error("USB transfer ZLP request failed");
         }
     }
@@ -54,7 +55,7 @@ iface_dynamic_resp_t USBInterface::send_request(iface_dynamic_req_t req) {
 
     int recv_len;
     resp_msg->payload_len = 0;
-    if (libusb_bulk_transfer(dev, ep_in, reinterpret_cast<unsigned char*>(resp_msg),
+    if (libusb_bulk_transfer(static_cast<libusb_device_handle*>(dev), ep_in, reinterpret_cast<unsigned char*>(resp_msg),
             static_cast<int>(IFACE_RESP_HDR_SIZE + resp_max_size), &recv_len, USB_TIMEOUT_MS) < 0) {
         throw std::runtime_error("USB transfer response failed");
     }
@@ -124,7 +125,7 @@ std::vector<Device> USBInterface::list_devices() {
             }
 
             libusb_device_handle *dev;
-            if(libusb_open(devs[i], &dev) < 0) {
+            if (libusb_open(devs[i], &dev) < 0) {
                 break;
             }
 
