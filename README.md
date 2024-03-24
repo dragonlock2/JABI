@@ -66,7 +66,7 @@ If you want to build from source, you may need to install a few dependencies.
     - Install [Visual Studio C++](https://visualstudio.microsoft.com/vs/features/cplusplus/) for its C++ compiler.
     - Use [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/) to install [git](https://winget.run/pkg/Git/Git) and [CMake](https://winget.run/pkg/Kitware/CMake).
     - Use [vcpkg](https://github.com/microsoft/vcpkg) to install `libusb`, `gRPC`, `OpenSSL`, and `getopt`.
-- Windows (MSYS2/MinGW)
+- Windows (MSYS2/MinGW) (experimental)
     - Install [MSYS2](https://www.msys2.org/) to install the following packages.
     - `pacman -S mingw-w64-ucrt-x86_64-gcc git mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-autotools mingw-w64-ucrt-x86_64-libusb mingw-w64-ucrt-x86_64-grpc`
         - If you're not on `x86_64`, your exact package names may be different.

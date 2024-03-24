@@ -38,7 +38,7 @@ class build_jabi(build_ext):
             cmds = [
                 [msbuild, "/p:configuration=release", f"/p:platform={plat}", "/target:libusb_static", "msvc/libusb.sln"]
             ]
-        elif not msvc and not Path("libusb/libusb/.libs").exists():
+        elif sys.platform != "win32" and not Path("libusb/libusb/.libs").exists():
             cmds = [
                 ["./bootstrap.sh"],
                 ["./autogen.sh", "--disable-udev"],
@@ -46,6 +46,7 @@ class build_jabi(build_ext):
                 ["make", f"-j{multiprocessing.cpu_count()}"],
             ]
         else:
+            # MinGW subprocess doesn't run correctly, can manually run above
             cmds = []
         for c in cmds:
             subprocess.run(c, cwd="libusb").check_returncode()

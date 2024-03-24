@@ -59,7 +59,7 @@ UARTInterface::UARTInterface(std::string port, int baud) {
     }
 
     // return even if 0 bytes read (for timeout calculation)
-    COMMTIMEOUTS timeouts = {0};
+    COMMTIMEOUTS timeouts{};
     timeouts.ReadIntervalTimeout = MAXDWORD;
 
     if (!SetCommTimeouts(hFile, &timeouts)) {
