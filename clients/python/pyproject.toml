@@ -1,5 +1,5 @@
 [project]
-name = "jabi"
+name = "pyjabi"
 version = "0.1.0"
 authors = [
     { name = "Matthew Tran", email = "matthewlamtran@berkeley.edu" },
@@ -18,7 +18,7 @@ Homepage = "https://github.com/dragonlock2/JABI"
 Issues = "https://github.com/dragonlock2/JABI/issues"
 
 [build-system]
-requires = ["setuptools>=69", "pybind11>=2.11"]
+requires = ["wheel>=0.43", "setuptools>=69", "pybind11>=2.11"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

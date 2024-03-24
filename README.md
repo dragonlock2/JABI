@@ -25,9 +25,9 @@ Microcontroller peripherals are made available over each interface via a custom 
 Clients connect to the microcontroller over any one of the interfaces. The following clients are supported.
 
 - C++
-- Python
+- Python - `pip install pyjabi`
 - gRPC
-- Rust
+- Rust - `cargo add jabi`
 
 ## Setup
 
@@ -77,7 +77,7 @@ C++ support is provided as a CMake library and can be added to any CMake project
 
 ### Python
 
-A Python library is published on [PyPI](TODO). For the latest changes, it can be built and installed locally by running the following. An example using it is in [examples/python](examples/python).
+A Python library is published on [PyPI](https://pypi.org/project/pyjabi). For the latest changes, it can be built and installed locally by running the following. An example using it is in [examples/python](examples/python).
 
 ```
 pip install clients/python
